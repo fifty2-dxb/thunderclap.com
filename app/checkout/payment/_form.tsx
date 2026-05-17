@@ -1,8 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { useRouter } from "next/navigation";
-import { CreditCard, Lock, ShieldCheck, Wallet } from "lucide-react";
+import { ArrowRight, CreditCard, ShieldCheck, Wallet } from "lucide-react";
 
 type Platform = "instagram" | "tiktok" | "youtube" | "facebook" | "twitter";
 type Service =
@@ -14,26 +13,31 @@ type Service =
   | "retweets";
 type Method = "card" | "apple" | "google" | "crypto";
 
-function formatCardNumber(raw: string) {
-  const digits = raw.replace(/\D/g, "").slice(0, 19);
-  return digits.replace(/(.{4})/g, "$1 ").trim();
-}
-function formatExpiry(raw: string) {
-  const digits = raw.replace(/\D/g, "").slice(0, 4);
-  if (digits.length <= 2) return digits;
-  return `${digits.slice(0, 2)}/${digits.slice(2)}`;
-}
-function formatCvc(raw: string) {
-  return raw.replace(/\D/g, "").slice(0, 4);
-}
-
-function brandFromNumber(num: string): "VISA" | "MC" | "AMEX" | null {
-  const d = num.replace(/\s/g, "");
-  if (/^4/.test(d)) return "VISA";
-  if (/^(5[1-5]|2[2-7])/.test(d)) return "MC";
-  if (/^3[47]/.test(d)) return "AMEX";
-  return null;
-}
+const METHOD_COPY: Record<
+  Method,
+  { eyebrow: string; title: string; body: string }
+> = {
+  card: {
+    eyebrow: "Card payment",
+    title: "Visa, Mastercard, Amex & Discover",
+    body: "You'll complete the payment on our secure gateway page — no card details are entered on this site.",
+  },
+  apple: {
+    eyebrow: "Apple Pay",
+    title: "Apple Pay through the gateway",
+    body: "Confirm with Face ID or Touch ID once the gateway page opens. Available on Apple devices with Apple Pay set up.",
+  },
+  google: {
+    eyebrow: "Google Pay",
+    title: "Google Pay through the gateway",
+    body: "Confirm with your Google account once the gateway page opens. Available where Google Pay is supported.",
+  },
+  crypto: {
+    eyebrow: "Crypto",
+    title: "Pay with crypto",
+    body: "The gateway will generate a one-time deposit address. Supports BTC, ETH, USDC and USDT.",
+  },
+};
 
 export function PaymentForm({
   platform,
@@ -54,35 +58,57 @@ export function PaymentForm({
   target: string;
   email: string;
 }) {
-  const router = useRouter();
   const [method, setMethod] = useState<Method>("card");
-  const [cardNumber, setCardNumber] = useState("");
-  const [expiry, setExpiry] = useState("");
-  const [cvc, setCvc] = useState("");
-  const [name, setName] = useState("");
-  const [zip, setZip] = useState("");
   const [submitting, setSubmitting] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
-  const brand = brandFromNumber(cardNumber);
-
-  const onSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+  const onSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (submitting) return;
+    setError(null);
     setSubmitting(true);
-    const params = new URLSearchParams({
-      platform,
-      service,
-      qty: String(qty),
-      price: String(basePrice),
-      premium: premium ? "1" : "0",
-      total: total.toFixed(2),
-    });
-    if (target) params.set("target", target);
-    if (email) params.set("email", email);
-    setTimeout(() => {
-      router.push(`/checkout/success?${params.toString()}`);
-    }, 1400);
+
+    try {
+      const res = await fetch("/api/checkout/session", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          platform,
+          service,
+          qty,
+          price: basePrice,
+          premium,
+          target,
+          email,
+          method,
+        }),
+      });
+
+      const json = (await res.json().catch(() => null)) as
+        | { redirectUrl?: string; error?: string }
+        | null;
+
+      if (!res.ok || !json?.redirectUrl) {
+        setSubmitting(false);
+        setError(
+          json?.error ||
+            "We couldn't start the payment session. Please try again in a moment.",
+        );
+        return;
+      }
+
+      window.location.href = json.redirectUrl;
+    } catch (err) {
+      setSubmitting(false);
+      setError(
+        err instanceof Error
+          ? err.message
+          : "Network error while contacting the gateway.",
+      );
+    }
   };
+
+  const copy = METHOD_COPY[method];
 
   return (
     <form onSubmit={onSubmit} noValidate>
@@ -93,6 +119,7 @@ export function PaymentForm({
           aria-selected={method === "card"}
           className={`co-method ${method === "card" ? "active" : ""}`}
           onClick={() => setMethod("card")}
+          disabled={submitting}
         >
           <CreditCard size={16} />
           Card
@@ -103,6 +130,7 @@ export function PaymentForm({
           aria-selected={method === "apple"}
           className={`co-method ${method === "apple" ? "active" : ""}`}
           onClick={() => setMethod("apple")}
+          disabled={submitting}
         >
           <svg width="14" height="16" viewBox="0 0 14 16" fill="currentColor" aria-hidden>
             <path d="M11.4 8.5c0-1.7 1.4-2.5 1.5-2.6-.8-1.2-2.1-1.3-2.5-1.4-1.1-.1-2.1.6-2.6.6-.6 0-1.4-.6-2.3-.6-1.2 0-2.3.7-2.9 1.8-1.2 2.1-.3 5.3.9 7 .6.9 1.3 1.8 2.2 1.8.9 0 1.2-.6 2.3-.6 1.1 0 1.4.6 2.3.6 1 0 1.6-.9 2.2-1.8.7-1 1-2 1-2.1-.1 0-1.9-.8-1.9-2.7zM9.6 3.3c.5-.6.8-1.4.7-2.2-.7 0-1.5.4-2 1-.4.5-.8 1.3-.7 2.1.7.1 1.5-.4 2-.9z" />
@@ -115,6 +143,7 @@ export function PaymentForm({
           aria-selected={method === "google"}
           className={`co-method ${method === "google" ? "active" : ""}`}
           onClick={() => setMethod("google")}
+          disabled={submitting}
         >
           <Wallet size={16} />
           Google Pay
@@ -125,6 +154,7 @@ export function PaymentForm({
           aria-selected={method === "crypto"}
           className={`co-method ${method === "crypto" ? "active" : ""}`}
           onClick={() => setMethod("crypto")}
+          disabled={submitting}
         >
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden>
             <circle cx="12" cy="12" r="9" stroke="currentColor" strokeWidth="2" />
@@ -140,122 +170,21 @@ export function PaymentForm({
         </button>
       </div>
 
-      {method === "card" ? (
-        <div className="co-pay-fields">
-          <div className="co-pay-wrap">
-            <span className="co-pay-label">Card number</span>
-            <input
-              className="co-pay-input"
-              type="text"
-              inputMode="numeric"
-              autoComplete="cc-number"
-              value={cardNumber}
-              onChange={(e) => setCardNumber(formatCardNumber(e.target.value))}
-              placeholder="1234 5678 9012 3456"
-              aria-label="Card number"
-              required
-            />
-            <span className="co-pay-input-icons" aria-hidden>
-              {brand === "VISA" && (
-                <span className="co-pay-brand" style={{ background: "#1a1f71" }}>
-                  VISA
-                </span>
-              )}
-              {brand === "MC" && (
-                <span className="co-pay-brand" style={{ background: "#eb001b" }}>
-                  MC
-                </span>
-              )}
-              {brand === "AMEX" && (
-                <span className="co-pay-brand" style={{ background: "#2e77bb" }}>
-                  AMEX
-                </span>
-              )}
-              {!brand && <CreditCard size={18} color="var(--uv-fg-4)" />}
-            </span>
-          </div>
+      <div className="co-gateway-pad" role="status" aria-live="polite">
+        <span className="co-gateway-eyebrow">{copy.eyebrow}</span>
+        <strong>{copy.title}</strong>
+        <p>{copy.body}</p>
+      </div>
 
-          <div className="co-pay-row">
-            <div className="co-pay-wrap">
-              <span className="co-pay-label">Expiry</span>
-              <input
-                className="co-pay-input"
-                type="text"
-                inputMode="numeric"
-                autoComplete="cc-exp"
-                value={expiry}
-                onChange={(e) => setExpiry(formatExpiry(e.target.value))}
-                placeholder="MM/YY"
-                aria-label="Card expiry date"
-                required
-              />
-            </div>
-            <div className="co-pay-wrap">
-              <span className="co-pay-label">CVC</span>
-              <input
-                className="co-pay-input"
-                type="text"
-                inputMode="numeric"
-                autoComplete="cc-csc"
-                value={cvc}
-                onChange={(e) => setCvc(formatCvc(e.target.value))}
-                placeholder="123"
-                aria-label="Card security code"
-                required
-              />
-              <span className="co-pay-input-icons" aria-hidden>
-                <Lock size={15} color="var(--uv-fg-4)" />
-              </span>
-            </div>
-          </div>
-
-          <div className="co-pay-row">
-            <div className="co-pay-wrap">
-              <span className="co-pay-label">Name on card</span>
-              <input
-                className="co-pay-input"
-                type="text"
-                autoComplete="cc-name"
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-                placeholder="Jane Doe"
-                aria-label="Name on card"
-                style={{ fontFamily: "var(--uv-font-body)", letterSpacing: 0 }}
-                required
-              />
-            </div>
-            <div className="co-pay-wrap">
-              <span className="co-pay-label">ZIP / Postal</span>
-              <input
-                className="co-pay-input"
-                type="text"
-                autoComplete="postal-code"
-                value={zip}
-                onChange={(e) => setZip(e.target.value)}
-                placeholder="10001"
-                aria-label="Billing ZIP or postal code"
-                required
-              />
-            </div>
-          </div>
-        </div>
-      ) : (
-        <div className="co-wallet-pad" role="status">
-          <strong>
-            {method === "apple"
-              ? "Apple Pay"
-              : method === "google"
-              ? "Google Pay"
-              : "Pay with crypto"}
-          </strong>
-          {method === "crypto"
-            ? "Continue to generate a one-time deposit address. Supports BTC, ETH, USDC, and USDT."
-            : "Continue to confirm the payment in your wallet."}
+      {error && (
+        <div className="co-pay-err" role="alert">
+          {error}
         </div>
       )}
 
       <button type="submit" className="co-cta" disabled={submitting}>
-        {submitting ? "Processing…" : `Pay $${total.toFixed(2)}`}
+        {submitting ? "Opening gateway…" : `Continue to payment · $${total.toFixed(2)}`}
+        {!submitting && <ArrowRight size={16} />}
       </button>
 
       <div className="co-pay-meta">

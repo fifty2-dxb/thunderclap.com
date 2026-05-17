@@ -1637,6 +1637,124 @@ img { display: block; max-width: 100%; }
 }
 .co-pay-meta svg { color: var(--uv-success-text); }
 
+.co-gateway-pad {
+  border: 1px solid var(--uv-line);
+  background: var(--uv-bg-tint);
+  border-radius: 12px;
+  padding: 22px 20px;
+  margin-bottom: 14px;
+  display: block;
+}
+.co-gateway-eyebrow {
+  display: block;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--uv-pink);
+  margin-bottom: 6px;
+}
+.co-gateway-pad strong {
+  display: block;
+  font-family: var(--uv-font-display);
+  font-size: 17px;
+  font-weight: 800;
+  color: var(--uv-fg-1);
+  margin-bottom: 6px;
+}
+.co-gateway-pad p {
+  margin: 0;
+  color: var(--uv-fg-2);
+  font-size: 14px;
+  line-height: 1.55;
+}
+
+.co-pay-err {
+  border: 1px solid #f5c6cb;
+  background: #fff5f5;
+  color: #b02a2a;
+  border-radius: 10px;
+  padding: 12px 14px;
+  font-size: 13.5px;
+  line-height: 1.45;
+  margin-bottom: 12px;
+}
+
+/* ---- Return / poll ---- */
+.co-return {
+  max-width: 480px;
+  margin: 64px auto 0;
+  background: #fff;
+  border: 1px solid var(--uv-line);
+  border-radius: 18px;
+  padding: 48px 36px;
+  text-align: center;
+  box-shadow: var(--uv-shadow-sm);
+}
+.co-return h1 {
+  font-family: var(--uv-font-display);
+  font-size: 24px;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  margin: 18px 0 6px;
+}
+.co-return p {
+  color: var(--uv-fg-2);
+  font-size: 14.5px;
+  line-height: 1.55;
+  margin: 0 0 18px;
+}
+.co-return-spinner {
+  display: inline-block;
+  width: 44px;
+  height: 44px;
+  border-radius: 999px;
+  border: 3px solid var(--uv-pink-soft);
+  border-top-color: var(--uv-pink);
+  animation: co-spin 900ms linear infinite;
+}
+@keyframes co-spin {
+  to { transform: rotate(360deg); }
+}
+.co-return-meta {
+  font-size: 12px;
+  color: var(--uv-fg-3);
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+.co-return-meta code {
+  font-family: var(--uv-font-mono);
+  font-size: 11.5px;
+  background: var(--uv-bg-tint);
+  padding: 2px 8px;
+  border-radius: 6px;
+  color: var(--uv-fg-1);
+}
+.co-return-err {
+  margin-top: 12px;
+  font-size: 12.5px;
+  color: #b02a2a;
+}
+
+/* ---- Failure ---- */
+.co-success.co-failed {
+  border-color: #f5c6cb;
+}
+.co-failed-ring {
+  width: 72px;
+  height: 72px;
+  border-radius: 999px;
+  background: #fff5f5;
+  color: #b02a2a;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 18px;
+}
+
 /* ---- Checkout · Success ---- */
 
 .co-success {

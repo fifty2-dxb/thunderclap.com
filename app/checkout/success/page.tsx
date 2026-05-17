@@ -87,8 +87,14 @@ export default async function Page({
   const totalParam = pickStr(sp.total, "");
   const total = Number(totalParam) || +(basePrice * (premium ? 1.35 : 1)).toFixed(2);
 
+  // Prefer the order id we generated server-side in /api/checkout/session
+  // (carried through the gateway round-trip); fall back to a deterministic
+  // hash so the legacy /checkout/success flow still works without Redlap.
+  const orderIdParam = pickStr(sp.order_id, "");
   const seed = `${platform}|${service}|${qty}|${basePrice}|${premium}|${target}|${email}`;
-  const orderId = orderIdFor(seed);
+  const orderId = orderIdParam || orderIdFor(seed);
+  const sessionId = pickStr(sp.payment_id, "");
+  const gatewayOrder = pickStr(sp.order_number, "");
 
   return (
     <main className="co-shell">
@@ -154,6 +160,31 @@ export default async function Page({
                 {target || "—"}
               </dd>
             </div>
+            {gatewayOrder && (
+              <div>
+                <dt>Gateway ref</dt>
+                <dd style={{ fontFamily: "var(--uv-font-mono)", fontSize: 12 }}>
+                  {gatewayOrder}
+                </dd>
+              </div>
+            )}
+            {sessionId && (
+              <div>
+                <dt>Session</dt>
+                <dd
+                  style={{
+                    fontFamily: "var(--uv-font-mono)",
+                    fontSize: 12,
+                    overflow: "hidden",
+                    textOverflow: "ellipsis",
+                    whiteSpace: "nowrap",
+                  }}
+                  title={sessionId}
+                >
+                  {sessionId}
+                </dd>
+              </div>
+            )}
           </dl>
 
           <div className="co-success-next">
