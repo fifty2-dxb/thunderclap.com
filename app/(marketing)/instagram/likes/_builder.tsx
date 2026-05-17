@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
 import {
   ArrowRight,
   Heart,
@@ -57,6 +58,7 @@ export function LikesHero() {
   const pkg = PACKAGES[selected];
   const total = (pkg.price * (premium ? 1.35 : 1)).toFixed(2);
   const youSave = pkg.save > 0 ? ((pkg.price * pkg.save) / 100).toFixed(2) : "0";
+  const checkoutHref = `/checkout?platform=instagram&service=likes&qty=${pkg.qty}&price=${pkg.price}&premium=${premium ? 1 : 0}`;
 
   return (
     <section style={{ background: "var(--uv-bg-lavender)", paddingTop: 40, paddingBottom: 96 }}>
@@ -210,9 +212,9 @@ export function LikesHero() {
                     <div className="pkg-save-line">You save ${youSave}</div>
                   )}
                 </div>
-                <button type="button" className="btn btn-primary btn-lg pkg-cta">
+                <Link href={checkoutHref} className="btn btn-primary btn-lg pkg-cta">
                   Add to cart <ArrowRight size={16} />
-                </button>
+                </Link>
               </div>
 
               <div className="pkg-trust">
@@ -269,9 +271,9 @@ export function LikesHero() {
                 </li>
               ))}
             </ul>
-            <button type="button" className="btn btn-primary btn-lg side-cta">
+            <Link href={checkoutHref} className="btn btn-primary btn-lg side-cta">
               Add to cart · ${total}
-            </button>
+            </Link>
             <div className="side-trust">
               <span style={{ display: "inline-flex", gap: 1 }}>
                 {[0, 1, 2, 3, 4].map((i) => (
