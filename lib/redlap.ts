@@ -1,9 +1,7 @@
 import { createHmac, timingSafeEqual } from "crypto";
 
-const DEFAULT_API_BASE = "https://api.redlap.xyz";
-
-function normaliseBase(raw: string | undefined): string {
-  const v = (raw ?? DEFAULT_API_BASE).trim().replace(/\/+$/, "");
+function normaliseBase(raw: string): string {
+  const v = raw.trim().replace(/\/+$/, "");
   // The PHP plugin appends `/api/payments/sessions` to the base. If the user
   // pasted a base that already ends with `/api`, drop it so we don't end up
   // with `/api/api/payments/sessions`.
@@ -19,9 +17,21 @@ export type RedlapEnv = {
   webhookSecret: string | undefined;
 };
 
+/**
+ * Read Redlap config from the environment. Fails loudly when REDLAP_API_BASE
+ * is unset so a misconfigured deploy never silently routes live cards to a
+ * stale production URL. Set REDLAP_API_BASE explicitly per environment
+ * (sandbox in dev/staging, prod gateway in prod).
+ */
 export function getRedlapEnv(): RedlapEnv {
+  const rawBase = process.env.REDLAP_API_BASE;
+  if (!rawBase) {
+    throw new Error(
+      "REDLAP_API_BASE is not set. Configure it in your hosting env (Amplify console + amplify.yml) before any /api/checkout/* route can reach the gateway.",
+    );
+  }
   return {
-    apiBase: normaliseBase(process.env.REDLAP_API_BASE),
+    apiBase: normaliseBase(rawBase),
     apiKey: process.env.REDLAP_API_KEY || undefined,
     websiteId: Number(process.env.REDLAP_WEBSITE_ID || "1") || 1,
     websiteOrigin:

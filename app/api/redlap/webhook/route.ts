@@ -28,7 +28,14 @@ const TERMINAL_FOR_STATUS: Record<string, "paid" | "failed" | "expired"> = {
 };
 
 export async function POST(req: Request) {
-  const env = getRedlapEnv();
+  let env;
+  try {
+    env = getRedlapEnv();
+  } catch (err) {
+    const message = err instanceof Error ? err.message : "Gateway not configured.";
+    console.error("[redlap]", message);
+    return new NextResponse("Gateway not configured", { status: 500 });
+  }
   const rawBody = await req.text();
   const signature = req.headers.get("x-webhook-signature");
 

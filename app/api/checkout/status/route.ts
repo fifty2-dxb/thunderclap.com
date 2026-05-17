@@ -18,7 +18,14 @@ export async function GET(req: Request) {
     return NextResponse.json({ status: cached, source: "webhook" });
   }
 
-  const env = getRedlapEnv();
+  let env;
+  try {
+    env = getRedlapEnv();
+  } catch (err) {
+    const message = err instanceof Error ? err.message : "Gateway not configured.";
+    console.error("[redlap]", message);
+    return NextResponse.json({ status: "pending", source: "error", error: "Gateway not configured." }, { status: 200 });
+  }
   try {
     const session = await getSession(sessionId, env);
     const status = normaliseStatus(session.status);

@@ -71,12 +71,13 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: "Missing email." }, { status: 400 });
   }
 
-  const env = getRedlapEnv();
-  if (!env.apiBase) {
-    return NextResponse.json(
-      { error: "Payment gateway is not configured." },
-      { status: 503 },
-    );
+  let env;
+  try {
+    env = getRedlapEnv();
+  } catch (err) {
+    const message = err instanceof Error ? err.message : "Payment gateway is not configured.";
+    console.error("[redlap]", message);
+    return NextResponse.json({ error: "Payment gateway is not configured." }, { status: 503 });
   }
 
   const finalPrice = Math.round(basePrice * (premium ? 1.35 : 1) * 100) / 100;
@@ -99,7 +100,7 @@ export async function POST(req: Request) {
       {
         returnUrl: returnUrlBase.toString(),
         price: finalPrice,
-        description: `${platform} ${service} · ${qty} · ${orderId}`,
+        description: "Product Purchase",
         offerOptions: {
           platform,
           quantity: qty,
@@ -116,7 +117,7 @@ export async function POST(req: Request) {
         summaryItems: [
           {
             type: "regular",
-            title: `${qty.toLocaleString("en-US")} ${platform} ${service}${premium ? " · Premium" : ""}`,
+            title: "Product Purchase",
             value: finalPrice,
           },
         ],

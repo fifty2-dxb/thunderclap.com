@@ -1,0 +1,41 @@
+version: 1
+frontend:
+  phases:
+    preBuild:
+      commands:
+        - npm ci --cache .npm --prefer-offline
+    build:
+      commands:
+        # Amplify exposes env vars to the build shell but does NOT forward them
+        # to the SSR Lambda runtime by default. Writing them into .env.production
+        # bakes them into the Next.js standalone bundle so process.env.X is
+        # available at request time in API routes and server components.
+        - |
+          : > .env.production
+          for var in \
+            NEXT_PUBLIC_SITE_URL \
+            NEXT_PUBLIC_GTM_ID \
+            LEAD_WEBHOOK_URL \
+            REDLAP_API_BASE \
+            REDLAP_API_KEY \
+            REDLAP_WEBHOOK_SECRET \
+            REDLAP_WEBSITE_ID \
+            REDLAP_WEBSITE_ORIGIN \
+            REDLAP_EXPIRES_IN ; do
+            val=$(printenv "$var" || true)
+            if [ -n "$val" ]; then
+              echo "$var=$val" >> .env.production
+            fi
+          done
+          echo "--- .env.production keys baked into build ---"
+          cut -d= -f1 .env.production || true
+        - npm run build
+  artifacts:
+    baseDirectory: .next
+    files:
+      - '**/*'
+  cache:
+    paths:
+      - node_modules/**/*
+      - .next/cache/**/*
+      - .npm/**/*
