@@ -734,10 +734,25 @@ img { display: block; max-width: 100%; }
 /* ---- Header layout (CSS-driven mobile/desktop visibility) ----
    The header height + which chrome is shown are media-query driven so the
    first paint is correct on SSR. Don't gate via JS state — that causes
-   the desktop nav to flash on mobile and clip the logo. */
+   the desktop nav to flash on mobile and clip the logo. The layout props
+   here must live in CSS (not inline style on the JSX) so the
+   @media (max-width: 980px) `display: none` overrides can actually take
+   effect — inline styles beat any external rule. */
 .hdr-row { height: var(--uv-header-h); }
-.hdr-desktop-nav { display: flex; }
-.hdr-desktop-cta { display: flex; }
+.hdr-desktop-nav {
+  display: flex;
+  align-items: center;
+  gap: 26px;
+  font-size: 14px;
+  color: var(--uv-fg-2);
+  font-weight: 500;
+}
+.hdr-desktop-cta {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-shrink: 0;
+}
 .hdr-mobile-toggle {
   display: none;
   width: 40px;

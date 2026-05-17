@@ -171,17 +171,7 @@ export function Header() {
             priority
           />
         </Link>
-        <nav
-          className="hdr-desktop-nav"
-          style={{
-            display: "flex",
-            alignItems: "center",
-            gap: 26,
-            fontSize: 14,
-            color: "var(--uv-fg-2)",
-            fontWeight: 500,
-          }}
-        >
+        <nav className="hdr-desktop-nav">
             {NAV.map((it) => {
               const isActive = active === it.id;
               const hasMenu = !!it.submenu;
@@ -248,7 +238,7 @@ export function Header() {
               );
           })}
         </nav>
-        <div className="hdr-desktop-cta" style={{ display: "flex", alignItems: "center", gap: 10, flexShrink: 0 }}>
+        <div className="hdr-desktop-cta">
           <a href="#" style={{ fontSize: 14, fontWeight: 500, color: "var(--uv-fg-2)" }}>
             Track order
           </a>
