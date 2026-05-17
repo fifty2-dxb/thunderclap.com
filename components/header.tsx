@@ -8,6 +8,7 @@ import { useEffect, useRef, useState } from "react";
 type NavItem = {
   id: string;
   label: string;
+  href?: string;
   submenu?: { label: string; href: string }[];
 };
 
@@ -57,7 +58,7 @@ const NAV: NavItem[] = [
     ],
   },
   { id: "tools", label: "Free Tools" },
-  { id: "blog", label: "Blog" },
+  { id: "blog", label: "Blog", href: "/blog" },
   { id: "support", label: "Support" },
 ];
 
@@ -175,6 +176,39 @@ export function Header() {
             {NAV.map((it) => {
               const isActive = active === it.id;
               const hasMenu = !!it.submenu;
+              const labelStyle = {
+                display: "inline-flex" as const,
+                alignItems: "center" as const,
+                gap: 4,
+                padding: "6px 0",
+                cursor: "pointer" as const,
+                color: isActive ? "var(--uv-pink)" : "var(--uv-fg-2)",
+                fontWeight: isActive ? 700 : 500,
+                transition: "color 160ms",
+                textDecoration: "none" as const,
+              };
+              const labelInner = (
+                <>
+                  {it.label}
+                  {hasMenu && (
+                    <svg
+                      width="10"
+                      height="10"
+                      viewBox="0 0 10 10"
+                      fill="none"
+                      style={{ marginTop: 1, opacity: 0.6 }}
+                    >
+                      <path
+                        d="M2 3.5L5 6.5L8 3.5"
+                        stroke="currentColor"
+                        strokeWidth="1.5"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                      />
+                    </svg>
+                  )}
+                </>
+              );
               return (
                 <div
                   key={it.id}
@@ -182,37 +216,13 @@ export function Header() {
                   onMouseLeave={scheduleClose}
                   style={{ position: "relative" }}
                 >
-                  <span
-                    style={{
-                      display: "inline-flex",
-                      alignItems: "center",
-                      gap: 4,
-                      padding: "6px 0",
-                      cursor: "pointer",
-                      color: isActive ? "var(--uv-pink)" : "var(--uv-fg-2)",
-                      fontWeight: isActive ? 700 : 500,
-                      transition: "color 160ms",
-                    }}
-                  >
-                    {it.label}
-                    {hasMenu && (
-                      <svg
-                        width="10"
-                        height="10"
-                        viewBox="0 0 10 10"
-                        fill="none"
-                        style={{ marginTop: 1, opacity: 0.6 }}
-                      >
-                        <path
-                          d="M2 3.5L5 6.5L8 3.5"
-                          stroke="currentColor"
-                          strokeWidth="1.5"
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                        />
-                      </svg>
-                    )}
-                  </span>
+                  {it.href && !hasMenu ? (
+                    <Link href={it.href} style={labelStyle}>
+                      {labelInner}
+                    </Link>
+                  ) : (
+                    <span style={labelStyle}>{labelInner}</span>
+                  )}
                   {hasMenu && openMenu === it.id && (
                     <div
                       className="nav-menu"
@@ -321,7 +331,7 @@ export function Header() {
                   return (
                     <Link
                       key={it.id}
-                      href="#"
+                      href={it.href ?? "#"}
                       onClick={closeMobile}
                       style={{
                         display: "block",
