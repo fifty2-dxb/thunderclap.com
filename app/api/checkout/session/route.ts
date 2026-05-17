@@ -30,6 +30,22 @@ const VALID_SERVICES = new Set([
   "retweets",
 ]);
 
+const PLATFORM_LABEL: Record<string, string> = {
+  instagram: "Instagram",
+  tiktok: "TikTok",
+  youtube: "YouTube",
+  facebook: "Facebook",
+  twitter: "Twitter / X",
+};
+const SERVICE_LABEL: Record<string, string> = {
+  followers: "Followers",
+  likes: "Likes",
+  views: "Views",
+  subscribers: "Subscribers",
+  comments: "Comments",
+  retweets: "Retweets",
+};
+
 function makeOrderId(): string {
   const alpha = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
   let out = "";
@@ -117,7 +133,7 @@ export async function POST(req: Request) {
         summaryItems: [
           {
             type: "regular",
-            title: "Product Purchase",
+            title: `${qty.toLocaleString("en-US")} ${PLATFORM_LABEL[platform]} ${SERVICE_LABEL[service]}${premium ? " · Premium" : ""}`,
             value: finalPrice,
           },
         ],
