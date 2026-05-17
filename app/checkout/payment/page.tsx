@@ -3,20 +3,20 @@ import Image from "next/image";
 import Link from "next/link";
 import {
   ArrowLeft,
+  Check,
   ChevronRight,
   Heart,
   MessageSquare,
   Play,
-  Plus,
   ShieldCheck,
   UserPlus,
 } from "lucide-react";
 import { formatQty } from "@/lib/utils";
-import { CheckoutForm } from "./_form";
+import { PaymentForm } from "./_form";
 
 export const metadata: Metadata = {
-  title: "Secure checkout · Thunderclap",
-  description: "Complete your Thunderclap order — fast, safe, no password required.",
+  title: "Payment · Thunderclap",
+  description: "Pay securely for your Thunderclap order — encrypted at checkout.",
   robots: { index: false, follow: false },
 };
 
@@ -35,49 +35,12 @@ const SERVICE_LABEL: Record<Service, string> = {
   subscribers: "Subscribers",
   comments: "Comments",
 };
-
 const SERVICE_ICON: Record<Service, typeof UserPlus> = {
   followers: UserPlus,
   subscribers: UserPlus,
   likes: Heart,
   views: Play,
   comments: MessageSquare,
-};
-
-type InputConfig = { label: string; placeholder: string };
-const INPUT_CONFIG: Record<string, InputConfig> = {
-  "instagram-followers": {
-    label: "Instagram username or profile link",
-    placeholder: "https://instagram.com/yourusername",
-  },
-  "instagram-likes": {
-    label: "Instagram post URL",
-    placeholder: "https://instagram.com/p/abc123/",
-  },
-  "instagram-views": {
-    label: "Instagram Reel or video URL",
-    placeholder: "https://instagram.com/reel/abc123/",
-  },
-  "tiktok-followers": {
-    label: "TikTok username or profile link",
-    placeholder: "https://tiktok.com/@yourusername",
-  },
-  "tiktok-likes": {
-    label: "TikTok video URL",
-    placeholder: "https://tiktok.com/@yourusername/video/1234567890",
-  },
-  "tiktok-views": {
-    label: "TikTok video URL",
-    placeholder: "https://tiktok.com/@yourusername/video/1234567890",
-  },
-  "youtube-subscribers": {
-    label: "YouTube channel URL",
-    placeholder: "https://youtube.com/@yourchannel",
-  },
-  "youtube-views": {
-    label: "YouTube video URL",
-    placeholder: "https://youtube.com/watch?v=A3uyBx675Sx",
-  },
 };
 
 const isPlatform = (v: string): v is Platform =>
@@ -89,10 +52,7 @@ const isService = (v: string): v is Service =>
   v === "subscribers" ||
   v === "comments";
 
-function pickStr(
-  v: string | string[] | undefined,
-  fallback: string,
-): string {
+function pickStr(v: string | string[] | undefined, fallback: string): string {
   if (Array.isArray(v)) return v[0] ?? fallback;
   return v ?? fallback;
 }
@@ -154,8 +114,14 @@ export default async function Page({
   const subtotal = +(basePrice * (premium ? 1.35 : 1)).toFixed(2);
   const total = subtotal;
 
-  const cfg = INPUT_CONFIG[`${platform}-${service}`] ?? INPUT_CONFIG["instagram-followers"];
-  const backHref = `/${platform}/${service}`;
+  const backHref = `/checkout?${new URLSearchParams({
+    platform,
+    service,
+    qty: String(qty),
+    price: String(basePrice),
+    premium: premium ? "1" : "0",
+  }).toString()}`;
+
   const Icon = SERVICE_ICON[service];
 
   return (
@@ -163,7 +129,7 @@ export default async function Page({
       <div className="co-top">
         <div className="container" style={{ position: "relative" }}>
           <div className="co-top-inner">
-            <Link href={backHref} aria-label="Back to package selection" className="co-back">
+            <Link href={backHref} aria-label="Back to details" className="co-back">
               <ArrowLeft size={18} />
             </Link>
             <Link href="/" className="co-logo" aria-label="Thunderclap home">
@@ -186,12 +152,14 @@ export default async function Page({
 
       <div className="container">
         <div className="co-stepper" aria-label="Checkout steps">
-          <span className="co-step active">
-            <span className="co-step-num">1</span>
+          <span className="co-step completed">
+            <span className="co-step-num">
+              <Check size={12} strokeWidth={3} />
+            </span>
             Details
           </span>
           <ChevronRight size={14} className="co-step-sep" />
-          <span className="co-step">
+          <span className="co-step active">
             <span className="co-step-num">2</span>
             Payment
           </span>
@@ -199,24 +167,23 @@ export default async function Page({
 
         <div className="co-grid">
           <section className="co-card">
-            <h1>Get started</h1>
+            <h1>Payment</h1>
             <div className="live-pill">
               <span className="live-dot" />
               <span>
-                <strong>498 live users</strong> on checkout
+                <strong>Encrypted</strong> · 256-bit SSL at checkout
               </span>
             </div>
 
-            <CheckoutForm
+            <PaymentForm
               platform={platform}
               service={service}
               qty={qty}
               basePrice={basePrice}
               premium={premium}
-              label={cfg.label}
-              placeholder={cfg.placeholder}
-              initialTarget={target}
-              initialEmail={email}
+              total={total}
+              target={target}
+              email={email}
             />
 
             <div className="co-trust-row">
@@ -248,6 +215,26 @@ export default async function Page({
                   ${subtotal.toFixed(2)}
                 </span>
               </div>
+              {target && (
+                <div className="co-sum-line">
+                  <span>Delivering to</span>
+                  <span
+                    style={{
+                      color: "var(--uv-fg-1)",
+                      fontWeight: 500,
+                      maxWidth: 200,
+                      overflow: "hidden",
+                      textOverflow: "ellipsis",
+                      whiteSpace: "nowrap",
+                      direction: "rtl",
+                      textAlign: "right",
+                    }}
+                    title={target}
+                  >
+                    {target}
+                  </span>
+                </div>
+              )}
               <div className="co-sum-line">
                 <span>Subtotal</span>
                 <span style={{ color: "var(--uv-fg-1)", fontWeight: 600 }}>
@@ -262,31 +249,11 @@ export default async function Page({
               </div>
             </div>
 
-            <button type="button" className="co-bundle" aria-label="Add more & save up to 25%">
-              <span className="co-bundle-icon">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
-                  <path
-                    d="M8 8a2 2 0 1 1-4 0 2 2 0 0 1 4 0zM20 16a2 2 0 1 1-4 0 2 2 0 0 1 4 0zM18.5 5.5l-13 13"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                    strokeLinecap="round"
-                  />
-                </svg>
-              </span>
-              <div>
-                <div className="co-bundle-title">Unlock bundle savings</div>
-                <div className="co-bundle-sub">Add more & save up to 25%</div>
-              </div>
-              <span className="co-bundle-plus" aria-hidden>
-                <Plus size={18} />
-              </span>
-            </button>
-
             <blockquote className="co-quote">
-              &ldquo;When you want to accomplish your social media goals, Thunderclap is the place
-              to turn.&rdquo;
+              &ldquo;The payment took about ten seconds. Order delivered to the inbox before I
+              closed the tab.&rdquo;
               <cite>
-                DENVER 7<span className="co-quote-stars">★★★★★</span>
+                MARCUS C.<span className="co-quote-stars">★★★★★</span>
               </cite>
             </blockquote>
           </aside>

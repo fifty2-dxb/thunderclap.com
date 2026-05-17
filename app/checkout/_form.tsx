@@ -1,9 +1,11 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import { ArrowRight, Check, ShieldCheck } from "lucide-react";
 
 type Platform = "instagram" | "tiktok" | "youtube";
+type Service = "followers" | "likes" | "views" | "subscribers" | "comments";
 
 function PlatformChipIcon({ platform }: { platform: Platform }) {
   if (platform === "instagram") {
@@ -38,15 +40,28 @@ function PlatformChipIcon({ platform }: { platform: Platform }) {
 
 export function CheckoutForm({
   platform,
+  service,
+  qty,
+  basePrice,
+  premium,
   label,
   placeholder,
+  initialTarget,
+  initialEmail,
 }: {
   platform: Platform;
+  service: Service;
+  qty: number;
+  basePrice: number;
+  premium: boolean;
   label: string;
   placeholder: string;
+  initialTarget?: string;
+  initialEmail?: string;
 }) {
-  const [target, setTarget] = useState("");
-  const [email, setEmail] = useState("");
+  const router = useRouter();
+  const [target, setTarget] = useState(initialTarget ?? "");
+  const [email, setEmail] = useState(initialEmail ?? "");
   const [promo, setPromo] = useState(true);
   const [submitting, setSubmitting] = useState(false);
 
@@ -54,7 +69,16 @@ export function CheckoutForm({
     e.preventDefault();
     if (submitting) return;
     setSubmitting(true);
-    setTimeout(() => setSubmitting(false), 1200);
+    const params = new URLSearchParams({
+      platform,
+      service,
+      qty: String(qty),
+      price: String(basePrice),
+      premium: premium ? "1" : "0",
+      target,
+      email,
+    });
+    router.push(`/checkout/payment?${params.toString()}`);
   };
 
   return (
