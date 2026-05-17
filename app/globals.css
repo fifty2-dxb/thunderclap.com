@@ -778,11 +778,13 @@ img { display: block; max-width: 100%; }
   background: #fff;
   border: 1.5px solid var(--uv-line);
   border-radius: 10px;
-  padding: 12px 6px;
+  padding: 16px 8px;
+  min-height: 92px;
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 4px;
+  justify-content: center;
+  gap: 6px;
   cursor: pointer;
   transition: all 160ms ease;
 }
@@ -1152,12 +1154,12 @@ img { display: block; max-width: 100%; }
   main h2 { font-size: clamp(28px, 5.5vw, 40px) !important; line-height: 1.12 !important; }
 }
 
-/* ---- ≤720px: keep pkg-grid at 3 cols (tighter), CTA row stacks ---- */
+/* ---- ≤720px: keep pkg-grid at 3 cols; CTA row stacks; tiles stay rectangular ---- */
 @media (max-width: 720px) {
-  .pkg-grid { gap: 6px; }
-  .pkg-tier { padding: 10px 4px; gap: 3px; border-radius: 9px; }
-  .pkg-qty { font-size: 15px; }
-  .pkg-price { font-size: 12.5px; }
+  .pkg-grid { gap: 7px; }
+  .pkg-tier { padding: 14px 6px; gap: 5px; border-radius: 10px; min-height: 82px; }
+  .pkg-qty { font-size: 16px; }
+  .pkg-price { font-size: 13px; }
   .pkg-cta-row { flex-direction: column; align-items: stretch; }
   .pkg-cta { width: 100%; }
   .coral-band { padding: 56px 24px; }
@@ -1170,18 +1172,18 @@ img { display: block; max-width: 100%; }
   .container { padding-left: 16px; padding-right: 16px; }
   .container-narrow { padding-left: 16px; padding-right: 16px; }
 
-  /* Pricing tiles: THREE columns at phone widths — compact overview, all
-     14 tiers visible at a glance. Tight padding, no sub-label. */
-  .pkg-grid { grid-template-columns: repeat(3, 1fr); gap: 5px; }
+  /* Pricing tiles: THREE columns at phone widths — proper rectangles with
+     real breathing room, not chips. All 14 tiles still fit in an overview. */
+  .pkg-grid { grid-template-columns: repeat(3, 1fr); gap: 6px; }
   .pkg-tier {
-    padding: 9px 3px;
-    gap: 3px;
-    min-height: auto;
-    border-radius: 8px;
+    padding: 14px 6px;
+    gap: 5px;
+    min-height: 78px;
+    border-radius: 10px;
   }
-  .pkg-qty { font-size: 13.5px; letter-spacing: -0.02em; }
-  .pkg-price { font-size: 11.5px; }
-  .pkg-tier-tag { font-size: 7.5px; padding: 2px 5px; top: -6px; letter-spacing: 0.04em; }
+  .pkg-qty { font-size: 15.5px; letter-spacing: -0.02em; }
+  .pkg-price { font-size: 12.5px; }
+  .pkg-tier-tag { font-size: 8px; padding: 2px 6px; top: -7px; letter-spacing: 0.05em; }
   .pkg-card { padding: 16px; }
   .pkg-head { margin-bottom: 14px; }
   .pkg-h-title { font-size: 16px; }
@@ -1257,18 +1259,18 @@ img { display: block; max-width: 100%; }
   .related-card { min-height: 64px; }
 }
 
-/* ---- ≤480px: tightest phone widths — 3-col pkg-grid, chrome tightened ---- */
+/* ---- ≤480px: tightest phone widths — 3-col pkg-grid, still proper rectangles ---- */
 @media (max-width: 480px) {
-  /* Pricing tiles stay THREE columns — compact overview, no list. */
-  .pkg-grid { grid-template-columns: repeat(3, 1fr); gap: 4px; }
+  .pkg-grid { grid-template-columns: repeat(3, 1fr); gap: 5px; }
   .pkg-tier {
-    padding: 7px 2px;
-    gap: 2px;
-    border-radius: 8px;
+    padding: 12px 4px;
+    gap: 4px;
+    min-height: 72px;
+    border-radius: 9px;
   }
-  .pkg-qty { font-size: 12.5px; }
-  .pkg-price { font-size: 10.5px; }
-  .pkg-tier-tag { font-size: 7px; padding: 1px 4px; top: -5px; }
+  .pkg-qty { font-size: 14px; }
+  .pkg-price { font-size: 11.5px; }
+  .pkg-tier-tag { font-size: 7.5px; padding: 1px 5px; top: -6px; }
 
   .compare-head, .compare-row { grid-template-columns: 1fr 44px 44px; padding: 10px 8px; font-size: 12px; }
   .related-card { padding: 14px 14px; gap: 12px; }
