@@ -200,7 +200,7 @@ export default async function Page({
             <Link href="/" className="btn btn-outline btn-md">
               Back to home
             </Link>
-            <Link href={`/${platform}/${service}`} className="btn btn-primary btn-md">
+            <Link href={`/buy-${platform}-${service}`} className="btn btn-primary btn-md">
               Order again
             </Link>
           </div>

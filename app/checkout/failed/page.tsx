@@ -136,7 +136,7 @@ export default async function Page({
           )}
 
           <div className="co-success-actions">
-            <Link href={`/${platform}/${service}`} className="btn btn-outline btn-md">
+            <Link href={`/buy-${platform}-${service}`} className="btn btn-outline btn-md">
               Back to package
             </Link>
             <Link

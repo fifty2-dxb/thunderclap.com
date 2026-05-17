@@ -16,44 +16,44 @@ const NAV: NavItem[] = [
     id: "instagram",
     label: "Instagram",
     submenu: [
-      { label: "Buy Instagram Followers", href: "/instagram/followers" },
-      { label: "Buy Instagram Likes", href: "/instagram/likes" },
-      { label: "Buy Instagram Views", href: "/instagram/views" },
+      { label: "Buy Instagram Followers", href: "/buy-instagram-followers" },
+      { label: "Buy Instagram Likes", href: "/buy-instagram-likes" },
+      { label: "Buy Instagram Views", href: "/buy-instagram-views" },
     ],
   },
   {
     id: "tiktok",
     label: "TikTok",
     submenu: [
-      { label: "Buy TikTok Followers", href: "/tiktok/followers" },
-      { label: "Buy TikTok Likes", href: "/tiktok/likes" },
-      { label: "Buy TikTok Views", href: "/tiktok/views" },
+      { label: "Buy TikTok Followers", href: "/buy-tiktok-followers" },
+      { label: "Buy TikTok Likes", href: "/buy-tiktok-likes" },
+      { label: "Buy TikTok Views", href: "/buy-tiktok-views" },
     ],
   },
   {
     id: "youtube",
     label: "YouTube",
     submenu: [
-      { label: "Buy YouTube Subscribers", href: "/youtube/subscribers" },
-      { label: "Buy YouTube Views", href: "/youtube/views" },
+      { label: "Buy YouTube Subscribers", href: "/buy-youtube-subscribers" },
+      { label: "Buy YouTube Views", href: "/buy-youtube-views" },
     ],
   },
   {
     id: "facebook",
     label: "Facebook",
     submenu: [
-      { label: "Buy Facebook Followers", href: "/facebook/followers" },
-      { label: "Buy Facebook Likes", href: "/facebook/likes" },
-      { label: "Buy Facebook Views", href: "/facebook/views" },
+      { label: "Buy Facebook Followers", href: "/buy-facebook-followers" },
+      { label: "Buy Facebook Likes", href: "/buy-facebook-likes" },
+      { label: "Buy Facebook Views", href: "/buy-facebook-views" },
     ],
   },
   {
     id: "twitter",
     label: "Twitter / X",
     submenu: [
-      { label: "Buy Twitter Followers", href: "/twitter/followers" },
-      { label: "Buy Twitter Likes", href: "/twitter/likes" },
-      { label: "Buy Twitter Retweets", href: "/twitter/retweets" },
+      { label: "Buy Twitter Followers", href: "/buy-twitter-followers" },
+      { label: "Buy Twitter Likes", href: "/buy-twitter-likes" },
+      { label: "Buy Twitter Retweets", href: "/buy-twitter-retweets" },
     ],
   },
   { id: "tools", label: "Free Tools" },
@@ -62,11 +62,11 @@ const NAV: NavItem[] = [
 ];
 
 function activeIdForPath(pathname: string): string | null {
-  if (pathname.startsWith("/instagram")) return "instagram";
-  if (pathname.startsWith("/tiktok")) return "tiktok";
-  if (pathname.startsWith("/youtube")) return "youtube";
-  if (pathname.startsWith("/facebook")) return "facebook";
-  if (pathname.startsWith("/twitter")) return "twitter";
+  if (pathname.startsWith("/buy-instagram")) return "instagram";
+  if (pathname.startsWith("/buy-tiktok")) return "tiktok";
+  if (pathname.startsWith("/buy-youtube")) return "youtube";
+  if (pathname.startsWith("/buy-facebook")) return "facebook";
+  if (pathname.startsWith("/buy-twitter")) return "twitter";
   if (pathname.startsWith("/blog")) return "blog";
   return null;
 }

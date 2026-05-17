@@ -6,40 +6,40 @@ const FOOTER_COLS = [
   {
     title: "Instagram",
     links: [
-      { label: "Buy Instagram Followers", href: "/instagram/followers" },
-      { label: "Buy Instagram Likes", href: "/instagram/likes" },
-      { label: "Buy Instagram Views", href: "/instagram/views" },
+      { label: "Buy Instagram Followers", href: "/buy-instagram-followers" },
+      { label: "Buy Instagram Likes", href: "/buy-instagram-likes" },
+      { label: "Buy Instagram Views", href: "/buy-instagram-views" },
     ],
   },
   {
     title: "TikTok",
     links: [
-      { label: "Buy TikTok Followers", href: "/tiktok/followers" },
-      { label: "Buy TikTok Likes", href: "/tiktok/likes" },
-      { label: "Buy TikTok Views", href: "/tiktok/views" },
+      { label: "Buy TikTok Followers", href: "/buy-tiktok-followers" },
+      { label: "Buy TikTok Likes", href: "/buy-tiktok-likes" },
+      { label: "Buy TikTok Views", href: "/buy-tiktok-views" },
     ],
   },
   {
     title: "YouTube",
     links: [
-      { label: "Buy YouTube Subscribers", href: "/youtube/subscribers" },
-      { label: "Buy YouTube Views", href: "/youtube/views" },
+      { label: "Buy YouTube Subscribers", href: "/buy-youtube-subscribers" },
+      { label: "Buy YouTube Views", href: "/buy-youtube-views" },
     ],
   },
   {
     title: "Facebook",
     links: [
-      { label: "Buy Facebook Followers", href: "/facebook/followers" },
-      { label: "Buy Facebook Likes", href: "/facebook/likes" },
-      { label: "Buy Facebook Views", href: "/facebook/views" },
+      { label: "Buy Facebook Followers", href: "/buy-facebook-followers" },
+      { label: "Buy Facebook Likes", href: "/buy-facebook-likes" },
+      { label: "Buy Facebook Views", href: "/buy-facebook-views" },
     ],
   },
   {
     title: "Twitter / X",
     links: [
-      { label: "Buy Twitter Followers", href: "/twitter/followers" },
-      { label: "Buy Twitter Likes", href: "/twitter/likes" },
-      { label: "Buy Twitter Retweets", href: "/twitter/retweets" },
+      { label: "Buy Twitter Followers", href: "/buy-twitter-followers" },
+      { label: "Buy Twitter Likes", href: "/buy-twitter-likes" },
+      { label: "Buy Twitter Retweets", href: "/buy-twitter-retweets" },
     ],
   },
   {

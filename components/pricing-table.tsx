@@ -72,7 +72,7 @@ export function PricingTable() {
           <a
             className="btn btn-outline btn-md"
             style={{ borderRadius: 999 }}
-            href="/instagram/followers"
+            href="/buy-instagram-followers"
           >
             See all packages <ArrowUpRight size={16} />
           </a>

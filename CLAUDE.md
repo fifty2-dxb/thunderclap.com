@@ -20,11 +20,12 @@ Social media growth marketing site (Instagram / TikTok / YouTube / Facebook / Tw
 | Route | Status |
 | --- | --- |
 | `/` | Built — hero, trust bar, service table, pricing, FAQ, testimonials, CTA |
-| `/instagram/{followers,likes,views}` | **Fully built** — full service-page pattern (see below) |
-| `/tiktok/{followers,likes,views}` | **Fully built** — same pattern, TikTok-branded |
-| `/youtube/{subscribers,views}` | **Fully built** — YouTube-branded with YPP threshold framing. FAQs export `YT_FAQS`. |
-| `/facebook/{followers,likes,views}` | **Fully built** — Facebook-branded copy. FAQs export `FB_FAQS`. |
-| `/twitter/{followers,likes,retweets}` | **Fully built** — labelled "Twitter / X" everywhere user-facing. FAQs export `TW_FAQS`. Adds the `retweets` service type. |
+| `/buy-instagram-{followers,likes,views}` | **Fully built** — full service-page pattern (see below). Flat `buy-{platform}-{service}` slug chosen to match the exact-match SERP cluster ("buy instagram followers" 34K vol etc., per Ahrefs) and to preserve the live `/buy-instagram-followers` ranking. |
+| `/buy-tiktok-{followers,likes,views}` | **Fully built** — same pattern, TikTok-branded |
+| `/buy-youtube-{subscribers,views}` | **Fully built** — YouTube-branded with YPP threshold framing. FAQs export `YT_FAQS`. |
+| `/buy-facebook-{followers,likes,views}` | **Fully built** — Facebook-branded copy. FAQs export `FB_FAQS`. |
+| `/buy-twitter-{followers,likes,retweets}` | **Fully built** — labelled "Twitter / X" everywhere user-facing. FAQs export `TW_FAQS`. Adds the `retweets` service type. |
+| `next.config.ts` redirects | 301s from old `/{platform}/{service}` nested routes AND legacy prod URLs (`/buy-instagram-impressions`, `/free-youtube-subscribers`, `/instagram`, `/tiktok`, `/youtube`, `/facebook`, `/twitter`) → new canonicals. |
 | `/checkout` | **Built** — Step 1 (Details), `noindex, nofollow`. Reads `?platform&service&qty&price&premium`, submits via `router.push` to `/checkout/payment` carrying `target` + `email`. |
 | `/checkout/payment` | **Built** — Step 2 (Payment method picker). On submit POSTs `/api/checkout/session`, then `window.location` redirects to the Redlap-hosted payment page. |
 | `/checkout/return` | **Built** — landing point for Redlap's redirect. Client island polls `/api/checkout/status` until terminal status, then `router.replace` to `/checkout/success` or `/checkout/failed`. |
@@ -47,11 +48,11 @@ app/
   opengraph-image.tsx                 dynamic OG image
   globals.css                         design tokens + ALL component classes (single source of CSS truth)
   (marketing)/                        grouped service pages (no URL segment)
-    instagram/{followers,likes,views}/{page.tsx, _builder.tsx, _faqs.ts}
-    tiktok/{followers,likes,views}/{page.tsx, _builder.tsx, _faqs.ts}
-    youtube/{subscribers,views}/{page.tsx, _builder.tsx, _faqs.ts}
-    facebook/{followers,likes,views}/{page.tsx, _builder.tsx, _faqs.ts}
-    twitter/{followers,likes,retweets}/{page.tsx, _builder.tsx, _faqs.ts}
+    buy-instagram-{followers,likes,views}/{page.tsx, _builder.tsx, _faqs.ts}
+    buy-tiktok-{followers,likes,views}/{page.tsx, _builder.tsx, _faqs.ts}
+    buy-youtube-{subscribers,views}/{page.tsx, _builder.tsx, _faqs.ts}
+    buy-facebook-{followers,likes,views}/{page.tsx, _builder.tsx, _faqs.ts}
+    buy-twitter-{followers,likes,retweets}/{page.tsx, _builder.tsx, _faqs.ts}
   checkout/
     page.tsx                          Step 1 server shell (details)
     _form.tsx                         Step 1 client form
@@ -122,7 +123,9 @@ Don't add a third UI mode. If you change the breakpoint, update the `matchMedia(
 7. **All fonts** use `next/font` self-hosted; do **not** add `<link>` tags to fonts.googleapis.com.
 8. **next-sitemap** runs in `postbuild`; `next-sitemap.config.js` is the source of truth for priorities and hreflang.
 9. **hreflang ready**: English is the default. Structure supports `/[locale]/...` future migration — don't hardcode `/en/` paths today.
-10. **Cross-link RELATED grids must use real `href`s, no `href="#"`.** SEO link equity matters. When cross-linking platforms, point to the equivalent service (`/instagram/likes` ↔ `/tiktok/likes`).
+10. **Cross-link RELATED grids must use real `href`s, no `href="#"`.** SEO link equity matters. When cross-linking platforms, point to the equivalent service (`/buy-instagram-likes` ↔ `/buy-tiktok-likes`).
+11. **URL slug is `/buy-{platform}-{service}`** — flat, hyphen-delimited, with the literal `buy` token. Don't nest under `/{platform}/`. Reason: every commercial keyword in this niche is `buy [platform] [service]` (Ahrefs US: "buy instagram followers" 34K, "buy tiktok followers" 31K, "buy youtube views" 16K, etc.). The exact slug match is a meaningful relevance signal and it keeps us aligned with the live `/buy-instagram-followers` URL that already ranks. `next.config.ts` 301-redirects the old nested paths.
+12. **H1 must lead with the exact keyword.** Each service page H1 starts with "Buy {Platform} {Service}" before any taglines — search-query alignment.
 
 ## Conversion rules
 
@@ -148,12 +151,12 @@ Don't add a third UI mode. If you change the breakpoint, update the `matchMedia(
 
 ## Service page pattern (Buy Instagram Likes is the canonical reference)
 
-The `/instagram/likes` route is the original template. All 14 service pages (IG x3, TT x3, YT x2, FB x3, TW x3) follow it identically.
+The `/buy-instagram-likes` route is the original template. All 14 service pages (IG x3, TT x3, YT x2, FB x3, TW x3) follow it identically.
 
 **File layout per service page:**
 
 ```
-app/(marketing)/<platform>/<service>/
+app/(marketing)/buy-<platform>-<service>/
   page.tsx       server component — metadata, JSON-LD (Product + AggregateRating + FAQPage + BreadcrumbList), static sections
   _builder.tsx   "use client" — interactive Hero (premium toggle, service tabs, package picker, URL input, total, side summary) + FAQ chips
   _faqs.ts       plain data module — FAQ array imported by BOTH page.tsx (for JSON-LD) and _builder.tsx (for UI). Must NOT live inside _builder.tsx — a "use client" file's non-component exports cannot be statically imported by a server component, and the build will fail with `f.X_FAQS.map is not a function` during page-data collection.

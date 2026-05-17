@@ -219,7 +219,7 @@ export default async function Page({
   const total = subtotal;
 
   const cfg = INPUT_CONFIG[`${platform}-${service}`] ?? INPUT_CONFIG["instagram-followers"];
-  const backHref = `/${platform}/${service}`;
+  const backHref = `/buy-${platform}-${service}`;
   const Icon = SERVICE_ICON[service];
 
   return (
