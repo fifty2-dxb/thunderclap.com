@@ -149,9 +149,8 @@ export function Header() {
       }}
     >
       <div
-        className="container"
+        className="container hdr-row"
         style={{
-          height: 72,
           display: "flex",
           alignItems: "center",
           justifyContent: "space-between",
@@ -160,6 +159,7 @@ export function Header() {
       >
         <Link
           href="/"
+          className="hdr-logo"
           style={{ display: "inline-flex", alignItems: "center", flexShrink: 0 }}
         >
           <Image
@@ -171,17 +171,17 @@ export function Header() {
             priority
           />
         </Link>
-        {!isMobile && (
-          <nav
-            style={{
-              display: "flex",
-              alignItems: "center",
-              gap: 26,
-              fontSize: 14,
-              color: "var(--uv-fg-2)",
-              fontWeight: 500,
-            }}
-          >
+        <nav
+          className="hdr-desktop-nav"
+          style={{
+            display: "flex",
+            alignItems: "center",
+            gap: 26,
+            fontSize: 14,
+            color: "var(--uv-fg-2)",
+            fontWeight: 500,
+          }}
+        >
             {NAV.map((it) => {
               const isActive = active === it.id;
               const hasMenu = !!it.submenu;
@@ -246,75 +246,57 @@ export function Header() {
                   )}
                 </div>
               );
-            })}
-          </nav>
-        )}
-        <div style={{ display: "flex", alignItems: "center", gap: 10, flexShrink: 0 }}>
-          {!isMobile && (
-            <>
-              <a href="#" style={{ fontSize: 14, fontWeight: 500, color: "var(--uv-fg-2)" }}>
-                Track order
-              </a>
-              <button
-                type="button"
-                className="btn btn-primary btn-sm"
-                style={{ borderRadius: 999, padding: "0 18px", height: 38 }}
-              >
-                Get Started
-              </button>
-            </>
-          )}
-          {isMobile && (
-            <button
-              type="button"
-              onClick={() => setMobileOpen((v) => !v)}
-              aria-label={mobileOpen ? "Close menu" : "Open menu"}
-              aria-expanded={mobileOpen}
-              aria-controls="mobile-nav"
-              style={{
-                width: 40,
-                height: 40,
-                display: "inline-flex",
-                alignItems: "center",
-                justifyContent: "center",
-                background: "transparent",
-                border: "none",
-                padding: 0,
-                cursor: "pointer",
-                color: "var(--uv-fg-1)",
-              }}
-            >
-              {mobileOpen ? (
-                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-                  <path
-                    d="M6 6L18 18M18 6L6 18"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                    strokeLinecap="round"
-                  />
-                </svg>
-              ) : (
-                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-                  <path
-                    d="M4 7H20M4 12H20M4 17H20"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                    strokeLinecap="round"
-                  />
-                </svg>
-              )}
-            </button>
-          )}
+          })}
+        </nav>
+        <div className="hdr-desktop-cta" style={{ display: "flex", alignItems: "center", gap: 10, flexShrink: 0 }}>
+          <a href="#" style={{ fontSize: 14, fontWeight: 500, color: "var(--uv-fg-2)" }}>
+            Track order
+          </a>
+          <button
+            type="button"
+            className="btn btn-primary btn-sm"
+            style={{ borderRadius: 999, padding: "0 18px", height: 38 }}
+          >
+            Get Started
+          </button>
         </div>
+        <button
+          type="button"
+          className="hdr-mobile-toggle"
+          onClick={() => setMobileOpen((v) => !v)}
+          aria-label={mobileOpen ? "Close menu" : "Open menu"}
+          aria-expanded={mobileOpen}
+          aria-controls="mobile-nav"
+        >
+          {mobileOpen ? (
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+              <path
+                d="M6 6L18 18M18 6L6 18"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+              />
+            </svg>
+          ) : (
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+              <path
+                d="M4 7H20M4 12H20M4 17H20"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+              />
+            </svg>
+          )}
+        </button>
       </div>
-      {isMobile && mobileOpen && (
+      {mobileOpen && (
         <>
           <div
             onClick={closeMobile}
             aria-hidden="true"
             style={{
               position: "fixed",
-              top: 72,
+              top: "var(--uv-header-h)",
               left: 0,
               right: 0,
               bottom: 0,
@@ -329,14 +311,14 @@ export function Header() {
             aria-label="Site navigation"
             style={{
               position: "fixed",
-              top: 72,
+              top: "var(--uv-header-h)",
               left: 0,
               right: 0,
               zIndex: 26,
               background: "#fff",
               borderBottom: "1px solid var(--uv-line)",
               boxShadow: "var(--uv-shadow-lg)",
-              maxHeight: "calc(100vh - 72px)",
+              maxHeight: "calc(100vh - var(--uv-header-h))",
               overflowY: "auto",
             }}
           >
