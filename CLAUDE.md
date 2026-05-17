@@ -80,3 +80,30 @@ The visual language was locked in via a Claude Design handoff. **All design toke
 ## Source of design
 
 `/tmp/thunderclap-design/` (extracted from the Claude Design handoff bundle) contains the original HTML/JSX prototypes. **Read those before reinventing a component** — `Service.jsx`, `Sections.jsx`, `CtaFaqBlog.jsx`, `Header.jsx`, `Footer.jsx` show the exact intended structure for every section.
+
+## Service page pattern (Buy Instagram Likes reference)
+
+The `/instagram/likes` route is the canonical implementation pattern for service pages. Use it as the template for new `/instagram/{followers,views}`, `/tiktok/*`, `/youtube/*` routes.
+
+**File layout per service page:**
+
+```
+app/(marketing)/<platform>/<service>/
+  page.tsx       server component — metadata, JSON-LD (Product + AggregateRating + FAQPage + BreadcrumbList), static sections (Benefits, Personas, Comparison, Testimonials, Related, CtaBand)
+  _builder.tsx   "use client" — interactive Hero (premium toggle, service tabs, package picker, URL input, total, side summary) + FAQ chips with collapse
+  _faqs.ts       plain data module — FAQ array imported by BOTH page.tsx (for JSON-LD) and _builder.tsx (for UI). Must NOT live inside _builder.tsx — a "use client" file's non-component exports cannot be statically imported by a server component, and the build will fail with `f.IG_FAQS.map is not a function` during page-data collection.
+```
+
+**Section order on a service page** (from the design):
+1. `<ServiceHero>` — breadcrumb, H1 with `.grad-text` on the variable phrase, `.live-pill`, two-column `.svc-layout` (left: premium toggle + service tabs + `.pkg-card` with 14-tier grid + URL input + total/CTA + trust strip; right: sticky `.svc-side` order summary)
+2. `WHY BUY ...` — `.why-grid-3` (3 hairline cards)
+3. `WHO IT'S FOR` — `.persona-row` × 3, alternating direction, on `--uv-bg-lavender`
+4. `WHY THUNDERCLAP` — `.compare-card` (Thunderclap vs Others, green check / grey X)
+5. `★ TRUSTPILOT` testimonials — `.testi-grid`
+6. `RELATED SERVICES` — `.related-grid` (3 link cards to sibling services)
+7. `.faq-chips` — 2-column chunky FAQ chips with collapse
+8. `.coral-band` — pink CTA band
+
+All required component classes already exist in `app/globals.css`. Use them — don't reinvent with Tailwind utility soup.
+
+**Pricing tiers** for the package picker live inside `_builder.tsx` (currently the 14-tier Instagram Likes ladder: 100 → 1M). When porting to other services, copy the `PACKAGES` array shape and swap the qty/price/save values; keep `popular: true` on one tier.

@@ -125,7 +125,11 @@ body {
   background: var(--uv-bg);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
 }
+body > main { flex: 1 0 auto; }
 a { color: inherit; text-decoration: none; }
 button { font-family: inherit; cursor: pointer; }
 img { display: block; max-width: 100%; }
@@ -273,7 +277,15 @@ img { display: block; max-width: 100%; }
   transition: background 160ms ease;
 }
 .st-row:last-child { border-bottom: 0; }
-.st-row.hover { background: rgba(245,243,238,0.6); }
+.st-row:hover { background: rgba(245,243,238,0.6); }
+.st-row:hover .st-action {
+  background: var(--uv-pink);
+  color: #fff;
+  border-color: var(--uv-pink);
+  box-shadow: 0 8px 22px -8px rgba(239,70,85,0.55);
+}
+
+.footer-social:hover { border-color: var(--uv-pink) !important; color: var(--uv-pink) !important; }
 .st-name { display: flex; align-items: center; gap: 14px; }
 .st-dot {
   width: 30px; height: 30px; border-radius: 8px;
