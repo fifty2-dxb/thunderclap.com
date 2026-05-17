@@ -136,8 +136,9 @@ Don't add a third UI mode. If you change the breakpoint, update the `matchMedia(
 ## Workflow
 
 - The user reviews each step before the next begins. Don't roll multiple steps into one commit.
-- After every step, run: `git add . && git commit -m "Step N: <description>" && git push origin main`.
-- **Always push to `main` after committing — don't ask first, just push.** No PRs, no feature branches. NOTE: in agent sessions HTTPS push fails (no cached credentials); use SSH: `git push git@github.com:fifty2-dxb/thunderclap.com.git main`.
+- **Commit + push are MANDATORY and AUTOMATIC after every step.** Never ask the user "should I commit?" or "should I push?" — just do it. Sequence: `git add <changed files>` → `git commit -m "Step N: <description>"` → `git push origin main`. If a push fails, fix the auth and retry — don't surface it to the user as a question.
+- Remote `origin` is **SSH** (`git@github.com:fifty2-dxb/thunderclap.com.git`). If you find it pointing at HTTPS in a fresh session, `git remote set-url origin git@github.com:fifty2-dxb/thunderclap.com.git` once and keep going — the user does not want HTTPS prompts.
+- No PRs, no feature branches — `main` only.
 - Don't add features, fallbacks, or scope creep beyond the brief.
 - Use multiple parallel `Agent` subtasks when the work is mechanically repetitive across 3+ files (e.g. "wire all 6 builders the same way"). It's faster and the user has asked for this pattern explicitly.
 
