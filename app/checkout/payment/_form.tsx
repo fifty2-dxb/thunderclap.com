@@ -4,8 +4,14 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { CreditCard, Lock, ShieldCheck, Wallet } from "lucide-react";
 
-type Platform = "instagram" | "tiktok" | "youtube";
-type Service = "followers" | "likes" | "views" | "subscribers" | "comments";
+type Platform = "instagram" | "tiktok" | "youtube" | "facebook" | "twitter";
+type Service =
+  | "followers"
+  | "likes"
+  | "views"
+  | "subscribers"
+  | "comments"
+  | "retweets";
 type Method = "card" | "apple" | "google" | "crypto";
 
 function formatCardNumber(raw: string) {

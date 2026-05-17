@@ -4,8 +4,14 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { ArrowRight, Check, ShieldCheck } from "lucide-react";
 
-type Platform = "instagram" | "tiktok" | "youtube";
-type Service = "followers" | "likes" | "views" | "subscribers" | "comments";
+type Platform = "instagram" | "tiktok" | "youtube" | "facebook" | "twitter";
+type Service =
+  | "followers"
+  | "likes"
+  | "views"
+  | "subscribers"
+  | "comments"
+  | "retweets";
 
 function PlatformChipIcon({ platform }: { platform: Platform }) {
   if (platform === "instagram") {
@@ -22,6 +28,26 @@ function PlatformChipIcon({ platform }: { platform: Platform }) {
       <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
         <path
           d="M16.5 3.5c.4 1.6 1.5 3 3.4 3.3v2.4c-1.3 0-2.5-.3-3.6-1v6.4a5.7 5.7 0 1 1-5.7-5.7c.3 0 .6 0 .8.1v2.5a3.2 3.2 0 1 0 2.4 3.1V3.5h2.7z"
+          fill="#fff"
+        />
+      </svg>
+    );
+  }
+  if (platform === "facebook") {
+    return (
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+        <path
+          d="M13.5 22v-8.4h2.8l.4-3.3h-3.2V8.2c0-.95.27-1.6 1.65-1.6h1.76V3.7c-.85-.1-1.7-.15-2.55-.15-2.52 0-4.25 1.55-4.25 4.4v2.45H7.27v3.3h2.86V22h3.37z"
+          fill="#fff"
+        />
+      </svg>
+    );
+  }
+  if (platform === "twitter") {
+    return (
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
+        <path
+          d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231 5.45-6.231zM17.083 19.77h1.833L7.084 4.126H5.117L17.083 19.77z"
           fill="#fff"
         />
       </svg>

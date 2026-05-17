@@ -1274,6 +1274,8 @@ img { display: block; max-width: 100%; }
 }
 .co-input-icon.platform-tiktok { background: #000; }
 .co-input-icon.platform-youtube { background: #ff0000; }
+.co-input-icon.platform-facebook { background: #1877f2; }
+.co-input-icon.platform-twitter { background: #000; }
 .co-input-label {
   position: absolute;
   top: 9px; left: 60px;
@@ -1488,6 +1490,20 @@ img { display: block; max-width: 100%; }
   width: 40px; height: 40px;
   border-radius: 10px;
   background: #ff0000;
+  display: inline-flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+}
+.side-fb-icon {
+  width: 40px; height: 40px;
+  border-radius: 10px;
+  background: #1877f2;
+  display: inline-flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+}
+.side-tw-icon {
+  width: 40px; height: 40px;
+  border-radius: 10px;
+  background: #000;
   display: inline-flex; align-items: center; justify-content: center;
   flex-shrink: 0;
 }

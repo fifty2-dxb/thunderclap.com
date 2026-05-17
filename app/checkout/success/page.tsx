@@ -10,13 +10,21 @@ export const metadata: Metadata = {
   robots: { index: false, follow: false },
 };
 
-type Platform = "instagram" | "tiktok" | "youtube";
-type Service = "followers" | "likes" | "views" | "subscribers" | "comments";
+type Platform = "instagram" | "tiktok" | "youtube" | "facebook" | "twitter";
+type Service =
+  | "followers"
+  | "likes"
+  | "views"
+  | "subscribers"
+  | "comments"
+  | "retweets";
 
 const PLATFORM_LABEL: Record<Platform, string> = {
   instagram: "Instagram",
   tiktok: "TikTok",
   youtube: "YouTube",
+  facebook: "Facebook",
+  twitter: "Twitter",
 };
 const SERVICE_LABEL: Record<Service, string> = {
   followers: "Followers",
@@ -24,16 +32,22 @@ const SERVICE_LABEL: Record<Service, string> = {
   views: "Views",
   subscribers: "Subscribers",
   comments: "Comments",
+  retweets: "Retweets",
 };
 
 const isPlatform = (v: string): v is Platform =>
-  v === "instagram" || v === "tiktok" || v === "youtube";
+  v === "instagram" ||
+  v === "tiktok" ||
+  v === "youtube" ||
+  v === "facebook" ||
+  v === "twitter";
 const isService = (v: string): v is Service =>
   v === "followers" ||
   v === "likes" ||
   v === "views" ||
   v === "subscribers" ||
-  v === "comments";
+  v === "comments" ||
+  v === "retweets";
 
 function pickStr(v: string | string[] | undefined, fallback: string): string {
   if (Array.isArray(v)) return v[0] ?? fallback;

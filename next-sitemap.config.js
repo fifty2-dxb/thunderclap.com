@@ -17,6 +17,12 @@ module.exports = {
       "/tiktok/views": 0.9,
       "/youtube/subscribers": 0.9,
       "/youtube/views": 0.9,
+      "/facebook/followers": 0.9,
+      "/facebook/likes": 0.9,
+      "/facebook/views": 0.9,
+      "/twitter/followers": 0.9,
+      "/twitter/likes": 0.9,
+      "/twitter/retweets": 0.9,
     };
     return {
       loc: path,

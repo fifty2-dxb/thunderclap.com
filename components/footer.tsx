@@ -9,7 +9,6 @@ const FOOTER_COLS = [
       { label: "Buy Instagram Followers", href: "/instagram/followers" },
       { label: "Buy Instagram Likes", href: "/instagram/likes" },
       { label: "Buy Instagram Views", href: "/instagram/views" },
-      { label: "Buy Instagram Comments", href: "#" },
     ],
   },
   {
@@ -18,7 +17,6 @@ const FOOTER_COLS = [
       { label: "Buy TikTok Followers", href: "/tiktok/followers" },
       { label: "Buy TikTok Likes", href: "/tiktok/likes" },
       { label: "Buy TikTok Views", href: "/tiktok/views" },
-      { label: "Buy TikTok Comments", href: "#" },
     ],
   },
   {
@@ -26,19 +24,22 @@ const FOOTER_COLS = [
     links: [
       { label: "Buy YouTube Subscribers", href: "/youtube/subscribers" },
       { label: "Buy YouTube Views", href: "/youtube/views" },
-      { label: "Buy YouTube Likes", href: "#" },
-      { label: "Buy YouTube Comments", href: "#" },
     ],
   },
   {
-    title: "Other",
+    title: "Facebook",
     links: [
-      { label: "Twitter / X", href: "#" },
-      { label: "Facebook", href: "#" },
-      { label: "Spotify", href: "#" },
-      { label: "Twitch", href: "#" },
-      { label: "LinkedIn", href: "#" },
-      { label: "Pinterest", href: "#" },
+      { label: "Buy Facebook Followers", href: "/facebook/followers" },
+      { label: "Buy Facebook Likes", href: "/facebook/likes" },
+      { label: "Buy Facebook Views", href: "/facebook/views" },
+    ],
+  },
+  {
+    title: "Twitter / X",
+    links: [
+      { label: "Buy Twitter Followers", href: "/twitter/followers" },
+      { label: "Buy Twitter Likes", href: "/twitter/likes" },
+      { label: "Buy Twitter Retweets", href: "/twitter/retweets" },
     ],
   },
   {

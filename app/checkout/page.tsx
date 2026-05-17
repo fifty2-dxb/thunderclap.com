@@ -8,6 +8,7 @@ import {
   MessageSquare,
   Play,
   Plus,
+  Repeat2,
   ShieldCheck,
   UserPlus,
 } from "lucide-react";
@@ -20,13 +21,21 @@ export const metadata: Metadata = {
   robots: { index: false, follow: false },
 };
 
-type Platform = "instagram" | "tiktok" | "youtube";
-type Service = "followers" | "likes" | "views" | "subscribers" | "comments";
+type Platform = "instagram" | "tiktok" | "youtube" | "facebook" | "twitter";
+type Service =
+  | "followers"
+  | "likes"
+  | "views"
+  | "subscribers"
+  | "comments"
+  | "retweets";
 
 const PLATFORM_LABEL: Record<Platform, string> = {
   instagram: "Instagram",
   tiktok: "TikTok",
   youtube: "YouTube",
+  facebook: "Facebook",
+  twitter: "Twitter",
 };
 const SERVICE_LABEL: Record<Service, string> = {
   followers: "Followers",
@@ -34,6 +43,7 @@ const SERVICE_LABEL: Record<Service, string> = {
   views: "Views",
   subscribers: "Subscribers",
   comments: "Comments",
+  retweets: "Retweets",
 };
 
 const SERVICE_ICON: Record<Service, typeof UserPlus> = {
@@ -42,6 +52,7 @@ const SERVICE_ICON: Record<Service, typeof UserPlus> = {
   likes: Heart,
   views: Play,
   comments: MessageSquare,
+  retweets: Repeat2,
 };
 
 type InputConfig = { label: string; placeholder: string };
@@ -78,16 +89,45 @@ const INPUT_CONFIG: Record<string, InputConfig> = {
     label: "YouTube video URL",
     placeholder: "https://youtube.com/watch?v=A3uyBx675Sx",
   },
+  "facebook-followers": {
+    label: "Facebook page URL",
+    placeholder: "https://facebook.com/yourpage",
+  },
+  "facebook-likes": {
+    label: "Facebook post URL",
+    placeholder: "https://facebook.com/yourpage/posts/123456789",
+  },
+  "facebook-views": {
+    label: "Facebook video or Reel URL",
+    placeholder: "https://facebook.com/yourpage/videos/123456789",
+  },
+  "twitter-followers": {
+    label: "Twitter / X profile URL",
+    placeholder: "https://x.com/yourhandle",
+  },
+  "twitter-likes": {
+    label: "Twitter / X post URL",
+    placeholder: "https://x.com/yourhandle/status/123456789",
+  },
+  "twitter-retweets": {
+    label: "Twitter / X post URL",
+    placeholder: "https://x.com/yourhandle/status/123456789",
+  },
 };
 
 const isPlatform = (v: string): v is Platform =>
-  v === "instagram" || v === "tiktok" || v === "youtube";
+  v === "instagram" ||
+  v === "tiktok" ||
+  v === "youtube" ||
+  v === "facebook" ||
+  v === "twitter";
 const isService = (v: string): v is Service =>
   v === "followers" ||
   v === "likes" ||
   v === "views" ||
   v === "subscribers" ||
-  v === "comments";
+  v === "comments" ||
+  v === "retweets";
 
 function pickStr(
   v: string | string[] | undefined,
@@ -115,6 +155,30 @@ function PlatformIcon({ platform }: { platform: Platform }) {
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
           <path
             d="M16.5 3.5c.4 1.6 1.5 3 3.4 3.3v2.4c-1.3 0-2.5-.3-3.6-1v6.4a5.7 5.7 0 1 1-5.7-5.7c.3 0 .6 0 .8.1v2.5a3.2 3.2 0 1 0 2.4 3.1V3.5h2.7z"
+            fill="#fff"
+          />
+        </svg>
+      </span>
+    );
+  }
+  if (platform === "facebook") {
+    return (
+      <span className="side-fb-icon" aria-hidden>
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+          <path
+            d="M13.5 22v-8.4h2.8l.4-3.3h-3.2V8.2c0-.95.27-1.6 1.65-1.6h1.76V3.7c-.85-.1-1.7-.15-2.55-.15-2.52 0-4.25 1.55-4.25 4.4v2.45H7.27v3.3h2.86V22h3.37z"
+            fill="#fff"
+          />
+        </svg>
+      </span>
+    );
+  }
+  if (platform === "twitter") {
+    return (
+      <span className="side-tw-icon" aria-hidden>
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+          <path
+            d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231 5.45-6.231zM17.083 19.77h1.833L7.084 4.126H5.117L17.083 19.77z"
             fill="#fff"
           />
         </svg>

@@ -42,18 +42,18 @@ const NAV: NavItem[] = [
     id: "facebook",
     label: "Facebook",
     submenu: [
-      { label: "Buy Facebook Followers", href: "#" },
-      { label: "Buy Facebook Likes", href: "#" },
-      { label: "Buy Facebook Views", href: "#" },
+      { label: "Buy Facebook Followers", href: "/facebook/followers" },
+      { label: "Buy Facebook Likes", href: "/facebook/likes" },
+      { label: "Buy Facebook Views", href: "/facebook/views" },
     ],
   },
   {
     id: "twitter",
-    label: "Twitter",
+    label: "Twitter / X",
     submenu: [
-      { label: "Buy Twitter Followers", href: "#" },
-      { label: "Buy Twitter Likes", href: "#" },
-      { label: "Buy Twitter Retweets", href: "#" },
+      { label: "Buy Twitter Followers", href: "/twitter/followers" },
+      { label: "Buy Twitter Likes", href: "/twitter/likes" },
+      { label: "Buy Twitter Retweets", href: "/twitter/retweets" },
     ],
   },
   { id: "tools", label: "Free Tools" },
@@ -65,6 +65,8 @@ function activeIdForPath(pathname: string): string | null {
   if (pathname.startsWith("/instagram")) return "instagram";
   if (pathname.startsWith("/tiktok")) return "tiktok";
   if (pathname.startsWith("/youtube")) return "youtube";
+  if (pathname.startsWith("/facebook")) return "facebook";
+  if (pathname.startsWith("/twitter")) return "twitter";
   if (pathname.startsWith("/blog")) return "blog";
   return null;
 }
