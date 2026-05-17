@@ -22,7 +22,7 @@ Social media growth marketing site (Instagram / TikTok / YouTube followers, like
 | `/` | Built — hero, trust bar, service table, pricing, FAQ, testimonials, CTA |
 | `/instagram/{followers,likes,views}` | **Fully built** — full service-page pattern (see below) |
 | `/tiktok/{followers,likes,views}` | **Fully built** — same pattern as Instagram, TikTok-branded copy + pricing |
-| `/youtube/{subscribers,views}` | **Placeholder only** — single `<h1>`. No `_builder.tsx` / `_faqs.ts` yet. Next big task is porting the service-page pattern here. |
+| `/youtube/{subscribers,views}` | **Fully built** — same pattern as Instagram/TikTok, YouTube-branded copy + pricing (YPP threshold framing). FAQs export `YT_FAQS`. |
 | `/checkout` | **Built — Step 1 (Details)** only. Reads `?platform=&service=&qty=&price=&premium=` from query string. No real payment integration; Step 2 (Payment) is future work. `noindex, nofollow`. |
 | `/blog`, `/blog/[slug]` | Scaffolded — basic pages exist, content TBD |
 | `/api/lead` | POST → webhook lead capture |
@@ -40,7 +40,7 @@ app/
   (marketing)/                        grouped service pages (no URL segment)
     instagram/{followers,likes,views}/{page.tsx, _builder.tsx, _faqs.ts}
     tiktok/{followers,likes,views}/{page.tsx, _builder.tsx, _faqs.ts}
-    youtube/{subscribers,views}/page.tsx     PLACEHOLDER
+    youtube/{subscribers,views}/{page.tsx, _builder.tsx, _faqs.ts}
   checkout/                           Step-1 checkout shell driven by query params
     page.tsx                          server — reads searchParams, renders layout + summary
     _form.tsx                         client — URL + email inputs, promo checkbox, submit
@@ -139,7 +139,7 @@ app/(marketing)/<platform>/<service>/
 
 **Hero component exports**: name them after the service for clarity — `LikesHero`/`LikesFaq` (IG) or `TikTokLikesHero`/`TikTokLikesFaq` (TT). The page.tsx imports them by name.
 
-**FAQ export name**: Instagram pages export `IG_FAQS`, TikTok pages export `TT_FAQS`. YouTube pages (when built) should export `YT_FAQS`.
+**FAQ export name**: Instagram pages export `IG_FAQS`, TikTok pages export `TT_FAQS`, YouTube pages export `YT_FAQS`.
 
 **Section order on a service page** (from the design):
 1. `<ServiceHero>` — breadcrumb, H1 with `.grad-text` on the variable phrase, `.live-pill`, two-column `.svc-layout` (left: premium toggle + service tabs + `.pkg-card` with 14-tier grid + URL input + total/CTA + trust strip; right: sticky `.svc-side` order summary)
