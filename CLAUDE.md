@@ -1,6 +1,6 @@
 # Thunderclap — Project Conventions
 
-Social media growth marketing site (Instagram / TikTok / YouTube followers, likes, views). SEO-optimized, conversion-focused.
+Social media growth marketing site (Instagram / TikTok / YouTube / Facebook / Twitter — followers, likes, views, subscribers, retweets). SEO-optimized, conversion-focused, payments routed through Redlap ("Social Empire Pay").
 
 ## Tech stack
 
@@ -21,12 +21,21 @@ Social media growth marketing site (Instagram / TikTok / YouTube followers, like
 | --- | --- |
 | `/` | Built — hero, trust bar, service table, pricing, FAQ, testimonials, CTA |
 | `/instagram/{followers,likes,views}` | **Fully built** — full service-page pattern (see below) |
-| `/tiktok/{followers,likes,views}` | **Fully built** — same pattern as Instagram, TikTok-branded copy + pricing |
-| `/youtube/{subscribers,views}` | **Fully built** — same pattern as Instagram/TikTok, YouTube-branded copy + pricing (YPP threshold framing). FAQs export `YT_FAQS`. |
-| `/checkout` | **Built — Step 1 (Details)** only. Reads `?platform=&service=&qty=&price=&premium=` from query string. No real payment integration; Step 2 (Payment) is future work. `noindex, nofollow`. |
+| `/tiktok/{followers,likes,views}` | **Fully built** — same pattern, TikTok-branded |
+| `/youtube/{subscribers,views}` | **Fully built** — YouTube-branded with YPP threshold framing. FAQs export `YT_FAQS`. |
+| `/facebook/{followers,likes,views}` | **Fully built** — Facebook-branded copy. FAQs export `FB_FAQS`. |
+| `/twitter/{followers,likes,retweets}` | **Fully built** — labelled "Twitter / X" everywhere user-facing. FAQs export `TW_FAQS`. Adds the `retweets` service type. |
+| `/checkout` | **Built** — Step 1 (Details), `noindex, nofollow`. Reads `?platform&service&qty&price&premium`, submits via `router.push` to `/checkout/payment` carrying `target` + `email`. |
+| `/checkout/payment` | **Built** — Step 2 (Payment method picker). On submit POSTs `/api/checkout/session`, then `window.location` redirects to the Redlap-hosted payment page. |
+| `/checkout/return` | **Built** — landing point for Redlap's redirect. Client island polls `/api/checkout/status` until terminal status, then `router.replace` to `/checkout/success` or `/checkout/failed`. |
+| `/checkout/success` | **Built** — order confirmation. Reads `order_id`, `payment_id` (Redlap session), `order_number` (Redlap gateway ref) from URL. |
+| `/checkout/failed` | **Built** — failure / cancelled / expired / timeout state with a "Try payment again" CTA back to `/checkout/payment`. |
+| `/api/checkout/session` | POST — creates a Redlap session, returns `{ sessionId, redirectUrl, orderId }`. |
+| `/api/checkout/status` | GET `?sid=…` — returns `{ status: "pending"\|"paid"\|"failed"\|"expired" }`. Reads from the in-process webhook cache, falls back to Redlap's `GET /api/payments/sessions/:id`. |
+| `/api/redlap/webhook` | POST — verifies `X-Webhook-Signature` HMAC-SHA256 and records the outcome in the in-process cache. **No fulfillment** — that lives inside the Redlap environment. |
 | `/blog`, `/blog/[slug]` | Scaffolded — basic pages exist, content TBD |
 | `/api/lead` | POST → webhook lead capture |
-| `content/packages.ts` | **Empty stub** — `PACKAGES = [] as const`. Pricing tiers currently live inline in each `_builder.tsx`. Don't centralize unless you also rewrite the 6 builders. |
+| `content/packages.ts` | **Empty stub** — `PACKAGES = [] as const`. Pricing tiers currently live inline in each `_builder.tsx`. Don't centralize unless you also rewrite all 11 builders. |
 
 ## Folder structure
 
@@ -41,17 +50,29 @@ app/
     instagram/{followers,likes,views}/{page.tsx, _builder.tsx, _faqs.ts}
     tiktok/{followers,likes,views}/{page.tsx, _builder.tsx, _faqs.ts}
     youtube/{subscribers,views}/{page.tsx, _builder.tsx, _faqs.ts}
-  checkout/                           Step-1 checkout shell driven by query params
-    page.tsx                          server — reads searchParams, renders layout + summary
-    _form.tsx                         client — URL + email inputs, promo checkbox, submit
+    facebook/{followers,likes,views}/{page.tsx, _builder.tsx, _faqs.ts}
+    twitter/{followers,likes,retweets}/{page.tsx, _builder.tsx, _faqs.ts}
+  checkout/
+    page.tsx                          Step 1 server shell (details)
+    _form.tsx                         Step 1 client form
+    payment/{page.tsx, _form.tsx}     Step 2 — method picker + POST to /api/checkout/session
+    return/{page.tsx, _poll.tsx}      gateway return landing + client polling island
+    success/page.tsx                  order received state
+    failed/page.tsx                   failure / cancelled / expired state
   blog/page.tsx
   blog/[slug]/page.tsx
-  api/lead/route.ts                   lead-capture POST → webhook
+  api/
+    lead/route.ts                     lead-capture POST → webhook
+    checkout/session/route.ts         create Redlap session
+    checkout/status/route.ts          poll status
+    redlap/webhook/route.ts           inbound Redlap webhook (HMAC verified)
 components/                           header (with mobile hamburger), footer, hero, faq, pricing-table, trust-bar, testimonials, cta-section, service-table, how-it-works, announcement
 lib/
   seo.ts                              SITE_URL, SITE_NAME, default metadata
   schema.ts                           JSON-LD generators
   utils.ts                            cn() + formatQty()
+  redlap.ts                           Redlap API client + HMAC verifier
+  redlap-status-cache.ts              in-process Map of session → outcome
 content/
   packages.ts                         EMPTY STUB — see Build status note
   faqs.ts                             global FAQ content (homepage)
@@ -66,7 +87,7 @@ The visual language was locked in via a Claude Design handoff. **All design toke
 - **Surface**: white `--uv-bg` + warm cream `--uv-bg-lavender` `#f5f3ee` for hero/footer
 - **Type**: Plus Jakarta Sans (display) + Manrope (body) + JetBrains Mono — all loaded via `next/font` (self-hosted, no Google Fonts requests at runtime)
 - **Component classes** ported from the handoff and added over time: `.btn`, `.btn-primary`, `.btn-outline`, `.tier`, `.tier-featured`, `.faq-chip`, `.coral-band`, `.pkg-card`, `.svc-layout`, `.svc-side`, `.compare-card`, `.persona-row`, `.related-grid`, `.testi-grid`, `.why-grid-3`, `.nav-menu*`, `.co-*` (checkout), etc. **Prefer these to re-inventing Tailwind utility soup** — they encode the design.
-- **Platform side icons** (used in the service-page order summary AND in checkout's order summary): `.side-ig-icon` (IG gradient), `.side-tt-icon` (TikTok black + cyan/red glow), `.side-yt-icon` (YouTube red). Each expects a small white-stroke SVG inside.
+- **Platform side icons** (used in the service-page order summary AND in checkout's order summary): `.side-ig-icon` (IG gradient), `.side-tt-icon` (TikTok black + cyan/red glow), `.side-yt-icon` (YouTube red), `.side-fb-icon` (Facebook blue), `.side-tw-icon` (Twitter black). Each expects a small white-stroke SVG inside.
 - Gradient text accent: `.grad-text` (used on key H1/H2 phrases for brand pop)
 - Coral CTA gradient button: `var(--uv-gradient-button)` — used by `.co-cta` and `.btn-primary`
 
@@ -92,7 +113,7 @@ Don't add a third UI mode. If you change the breakpoint, update the `matchMedia(
 
 ## SEO rules (must follow)
 
-1. **Every public route exports `metadata`** with `title`, `description`, `alternates.canonical`, `openGraph`, `twitter`. Exception: `/checkout` uses `robots: { index: false, follow: false }` and skips canonical.
+1. **Every public route exports `metadata`** with `title`, `description`, `alternates.canonical`, `openGraph`, `twitter`. Exception: all `/checkout*` routes use `robots: { index: false, follow: false }` and skip canonical.
 2. **Homepage** injects `Organization` + `WebSite` JSON-LD via a `<script type="application/ld+json">` tag in the page (not layout, to avoid duplication on other routes).
 3. **Service pages** inject `Product` + `AggregateRating` + `FAQPage` + `BreadcrumbList` JSON-LD, all in `page.tsx`.
 4. **`Product.offers`** uses `AggregateOffer` with `lowPrice`/`highPrice` matching the `PACKAGES` array in the matching `_builder.tsx`. Keep these in sync when you change pricing.
@@ -116,7 +137,7 @@ Don't add a third UI mode. If you change the breakpoint, update the `matchMedia(
 
 - The user reviews each step before the next begins. Don't roll multiple steps into one commit.
 - After every step, run: `git add . && git commit -m "Step N: <description>" && git push origin main`.
-- **Always push to `origin/main` after committing — don't ask first, just push.** No PRs, no feature branches.
+- **Always push to `main` after committing — don't ask first, just push.** No PRs, no feature branches. NOTE: in agent sessions HTTPS push fails (no cached credentials); use SSH: `git push git@github.com:fifty2-dxb/thunderclap.com.git main`.
 - Don't add features, fallbacks, or scope creep beyond the brief.
 - Use multiple parallel `Agent` subtasks when the work is mechanically repetitive across 3+ files (e.g. "wire all 6 builders the same way"). It's faster and the user has asked for this pattern explicitly.
 
@@ -126,7 +147,7 @@ Don't add a third UI mode. If you change the breakpoint, update the `matchMedia(
 
 ## Service page pattern (Buy Instagram Likes is the canonical reference)
 
-The `/instagram/likes` route is the template. Use it as the basis for new `/youtube/*` builds.
+The `/instagram/likes` route is the original template. All 14 service pages (IG x3, TT x3, YT x2, FB x3, TW x3) follow it identically.
 
 **File layout per service page:**
 
@@ -137,9 +158,9 @@ app/(marketing)/<platform>/<service>/
   _faqs.ts       plain data module — FAQ array imported by BOTH page.tsx (for JSON-LD) and _builder.tsx (for UI). Must NOT live inside _builder.tsx — a "use client" file's non-component exports cannot be statically imported by a server component, and the build will fail with `f.X_FAQS.map is not a function` during page-data collection.
 ```
 
-**Hero component exports**: name them after the service for clarity — `LikesHero`/`LikesFaq` (IG) or `TikTokLikesHero`/`TikTokLikesFaq` (TT). The page.tsx imports them by name.
+**Hero component exports**: name them after the platform+service for clarity — `LikesHero`/`LikesFaq` (IG), `TikTokLikesHero`/`TikTokLikesFaq` (TT), `YouTubeViewsHero`/`YouTubeViewsFaq` (YT), `FacebookLikesHero`/`FacebookLikesFaq` (FB), `TwitterRetweetsHero`/`TwitterRetweetsFaq` (TW). The page.tsx imports them by name.
 
-**FAQ export name**: Instagram pages export `IG_FAQS`, TikTok pages export `TT_FAQS`, YouTube pages export `YT_FAQS`.
+**FAQ export names**: Instagram → `IG_FAQS`, TikTok → `TT_FAQS`, YouTube → `YT_FAQS`, Facebook → `FB_FAQS`, Twitter → `TW_FAQS`.
 
 **Section order on a service page** (from the design):
 1. `<ServiceHero>` — breadcrumb, H1 with `.grad-text` on the variable phrase, `.live-pill`, two-column `.svc-layout` (left: premium toggle + service tabs + `.pkg-card` with 14-tier grid + URL input + total/CTA + trust strip; right: sticky `.svc-side` order summary)
@@ -175,26 +196,58 @@ const checkoutHref = `/checkout?platform=instagram&service=likes&qty=${pkg.qty}&
 
 The `price` query param is the **base** tier price (not premium-adjusted). The checkout page re-applies the +35% based on the `premium` flag so the math stays consistent.
 
-## Checkout flow
+## Checkout flow (Steps 1 → 2 → Redlap → Return → Success/Failed)
 
-`/checkout` is the Step-1 details page. Server-rendered shell, single client island for the form.
+The full payment funnel is wired end-to-end. The Thunderclap site only verifies that payment succeeded; **order fulfillment lives inside the Redlap environment** — don't add fulfillment hooks here.
 
-**URL contract** (all string params):
-| param | type | default | example |
-| --- | --- | --- | --- |
-| `platform` | `instagram` \| `tiktok` \| `youtube` | `instagram` | `instagram` |
-| `service` | `followers` \| `likes` \| `views` \| `subscribers` \| `comments` | `followers` | `likes` |
-| `qty` | number | `1000` | `5000` |
-| `price` | number (base, USD) | `7.99` | `17.99` |
-| `premium` | `0` \| `1` | `0` | `1` |
+**URL contract (Step 1, `/checkout`)** — all string params:
 
-`page.tsx` validates each, applies sensible fallbacks, computes `subtotal = price * (premium ? 1.35 : 1)`, and renders:
-- Sticky header (back arrow → `/${platform}/${service}`, centered logo, "Secure checkout" badge)
-- Centered Details → Payment stepper (Step 1 active)
-- Two-column grid (`.co-grid`): left form card (`<CheckoutForm>`), right order summary + bundle upsell + Trustpilot quote
+| param | type | default |
+| --- | --- | --- |
+| `platform` | `instagram` \| `tiktok` \| `youtube` \| `facebook` \| `twitter` | `instagram` |
+| `service` | `followers` \| `likes` \| `views` \| `subscribers` \| `comments` \| `retweets` | `followers` |
+| `qty` | number | `1000` |
+| `price` | number (base, USD) | `7.99` |
+| `premium` | `0` \| `1` | `0` |
+| `target` / `email` | strings — optional on Step 1 (set when user comes back from Step 2 via back) | — |
+
+`/checkout/page.tsx` validates each, applies sensible fallbacks, computes `subtotal = price * (premium ? 1.35 : 1)`, and renders a two-column grid: form (`<CheckoutForm>`) on left, order summary + bundle upsell + Trustpilot quote on right.
+
 - **Per-service input** label and placeholder are looked up from `INPUT_CONFIG[`${platform}-${service}`]` — extend this map when adding new service combos
-- **Platform-coloured input chip** uses `.platform-instagram` / `.platform-tiktok` / `.platform-youtube` modifier classes on `.co-input-icon`
+- **Platform-coloured input chip** uses `.platform-instagram` / `.platform-tiktok` / `.platform-youtube` / `.platform-facebook` / `.platform-twitter` modifier classes on `.co-input-icon`
 
-The form is intentionally **not wired to a payment backend yet**. `onSubmit` just simulates a brief loading state. When Step 2 lands, it should `router.push('/checkout/payment?…')` and the same query-param contract should extend with the user's `target` URL and `email`.
+On submit Step 1 carries everything (`target`, `email` included) forward as `router.push('/checkout/payment?...')`.
+
+**Step 2 (`/checkout/payment`)** is a method picker (Card / Apple Pay / Google Pay / Crypto tabs — UI only; the actual card form lives on the Redlap-hosted page). Submit does `POST /api/checkout/session` and on success sets `window.location.href = redirectUrl` to hand off to Redlap. Error messages from the API are surfaced inline via `.co-pay-err`.
+
+**Step 3 (`/checkout/return`)** is the landing point Redlap redirects back to. It validates Redlap-appended params (`payment_status`, `payment_id`, `order_number`); if `payment_status` is already `failed`/`cancelled`/`expired` it 302s straight to `/checkout/failed`. Otherwise it renders a "Confirming…" UI with a client island (`_poll.tsx`) that polls `/api/checkout/status?sid=...` every 3s for up to ~3 minutes, then `router.replace`s to `/checkout/success` or `/checkout/failed?reason=...`.
+
+**`/checkout/success`** displays the confirmed order (`order_id`, `payment_id`, `order_number`, package, total, target). Reads order_id from URL (set by `/api/checkout/session`), falls back to a deterministic hash for legacy paths.
+
+**`/checkout/failed`** shows a reason-specific message (`failed`, `cancelled`, `expired`, `timeout`, `missing_session`, `error`) and a "Try payment again" CTA that round-trips back to `/checkout/payment` with the same params intact.
 
 All checkout classes are prefixed `.co-*` and live in the "Checkout" block of `globals.css`. Don't add ad-hoc inline styles for chrome — extend the `.co-*` set instead.
+
+## Redlap (Social Empire Pay) integration
+
+Modelled on the WooCommerce PHP plugin (`/tmp/redlap-plugin.php` reference if re-extracted). Contract:
+
+| Endpoint | Direction | Purpose |
+| --- | --- | --- |
+| `POST {REDLAP_API_BASE}/api/payments/sessions` | us → Redlap | Create a session. Returns `{ id, frontendPaymentUrl }`. |
+| `GET  {REDLAP_API_BASE}/api/payments/sessions/:id` | us → Redlap | Authoritative status / final price / coupon. |
+| `POST /api/redlap/webhook` | Redlap → us | Server-to-server confirmation. Header `X-Webhook-Signature` is `hmac_sha256(rawBody, REDLAP_WEBHOOK_SECRET)` hex. Events: `payment.completed`, `payment.failed`, `payment.expired`. |
+
+**Env vars** (all in `.env.example`):
+- `REDLAP_API_BASE` — production `https://api.redlap.xyz`, sandbox `https://sa-b084fe3ea34a4a86be5e2766f8f09494.ecs.eu-central-1.on.aws`. The client strips a trailing `/api/` if pasted by mistake, then appends `/api/payments/sessions` itself.
+- `REDLAP_API_KEY` — optional bearer token
+- `REDLAP_WEBHOOK_SECRET` — used by HMAC verification (required for webhook to accept anything)
+- `REDLAP_WEBSITE_ID` — Redlap-issued numeric id for this site
+- `REDLAP_WEBSITE_ORIGIN` — optional; defaults to `NEXT_PUBLIC_SITE_URL`
+- `REDLAP_EXPIRES_IN` — optional, default 3600s
+
+**Webhook config in Redlap dashboard**: point it at `${NEXT_PUBLIC_SITE_URL}/api/redlap/webhook`.
+
+**Persistence**: there is no database. `lib/redlap-status-cache.ts` keeps an in-process Map (TTL 30 min, cap 2000 entries) so the status route can short-circuit polling when the webhook lands before the user is redirected back. On cold start the map is empty and the status route falls back to a live `GET /api/payments/sessions/:id` — that's always the truth. Don't paper over the lack of persistence with a feature flag; if you need durable storage, add Vercel KV and replace the cache module wholesale.
+
+**Don't add fulfillment hooks in the webhook handler.** Fulfillment is the Redlap environment's job. The handler only verifies the signature, records the outcome, and acks 200.
