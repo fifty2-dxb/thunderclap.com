@@ -96,13 +96,16 @@ The visual language was locked in via a Claude Design handoff. **All design toke
 
 The site was bolted onto a desktop-first design; mobile rules are concentrated in **`app/globals.css`**'s `Responsive` section at the bottom. The breakpoints are stacked:
 
-- `@media (max-width: 1080px)` — collapse `.svc-layout` to single column
-- `@media (max-width: 980px)` — header swaps to **hamburger + slide-down sheet** (logic in `components/header.tsx` driven by `matchMedia`), grids collapse to 1 column, `.faq-chips` to 1 column, `.co-grid` (checkout) to 1 column
-- `@media (max-width: 720px)` — `.pkg-grid` to 2 cols, coral-band tightens
-- `@media (max-width: 640px)` — main responsive bulk: `.pkg-grid` to 2 cols at 8px gap, `.svc-side` static padding, `.faq-chip` smaller, `.coral-band h2` to 28px, `.persona-img` capped, container padding 16px, **plus inline-style headline overrides via `clamp()` + `!important`** for `main h1/h2/h3/p` (this is how the inline `fontSize: 72` on service-page H1s gets capped on phones — don't remove this block)
-- `@media (max-width: 480px)` — `.pkg-grid` to 1 column with horizontal tier layout (hides `.pkg-qty-sub`), compare grid shrinks further
+- `@media (max-width: 1080px)` — collapse `.svc-layout` to single column. **First H1 cap** (`clamp(40px, 6.5vw, 60px)`) so the inline `fontSize: 72` on service-page hero H1s scales smoothly on tablets.
+- `@media (max-width: 980px)` — header swaps to **hamburger + slide-down sheet** (logic in `components/header.tsx` driven by `matchMedia`), card grids collapse to 1 column, `.faq-chips` to 1 column, `.co-grid` (checkout) to 1 column, `.hiw-top` (how-it-works hero grid) to 1 column. Second H1 cap (`clamp(36px, 7.5vw, 52px)`) + H2 cap.
+- `@media (max-width: 720px)` — `.pkg-grid` to **2 cols** (not 1), `.pkg-cta-row` stacks, coral-band tightens.
+- `@media (max-width: 640px)` — phone breakpoint, main responsive bulk: container padding 16px, `.pkg-grid` STAYS at 2 cols (gap 8px, tighter padding), `.pkg-tier` keeps vertical qty/price stacking (no horizontal list), `.svc-side` static padding, `.faq-chip` smaller with 48px min-height, `.coral-band h2` 28px, `.persona-img` capped, service-table drops the action column to a 2-col grid, footer to 2 cols with brand full-width on top. **Headline clamps** (`main h1/h2/h3/p` with `clamp()` + `!important`) cap any inline `fontSize` from in-line styles on hero H1s. **iOS Safari**: all inputs forced to 16px (`.uv-input, .pkg-url-input, .co-input, .co-pay-input`) to prevent focus auto-zoom; tap targets bumped to ≥40-48px.
+- `@media (max-width: 480px)` — `.pkg-grid` STAYS at 2 cols (do NOT collapse to a vertical list — explicit user preference), `.pkg-qty-sub` hidden so two tiles always fit, footer collapses to single column, `.footer-bottom` stacks vertically.
+- `@media (max-width: 420px)` — checkout payment-method chips shrink one more notch.
 
-When adding new sections, target ≤ 640px viewport — that's where the bugs hide. If you add inline `fontSize` on a heading inside `<main>`, the global clamp rule already caps it on mobile.
+**Don't add a horizontal-list `.pkg-tier { flex-direction: row }` style — the user explicitly rejected that layout.** Keep tiles as a 2-col grid with qty stacked above price.
+
+When adding new sections, target ≤ 640px viewport — that's where the bugs hide. If you add inline `fontSize` on a heading inside `<main>`, the global clamp rule already caps it on mobile. If you add a 2-col grid via inline styles (like `.hiw-top`), add a `@media (max-width: 980px)` rule with `grid-template-columns: 1fr !important` so it collapses.
 
 ## Header mobile menu
 

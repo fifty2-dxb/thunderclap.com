@@ -733,7 +733,7 @@ img { display: block; max-width: 100%; }
 }
 .pkg-grid {
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
+  grid-template-columns: repeat(3, 1fr);
   gap: 10px;
   margin-bottom: 18px;
 }
@@ -1078,82 +1078,168 @@ img { display: block; max-width: 100%; }
 
 /* ============================================================
    Responsive
+   Breakpoint cascade: 1080 → 980 → 720 → 640 → 480
    ============================================================ */
+
+/* ---- ≤1080px: collapse the two-col service layout, cap large H1s ---- */
 @media (max-width: 1080px) {
   .footer-top { grid-template-columns: 1.4fr repeat(3, 1fr); }
   .svc-layout { grid-template-columns: 1fr; }
   .svc-side { position: static; }
-  .pkg-grid { grid-template-columns: repeat(3, 1fr); }
+  /* H1 with inline fontSize: 72 overflows on tablet widths — cap it here.
+     Doesn't touch the ≤640 clamp() rule that already exists below. */
+  main h1 { font-size: clamp(40px, 6.5vw, 60px) !important; line-height: 1.06 !important; }
 }
+
+/* ---- ≤980px: hamburger menu (in components/header.tsx), card grids → 1 col ---- */
 @media (max-width: 980px) {
   .why-grid-3 { grid-template-columns: 1fr; }
   .pricing-grid { grid-template-columns: 1fr; }
   .tier-featured { transform: none; }
   .testi-grid { grid-template-columns: 1fr; }
   .faq-chips { grid-template-columns: 1fr; }
-  .st-head, .st-row { grid-template-columns: 1.5fr 1fr 110px; }
+  .st-head, .st-row { grid-template-columns: 1.4fr 1fr 110px; padding-left: 18px; padding-right: 18px; }
   .st-head span:nth-child(3), .st-row > :nth-child(3) { display: none; }
-  .footer-top { grid-template-columns: repeat(2, 1fr); }
-  .persona-row { grid-template-columns: 1fr; }
+  .footer-top { grid-template-columns: repeat(2, 1fr); gap: 28px; padding-bottom: 36px; }
+  .persona-row { grid-template-columns: 1fr; gap: 28px; }
   .related-grid { grid-template-columns: 1fr; }
   .compare-head, .compare-row { grid-template-columns: 1.6fr 70px 70px; padding: 16px; }
+  /* How-it-works hero card collapses to a single column */
+  .hiw-top { grid-template-columns: 1fr !important; gap: 32px !important; }
+  /* H1/H2 tablet caps — keep H1s readable between 720–980 */
+  main h1 { font-size: clamp(36px, 7.5vw, 52px) !important; line-height: 1.06 !important; letter-spacing: -0.03em !important; }
+  main h2 { font-size: clamp(28px, 5.5vw, 40px) !important; line-height: 1.12 !important; }
 }
+
+/* ---- ≤720px: pkg-grid → 2 cols, CTA row stacks, coral band tightens ---- */
 @media (max-width: 720px) {
   .pkg-grid { grid-template-columns: repeat(2, 1fr); }
   .pkg-cta-row { flex-direction: column; align-items: stretch; }
   .pkg-cta { width: 100%; }
   .coral-band { padding: 56px 24px; }
   .coral-band h2 { font-size: 34px; }
+  .footer-top { grid-template-columns: repeat(2, 1fr); }
 }
+
+/* ---- ≤640px: phone breakpoint — the bulk of the mobile rules live here ---- */
 @media (max-width: 640px) {
   .container { padding-left: 16px; padding-right: 16px; }
   .container-narrow { padding-left: 16px; padding-right: 16px; }
-  .pkg-grid { grid-template-columns: 1fr 1fr; gap: 8px; }
-  .pkg-tier { padding: 12px 10px; min-height: auto; }
-  .pkg-qty { font-size: 17px; }
-  .pkg-price { font-size: 13px; }
-  .pkg-card { padding: 18px; }
+
+  /* Pricing tiles: TWO columns at phone widths (NOT a vertical list).
+     Tight padding + smaller type so two tiles fit on a 360px screen. */
+  .pkg-grid { grid-template-columns: repeat(2, 1fr); gap: 8px; }
+  .pkg-tier {
+    padding: 14px 6px 12px;
+    min-height: auto;
+    border-radius: 10px;
+  }
+  .pkg-qty { font-size: 16px; letter-spacing: -0.02em; }
+  .pkg-qty-sub { font-size: 9.5px; margin-top: 3px; letter-spacing: 0.06em; }
+  .pkg-price { font-size: 13px; margin-top: 6px; }
+  .pkg-tier-tag { font-size: 8.5px; padding: 2px 6px; top: -7px; }
+  .pkg-card { padding: 16px; }
+  .pkg-head { margin-bottom: 14px; }
+  .pkg-h-title { font-size: 16px; }
+  .pkg-save { font-size: 11px; padding: 4px 10px; }
+  .pkg-total { font-size: 30px; }
+  .pkg-cta-row { flex-direction: column; align-items: stretch; gap: 12px; }
+  .pkg-cta { width: 100%; justify-content: center; }
+  .pkg-trust { gap: 14px; font-size: 12px; padding-top: 14px; }
+
   .svc-side { padding: 18px; margin-top: 24px; }
   .prem-row { padding: 12px 14px; }
   .prem-title { font-size: 14px; }
   .prem-sub { font-size: 12px; }
-  .svc-tabs { gap: 6px; flex-wrap: wrap; }
+  .svc-tabs { gap: 4px; flex-wrap: wrap; padding: 3px; }
   .svc-tab { padding: 8px 12px; font-size: 13px; }
-  .coral-band { padding: 44px 18px; }
+
+  .coral-band { padding: 44px 18px; border-radius: 22px; }
   .coral-band h2 { font-size: 28px; line-height: 1.1; }
   .coral-band p { font-size: 14px; }
-  .persona-img { min-height: 220px; max-height: 260px; }
+  .coral-btn-light, .coral-btn-ghost { height: 46px; padding: 0 22px; font-size: 14px; }
+
+  .persona-img { min-height: 220px; max-height: 260px; height: 240px; }
   .persona-body h3 { font-size: 22px !important; }
+  .persona-body { padding: 0; }
+
   .faq-chip { padding: 14px 16px; font-size: 13.5px; }
   .faq-chip-panel { padding: 14px 16px; font-size: 13.5px; }
+
   .compare-head, .compare-row { grid-template-columns: 1.3fr 56px 56px; padding: 12px; font-size: 13px; gap: 8px; }
   .compare-h-us, .compare-h-them { font-size: 12px; }
+
   .why-card-clean { padding: 22px; }
   .related-card { padding: 16px 18px; }
   .testi-card { padding: 22px; }
+  .testi-card p { font-size: 15.5px; margin-bottom: 18px; }
   .live-pill { font-size: 12.5px; padding: 8px 12px; }
+
   .side-summary { gap: 10px; padding-bottom: 14px; margin-bottom: 14px; }
   .side-sum-title { font-size: 15px; }
   .side-sum-price { font-size: 16px; }
   .side-benefits { font-size: 13px; }
-  .side-benefits li { padding: 6px 0; }
-  .pkg-cta-row { flex-direction: column; align-items: stretch; gap: 12px; }
-  .pkg-cta { width: 100%; justify-content: center; }
-  main h1 { font-size: clamp(32px, 9vw, 72px) !important; line-height: 1.05 !important; letter-spacing: -0.03em !important; }
-  main h2 { font-size: clamp(24px, 6.5vw, 40px) !important; line-height: 1.12 !important; }
-  main h3 { font-size: clamp(18px, 5vw, 28px) !important; }
+  .side-benefits li { padding: 0; }
+
+  /* Service table on phones: 2-col grid (name + price). Action button hidden,
+     the whole row stays informational. The user reaches the same destination
+     from the header hamburger menu or from any pricing CTA. */
+  .service-table { border-radius: 16px; }
+  .st-head, .st-row { grid-template-columns: 1.5fr auto; padding: 14px 16px; gap: 10px; }
+  .st-head > :nth-child(4), .st-row > :nth-child(4) { display: none; }
+  .st-head > :nth-child(2), .st-row > :nth-child(2) { text-align: right; font-size: 14px; }
+  .st-name { gap: 10px; min-width: 0; }
+  .st-name > :nth-child(2) { font-size: 14px; }
+
+  /* Footer collapses to a 2-col grid with the brand sitting full-width on top */
+  .footer-light { padding-top: 48px; }
+  .footer-top { grid-template-columns: repeat(2, 1fr); gap: 24px; padding-bottom: 32px; }
+  .footer-top > :first-child { grid-column: 1 / -1; }
+  .footer-bottom { padding: 16px 0; gap: 12px; }
+
+  /* Headline clamps — protect against any inline fontSize on H1/H2/H3 */
+  main h1 { font-size: clamp(28px, 8.5vw, 48px) !important; line-height: 1.06 !important; letter-spacing: -0.03em !important; }
+  main h2 { font-size: clamp(24px, 6.5vw, 36px) !important; line-height: 1.12 !important; }
+  main h3 { font-size: clamp(17px, 4.5vw, 24px) !important; }
   main p { font-size: 15px !important; }
+
+  /* iOS Safari: prevent auto-zoom on focus by keeping inputs at 16px+ */
+  .uv-input, .pkg-url-input, .co-input, .co-pay-input {
+    font-size: 16px !important;
+  }
+  /* Tap targets ≥ 44px wherever realistic */
+  .btn-sm { height: 40px; }
+  .faq-chip { min-height: 48px; }
+  .pkg-tier { min-height: 76px; }
+  .related-card { min-height: 64px; }
 }
+
+/* ---- ≤480px: tightest phone widths — keep 2-col pkg-grid, shrink chrome ---- */
 @media (max-width: 480px) {
-  .pkg-grid { grid-template-columns: 1fr; }
-  .pkg-tier { flex-direction: row; align-items: center; justify-content: space-between; text-align: left; padding: 14px 14px; min-height: auto; }
+  /* Pricing tiles stay TWO columns (not a vertical list) per design call. */
+  .pkg-grid { grid-template-columns: repeat(2, 1fr); gap: 6px; }
+  .pkg-tier {
+    padding: 12px 4px 10px;
+    border-radius: 10px;
+    /* DO NOT switch to row/horizontal — keep stacked qty/price for legibility. */
+  }
+  .pkg-qty { font-size: 15px; }
+  .pkg-price { font-size: 12.5px; margin-top: 5px; }
+  /* Hide the all-caps label on the very tightest widths so two tiles always fit */
   .pkg-tier .pkg-qty-sub { display: none; }
+  .pkg-tier-tag { font-size: 8px; padding: 2px 5px; }
+
   .compare-head, .compare-row { grid-template-columns: 1fr 44px 44px; padding: 10px 8px; font-size: 12px; }
   .related-card { padding: 14px 14px; gap: 12px; }
   .related-icon { width: 38px; height: 38px; }
   .svc-side { padding: 16px; }
   .testi-card { padding: 18px; font-size: 14px; }
   .live-pill { font-size: 12px; padding: 7px 10px; }
+
+  /* Footer becomes a single column at the very smallest widths */
+  .footer-top { grid-template-columns: 1fr; gap: 22px; }
+  .footer-top > :first-child { grid-column: auto; }
+  .footer-bottom { flex-direction: column; align-items: flex-start; }
 }
 
 /* ============================================================
@@ -1845,23 +1931,45 @@ img { display: block; max-width: 100%; }
 }
 
 @media (max-width: 980px) {
-  .co-grid { grid-template-columns: 1fr; }
+  .co-grid { grid-template-columns: 1fr; gap: 20px; padding: 20px 0 64px; }
+  .co-card { padding: 32px 32px; }
 }
 @media (max-width: 640px) {
   .co-top-inner { height: 64px; }
-  .co-card { padding: 28px 22px; }
-  .co-card h1 { font-size: 26px !important; }
-  .co-input { padding: 22px 14px 12px 50px; font-size: 14.5px; }
+  .co-back { width: 36px; height: 36px; }
+  .co-card { padding: 24px 18px; border-radius: 14px; }
+  .co-card h1 { font-size: 24px !important; margin-bottom: 12px; }
+  /* iOS Safari: keep inputs ≥16px to prevent auto-zoom */
+  .co-input { padding: 22px 14px 12px 50px; font-size: 16px !important; }
   .co-input-icon { width: 28px; height: 28px; left: 12px; }
   .co-input-label { left: 50px; font-size: 10.5px; }
-  .co-summary { padding: 20px; }
-  .co-bundle { padding: 14px 16px; }
+  .co-summary { padding: 18px; border-radius: 14px; }
+  .co-bundle { padding: 14px 14px; gap: 10px; }
+  .co-bundle-title { font-size: 14px; }
+  .co-bundle-sub { font-size: 12.5px; }
+  .co-bundle-plus { width: 32px; height: 32px; font-size: 18px; }
   .co-stepper { font-size: 13px; gap: 10px; padding: 18px 0 0; }
   .co-secure span { display: none; }
+  .co-secure { gap: 0; }
   .co-methods { grid-template-columns: repeat(2, 1fr); }
-  .co-method { height: 50px; font-size: 11.5px; }
-  .co-pay-input { font-size: 14px; height: 52px; padding-top: 20px; padding-bottom: 10px; }
-  .co-success { padding: 36px 22px; margin-top: 28px; }
+  .co-method { height: 52px; font-size: 12px; }
+  .co-pay-input { font-size: 16px !important; height: 56px; padding-top: 22px; padding-bottom: 10px; }
+  .co-pay-row { grid-template-columns: 1fr 1fr; gap: 8px; }
+  .co-cta { height: 54px; font-size: 15px; }
+  .co-trust-row { display: flex; flex-wrap: wrap; gap: 6px; padding-top: 16px; margin-top: 16px; }
+  .co-pay-meta { flex-direction: column; align-items: flex-start; gap: 8px; }
+  .co-gateway-pad { padding: 18px 16px; }
+  .co-success { padding: 36px 22px; margin-top: 24px; border-radius: 14px; }
   .co-success h1 { font-size: 22px; }
+  .co-success p { font-size: 14.5px; }
   .co-success-meta { grid-template-columns: 1fr; gap: 10px; }
+  .co-success-actions { flex-direction: column; align-items: stretch; gap: 8px; width: 100%; }
+  .co-success-actions .btn { width: 100%; }
+  .co-return { padding: 36px 22px; margin: 32px auto 0; border-radius: 14px; }
+}
+@media (max-width: 420px) {
+  /* Stack payment methods 2x2 with shorter chips so they don't overflow */
+  .co-methods { gap: 6px; }
+  .co-method { height: 48px; font-size: 11.5px; }
+  .co-card { padding: 22px 16px; }
 }

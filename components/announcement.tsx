@@ -11,14 +11,15 @@ export function Announcement() {
         background: "var(--uv-fg-1)",
         color: "#fff",
         fontSize: 13,
-        padding: "9px 48px 9px 16px",
+        padding: "9px 44px 9px 16px",
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
         gap: 14,
         flexWrap: "wrap",
         position: "relative",
-        whiteSpace: "nowrap",
+        textAlign: "center",
+        lineHeight: 1.35,
       }}
     >
       <span style={{ display: "inline-flex", alignItems: "center", gap: 8, flexShrink: 0 }}>
