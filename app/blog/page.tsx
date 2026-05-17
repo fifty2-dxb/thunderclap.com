@@ -1,7 +1,8 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { ArrowRight, BookOpen, Mail } from "lucide-react";
+import { ArrowRight } from "lucide-react";
 import { SITE_URL } from "@/lib/seo";
+import { getAllPosts } from "@/content/blog";
 
 const URL_PATH = "/blog";
 const CANONICAL = `${SITE_URL}${URL_PATH}`;
@@ -9,12 +10,12 @@ const CANONICAL = `${SITE_URL}${URL_PATH}`;
 export const metadata: Metadata = {
   title: "Blog — Growth playbooks for Instagram, TikTok & YouTube · Thunderclap",
   description:
-    "Practical, no-fluff growth playbooks for creators and brands building on Instagram, TikTok, YouTube, Facebook and X. Fresh posts coming soon.",
+    "Practical, no-fluff growth playbooks for creators and brands building on Instagram, TikTok, YouTube, Facebook and X. Real tactics, no shortcuts that get you banned.",
   alternates: { canonical: CANONICAL },
   openGraph: {
     title: "Blog — Growth playbooks · Thunderclap",
     description:
-      "Practical, no-fluff growth playbooks for creators and brands. Fresh posts coming soon.",
+      "Practical, no-fluff growth playbooks for creators and brands.",
     url: CANONICAL,
     siteName: "Thunderclap",
     type: "website",
@@ -26,46 +27,46 @@ export const metadata: Metadata = {
   },
 };
 
-const blogJsonLd = {
-  "@context": "https://schema.org",
-  "@type": "Blog",
-  name: "Thunderclap Blog",
-  url: CANONICAL,
-  description: "Growth playbooks for Instagram, TikTok, YouTube, Facebook and X.",
-  blogPost: [],
-};
-
-const breadcrumbJsonLd = {
-  "@context": "https://schema.org",
-  "@type": "BreadcrumbList",
-  itemListElement: [
-    { "@type": "ListItem", position: 1, name: "Home", item: SITE_URL },
-    { "@type": "ListItem", position: 2, name: "Blog", item: CANONICAL },
-  ],
-};
-
-const COMING_SOON = [
-  {
-    eyebrow: "Instagram",
-    title: "How to engineer a Reel for the Explore page in 2026",
-    blurb:
-      "The 7 retention checkpoints Meta's algorithm actually scores, and the editing template we use to hit every one of them.",
-  },
-  {
-    eyebrow: "TikTok",
-    title: "Why your FYP reach died — and the 3-day recovery playbook",
-    blurb:
-      "Shadow-bans aren't real. Velocity penalties are. What to do when impressions tank without a strike.",
-  },
-  {
-    eyebrow: "YouTube",
-    title: "From 0 to monetised: the 14-video YPP sprint",
-    blurb:
-      "Hit 1,000 subs + 4,000 watch hours in one quarter without burning out. The exact upload calendar that worked for 87 of our test channels.",
-  },
-];
+function formatDate(iso: string): string {
+  const d = new Date(iso + "T00:00:00Z");
+  return d.toLocaleDateString("en-US", {
+    year: "numeric",
+    month: "short",
+    day: "numeric",
+    timeZone: "UTC",
+  });
+}
 
 export default function Page() {
+  const posts = getAllPosts();
+  const [featured, ...rest] = posts;
+
+  const blogJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "Blog",
+    name: "Thunderclap Blog",
+    url: CANONICAL,
+    description: "Growth playbooks for Instagram, TikTok, YouTube, Facebook and X.",
+    blogPost: posts.map((p) => ({
+      "@type": "BlogPosting",
+      headline: p.title,
+      description: p.description,
+      datePublished: p.publishedAt,
+      author: { "@type": "Person", name: p.author },
+      url: `${SITE_URL}/blog/${p.slug}`,
+      image: p.heroImage,
+    })),
+  };
+
+  const breadcrumbJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    itemListElement: [
+      { "@type": "ListItem", position: 1, name: "Home", item: SITE_URL },
+      { "@type": "ListItem", position: 2, name: "Blog", item: CANONICAL },
+    ],
+  };
+
   return (
     <main>
       <script
@@ -79,200 +80,93 @@ export default function Page() {
         dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }}
       />
 
-      <section style={{ background: "var(--uv-bg-lavender)", padding: "72px 0 56px" }}>
+      <section className="blog-index-hero">
         <div className="container">
-          <nav
-            style={{
-              display: "flex",
-              alignItems: "center",
-              gap: 8,
-              fontSize: 13,
-              color: "var(--uv-fg-3)",
-              marginBottom: 22,
-            }}
-          >
-            <Link href="/" style={{ color: "var(--uv-fg-3)" }}>
-              Home
-            </Link>
-            <span style={{ opacity: 0.4 }}>›</span>
-            <span style={{ color: "var(--uv-fg-1)", fontWeight: 600 }}>Blog</span>
+          <nav className="blog-crumbs" aria-label="Breadcrumb">
+            <Link href="/">Home</Link>
+            <span aria-hidden>›</span>
+            <span className="blog-crumbs-current">Blog</span>
           </nav>
 
-          <span
-            className="uv-eyebrow"
-            style={{ color: "var(--uv-pink)", letterSpacing: "0.08em" }}
-          >
-            BLOG · GROWTH PLAYBOOKS
-          </span>
-          <h1
-            style={{
-              fontFamily: "var(--uv-font-display)",
-              fontSize: 60,
-              fontWeight: 800,
-              letterSpacing: "-0.03em",
-              lineHeight: 1.04,
-              margin: "12px 0 18px",
-              maxWidth: 820,
-              textWrap: "balance",
-            }}
-          >
+          <span className="blog-eyebrow">BLOG · GROWTH PLAYBOOKS</span>
+          <h1 className="blog-index-title">
             Notes on going <span className="grad-text">big on social</span>.
           </h1>
-          <p
-            style={{
-              fontSize: 17,
-              lineHeight: 1.6,
-              color: "var(--uv-fg-2)",
-              margin: 0,
-              maxWidth: 640,
-              textWrap: "pretty",
-            }}
-          >
-            Practical, no-fluff growth playbooks for creators and brands building on Instagram,
-            TikTok, YouTube, Facebook and X. We&rsquo;re lining up the first posts now —
-            check back soon, or grab the email list to know the moment they drop.
+          <p className="blog-index-lede">
+            Practical, no-fluff playbooks for creators and brands building on Instagram,
+            TikTok, YouTube, Facebook and X. We write about what actually moves the algorithm
+            — not what fits a Twitter thread.
           </p>
         </div>
       </section>
 
-      <section style={{ padding: "72px 0 32px" }}>
-        <div className="container">
-          <div
-            style={{
-              display: "flex",
-              alignItems: "center",
-              gap: 12,
-              marginBottom: 28,
-            }}
-          >
-            <span
-              style={{
-                width: 36,
-                height: 36,
-                borderRadius: 10,
-                background: "var(--uv-pink-soft)",
-                color: "var(--uv-pink)",
-                display: "inline-flex",
-                alignItems: "center",
-                justifyContent: "center",
-              }}
-              aria-hidden
-            >
-              <BookOpen size={18} />
-            </span>
-            <div>
+      {featured && (
+        <section className="blog-featured-section">
+          <div className="container">
+            <Link href={`/blog/${featured.slug}`} className="blog-featured">
               <div
-                style={{
-                  fontFamily: "var(--uv-font-display)",
-                  fontWeight: 800,
-                  fontSize: 20,
-                  color: "var(--uv-fg-1)",
-                  letterSpacing: "-0.01em",
-                }}
-              >
-                First three posts, on the way
+                className="blog-featured-image"
+                style={{ backgroundImage: `url(${featured.heroImage})` }}
+              />
+              <div className="blog-featured-body">
+                <span className="blog-card-eyebrow">{featured.category} · Featured</span>
+                <h2>{featured.title}</h2>
+                <p>{featured.excerpt}</p>
+                <div className="blog-featured-meta">
+                  <span>{featured.author}</span>
+                  <span aria-hidden>·</span>
+                  <time dateTime={featured.publishedAt}>{formatDate(featured.publishedAt)}</time>
+                  <span aria-hidden>·</span>
+                  <span>{featured.readMinutes} min read</span>
+                </div>
+                <span className="blog-card-link">
+                  Read the post <ArrowRight size={14} />
+                </span>
               </div>
-              <div style={{ fontSize: 13.5, color: "var(--uv-fg-3)", marginTop: 2 }}>
-                Drafts in review with the growth team.
-              </div>
+            </Link>
+          </div>
+        </section>
+      )}
+
+      {rest.length > 0 && (
+        <section className="blog-list-section">
+          <div className="container">
+            <h2 className="blog-list-title">All posts</h2>
+            <div className="blog-grid">
+              {rest.map((p) => (
+                <Link key={p.slug} href={`/blog/${p.slug}`} className="blog-card">
+                  <div
+                    className="blog-card-image"
+                    style={{ backgroundImage: `url(${p.heroImage})` }}
+                  />
+                  <div className="blog-card-body">
+                    <span className="blog-card-eyebrow">{p.category}</span>
+                    <h3>{p.title}</h3>
+                    <p>{p.excerpt}</p>
+                    <div className="blog-card-meta">
+                      <time dateTime={p.publishedAt}>{formatDate(p.publishedAt)}</time>
+                      <span aria-hidden>·</span>
+                      <span>{p.readMinutes} min read</span>
+                    </div>
+                    <span className="blog-card-link">
+                      Read post <ArrowRight size={14} />
+                    </span>
+                  </div>
+                </Link>
+              ))}
             </div>
           </div>
+        </section>
+      )}
 
-          <div className="related-grid">
-            {COMING_SOON.map((p) => (
-              <article
-                key={p.title}
-                style={{
-                  background: "#fff",
-                  border: "1px solid var(--uv-line)",
-                  borderRadius: 16,
-                  padding: 22,
-                  display: "flex",
-                  flexDirection: "column",
-                  gap: 12,
-                  position: "relative",
-                  overflow: "hidden",
-                }}
-              >
-                <span
-                  className="uv-eyebrow"
-                  style={{ color: "var(--uv-pink)", letterSpacing: "0.08em", fontSize: 11 }}
-                >
-                  {p.eyebrow.toUpperCase()}
-                </span>
-                <h2
-                  style={{
-                    fontFamily: "var(--uv-font-display)",
-                    fontSize: 19,
-                    fontWeight: 800,
-                    letterSpacing: "-0.015em",
-                    lineHeight: 1.2,
-                    margin: 0,
-                    color: "var(--uv-fg-1)",
-                  }}
-                >
-                  {p.title}
-                </h2>
-                <p
-                  style={{
-                    margin: 0,
-                    fontSize: 14,
-                    lineHeight: 1.55,
-                    color: "var(--uv-fg-3)",
-                    textWrap: "pretty",
-                  }}
-                >
-                  {p.blurb}
-                </p>
-                <div style={{ marginTop: "auto", paddingTop: 8 }}>
-                  <span
-                    style={{
-                      display: "inline-flex",
-                      alignItems: "center",
-                      gap: 8,
-                      padding: "6px 12px",
-                      borderRadius: 999,
-                      background: "var(--uv-bg-tint)",
-                      color: "var(--uv-fg-3)",
-                      fontSize: 11.5,
-                      fontWeight: 700,
-                      letterSpacing: "0.06em",
-                      textTransform: "uppercase",
-                    }}
-                  >
-                    Coming soon
-                  </span>
-                </div>
-              </article>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      <section style={{ padding: "32px 0 80px" }}>
+      <section className="blog-cta-band">
         <div className="container">
           <div className="coral-band">
             <div className="coral-band-bg" />
-            <span
-              aria-hidden
-              style={{
-                width: 44,
-                height: 44,
-                borderRadius: 999,
-                background: "rgba(255,255,255,0.15)",
-                color: "#fff",
-                display: "inline-flex",
-                alignItems: "center",
-                justifyContent: "center",
-                marginBottom: 14,
-              }}
-            >
-              <Mail size={20} />
-            </span>
-            <h2>Be the first to read the next post.</h2>
+            <h2>Skip the research, start growing.</h2>
             <p>
-              While we line up the first stories, you can start growing today — every package
-              ships drip-fed from real accounts with a 30-day refill guarantee.
+              Real-account growth across every platform, drip-fed safely, with a 30-day refill
+              guarantee. First results in 15 minutes.
             </p>
             <div
               style={{
@@ -282,12 +176,11 @@ export default function Page() {
                 justifyContent: "center",
               }}
             >
-              <Link href="/" className="btn btn-md coral-btn-light">
-                See all services
-                <ArrowRight size={16} style={{ marginLeft: 6 }} />
-              </Link>
-              <Link href="/buy-instagram-followers" className="btn btn-md coral-btn-ghost">
+              <Link href="/buy-instagram-followers" className="btn btn-md coral-btn-light">
                 Start with Instagram
+              </Link>
+              <Link href="/buy-tiktok-followers" className="btn btn-md coral-btn-ghost">
+                Or TikTok
               </Link>
             </div>
           </div>

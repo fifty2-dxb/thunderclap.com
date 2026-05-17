@@ -23,7 +23,20 @@ module.exports = {
       "/buy-twitter-followers": 0.9,
       "/buy-twitter-likes": 0.9,
       "/buy-twitter-retweets": 0.9,
+      "/blog": 0.8,
     };
+    if (path.startsWith("/blog/")) {
+      return {
+        loc: path,
+        changefreq: "monthly",
+        priority: 0.7,
+        lastmod: new Date().toISOString(),
+        alternateRefs: [
+          { href: `${config.siteUrl}${path}`, hreflang: "en" },
+          { href: `${config.siteUrl}${path}`, hreflang: "x-default" },
+        ],
+      };
+    }
     return {
       loc: path,
       changefreq: config.changefreq,
