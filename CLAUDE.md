@@ -73,8 +73,8 @@ The visual language was locked in via a Claude Design handoff. **All design toke
 ## Workflow
 
 - The user reviews each step before the next begins. Don't roll multiple steps into one commit.
-- After every step, run: `git add . && git commit -m "Step N: <description>"`.
-- Don't push to a remote unless asked.
+- After every step, run: `git add . && git commit -m "Step N: <description>" && git push origin main`.
+- Always push to `origin/main` after committing — don't ask first, just push. No PRs, no feature branches.
 - Don't add features, fallbacks, or scope creep beyond the brief.
 
 ## Source of design
