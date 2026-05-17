@@ -69,7 +69,6 @@ export function TikTokViewsHero() {
             fontSize: 13,
             color: "var(--uv-fg-3)",
             marginBottom: 24,
-            whiteSpace: "nowrap",
           }}
         >
           <a href="/" style={{ color: "var(--uv-fg-3)" }}>
@@ -182,7 +181,7 @@ export function TikTokViewsHero() {
                     )}
                     <span className="pkg-qty">{formatQty(p.qty)}</span>
                     <span className="pkg-qty-sub">{tab.toUpperCase()}</span>
-                    <span className="pkg-price">${p.price}</span>
+                    <span className="pkg-price">${(p.price * (premium ? 1.35 : 1)).toFixed(2)}</span>
                   </button>
                 ))}
               </div>
