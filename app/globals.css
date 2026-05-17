@@ -243,6 +243,11 @@ img { display: block; max-width: 100%; }
   background: var(--uv-bg-lavender);
   color: var(--uv-pink);
 }
+.nav-menu-item.is-active {
+  background: var(--uv-bg-lavender);
+  color: var(--uv-pink);
+  font-weight: 700;
+}
 
 /* ============================================================
    Service Table — single white card with platform rows

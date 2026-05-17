@@ -8,7 +8,7 @@ import { useEffect, useRef, useState } from "react";
 type NavItem = {
   id: string;
   label: string;
-  submenu?: { label: string; href: string; pink?: boolean }[];
+  submenu?: { label: string; href: string }[];
 };
 
 const NAV: NavItem[] = [
@@ -16,7 +16,6 @@ const NAV: NavItem[] = [
     id: "instagram",
     label: "Instagram",
     submenu: [
-      { label: "Instagram Growth Services", href: "/instagram/followers", pink: true },
       { label: "Buy Instagram Followers", href: "/instagram/followers" },
       { label: "Buy Instagram Likes", href: "/instagram/likes" },
       { label: "Buy Instagram Views", href: "/instagram/views" },
@@ -26,7 +25,6 @@ const NAV: NavItem[] = [
     id: "tiktok",
     label: "TikTok",
     submenu: [
-      { label: "TikTok Growth Services", href: "/tiktok/followers", pink: true },
       { label: "Buy TikTok Followers", href: "/tiktok/followers" },
       { label: "Buy TikTok Likes", href: "/tiktok/likes" },
       { label: "Buy TikTok Views", href: "/tiktok/views" },
@@ -36,7 +34,6 @@ const NAV: NavItem[] = [
     id: "youtube",
     label: "YouTube",
     submenu: [
-      { label: "YouTube Growth Services", href: "/youtube/subscribers", pink: true },
       { label: "Buy YouTube Subscribers", href: "/youtube/subscribers" },
       { label: "Buy YouTube Views", href: "/youtube/views" },
     ],
@@ -45,7 +42,6 @@ const NAV: NavItem[] = [
     id: "facebook",
     label: "Facebook",
     submenu: [
-      { label: "Facebook Growth Services", href: "#", pink: true },
       { label: "Buy Facebook Followers", href: "#" },
       { label: "Buy Facebook Likes", href: "#" },
       { label: "Buy Facebook Views", href: "#" },
@@ -55,7 +51,6 @@ const NAV: NavItem[] = [
     id: "twitter",
     label: "Twitter",
     submenu: [
-      { label: "Twitter Growth Services", href: "#", pink: true },
       { label: "Buy Twitter Followers", href: "#" },
       { label: "Buy Twitter Likes", href: "#" },
       { label: "Buy Twitter Retweets", href: "#" },
@@ -191,16 +186,19 @@ export function Header() {
                     onMouseEnter={() => open(it.id)}
                     onMouseLeave={scheduleClose}
                   >
-                    {it.submenu!.map((s) => (
-                      <Link
-                        key={s.label}
-                        href={s.href}
-                        className="nav-menu-item"
-                        style={s.pink ? { color: "var(--uv-pink)", fontWeight: 700 } : undefined}
-                      >
-                        {s.label}
-                      </Link>
-                    ))}
+                    {it.submenu!.map((s) => {
+                      const isCurrent = s.href !== "#" && pathname === s.href;
+                      return (
+                        <Link
+                          key={s.label}
+                          href={s.href}
+                          aria-current={isCurrent ? "page" : undefined}
+                          className={`nav-menu-item${isCurrent ? " is-active" : ""}`}
+                        >
+                          {s.label}
+                        </Link>
+                      );
+                    })}
                   </div>
                 )}
               </div>
