@@ -297,6 +297,16 @@ img { display: block; max-width: 100%; }
   border-color: var(--uv-pink);
   box-shadow: 0 8px 22px -8px rgba(239,70,85,0.55);
 }
+.st-row-link {
+  text-decoration: none;
+  color: inherit;
+  cursor: pointer;
+}
+.st-row-link:focus-visible {
+  outline: 2px solid var(--uv-pink);
+  outline-offset: -2px;
+  background: rgba(245,243,238,0.6);
+}
 
 .footer-social:hover { border-color: var(--uv-pink) !important; color: var(--uv-pink) !important; }
 .st-name { display: flex; align-items: center; gap: 14px; }
