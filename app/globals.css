@@ -2783,3 +2783,57 @@ img { display: block; max-width: 100%; }
   .ticker-icon { width: 18px; height: 18px; border-radius: 6px; }
   .ticker-sep { margin: 0 12px; }
 }
+
+/* ============================================================
+   Mobile menu sheet — full-screen overlay with internal close button
+   ============================================================ */
+
+.hdr-mobile-sheet {
+  position: fixed;
+  inset: 0;
+  z-index: 60;
+  background: #fff;
+  display: flex;
+  flex-direction: column;
+  animation: hdr-sheet-in 200ms ease-out;
+}
+@keyframes hdr-sheet-in {
+  from { opacity: 0; transform: translateY(-6px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.hdr-mobile-sheet-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 16px;
+  height: 56px;
+  border-bottom: 1px solid var(--uv-line);
+  background: #fff;
+  flex-shrink: 0;
+}
+.hdr-mobile-close {
+  width: 44px;
+  height: 44px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--uv-bg-tint);
+  border: 1px solid var(--uv-line);
+  border-radius: 999px;
+  color: var(--uv-fg-1);
+  cursor: pointer;
+  padding: 0;
+  transition: background 140ms ease, border-color 140ms ease;
+}
+.hdr-mobile-close:hover {
+  background: var(--uv-pink-soft);
+  border-color: var(--uv-pink);
+  color: var(--uv-pink);
+}
+.hdr-mobile-close:active { transform: scale(0.96); }
+.hdr-mobile-sheet-body {
+  flex: 1;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
+}

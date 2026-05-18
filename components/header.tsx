@@ -295,39 +295,46 @@ export function Header() {
         />
       )}
       {mobileOpen && (
-        <>
-          <div
-            onClick={closeMobile}
-            aria-hidden="true"
-            style={{
-              position: "fixed",
-              top: "var(--uv-header-h)",
-              left: 0,
-              right: 0,
-              bottom: 0,
-              background: "rgba(0,0,0,0.3)",
-              zIndex: 25,
-            }}
-          />
-          <div
-            id="mobile-nav"
-            role="dialog"
-            aria-modal="true"
-            aria-label="Site navigation"
-            style={{
-              position: "fixed",
-              top: "var(--uv-header-h)",
-              left: 0,
-              right: 0,
-              zIndex: 26,
-              background: "#fff",
-              borderBottom: "1px solid var(--uv-line)",
-              boxShadow: "var(--uv-shadow-lg)",
-              maxHeight: "calc(100vh - var(--uv-header-h))",
-              overflowY: "auto",
-            }}
-          >
-            <nav style={{ padding: "8px 0" }}>
+        <div
+          id="mobile-nav"
+          role="dialog"
+          aria-modal="true"
+          aria-label="Site navigation"
+          className="hdr-mobile-sheet"
+        >
+          <div className="hdr-mobile-sheet-top">
+            <Link
+              href="/"
+              onClick={closeMobile}
+              aria-label="Thunderclap home"
+              style={{ display: "inline-flex", alignItems: "center" }}
+            >
+              <Image
+                src="/logo.webp"
+                alt="Thunderclap"
+                width={120}
+                height={24}
+                style={{ height: 22, width: "auto", maxWidth: "none" }}
+              />
+            </Link>
+            <button
+              type="button"
+              onClick={closeMobile}
+              aria-label="Close menu"
+              className="hdr-mobile-close"
+            >
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                <path
+                  d="M6 6L18 18M18 6L6 18"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                />
+              </svg>
+            </button>
+          </div>
+          <div className="hdr-mobile-sheet-body">
+            <nav style={{ padding: "4px 0 16px" }}>
               {NAV.map((it) => {
                 const isActive = active === it.id;
                 const hasMenu = !!it.submenu;
@@ -444,7 +451,7 @@ export function Header() {
               >
                 Track order
               </Link>
-              <div style={{ padding: "12px 20px 20px" }}>
+              <div style={{ padding: "12px 20px 32px" }}>
                 <button
                   type="button"
                   onClick={closeMobile}
@@ -452,7 +459,7 @@ export function Header() {
                   style={{
                     width: "100%",
                     borderRadius: 999,
-                    height: 44,
+                    height: 48,
                   }}
                 >
                   Get Started
@@ -460,7 +467,7 @@ export function Header() {
               </div>
             </nav>
           </div>
-        </>
+        </div>
       )}
     </header>
   );
