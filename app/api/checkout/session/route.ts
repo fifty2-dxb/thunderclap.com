@@ -140,7 +140,13 @@ export async function POST(req: Request) {
           currency: "USD",
           premium,
           ...(SMM_SERVICE_IDS[`${platform}-${service}`] !== undefined
-            ? { smmServiceId: SMM_SERVICE_IDS[`${platform}-${service}`] }
+            ? {
+                smmData: {
+                  smmServiceId: SMM_SERVICE_IDS[`${platform}-${service}`],
+                  amount: qty,
+                  url: target,
+                },
+              }
             : {}),
         },
         summaryItems: [
