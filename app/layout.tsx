@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Plus_Jakarta_Sans, Manrope, JetBrains_Mono } from "next/font/google";
 import { Announcement } from "@/components/announcement";
 import { Header } from "@/components/header";
+import { Ticker } from "@/components/ticker";
 import { Footer } from "@/components/footer";
 import { SITE_URL } from "@/lib/seo";
 import "./globals.css";
@@ -50,6 +51,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         </svg>
         <Announcement />
         <Header />
+        <Ticker />
         {children}
         <Footer />
       </body>
