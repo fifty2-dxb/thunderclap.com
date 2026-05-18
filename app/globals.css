@@ -119,6 +119,14 @@
 
 * { box-sizing: border-box; }
 html, body { margin: 0; padding: 0; }
+/* Defensive guard: never let any descendant (notably the ticker's
+   width:max-content track, or a stray overflowing hero) push the
+   page wider than the viewport on mobile. `overflow-x: clip` keeps
+   sticky positioning working on the header — `hidden` would break it. */
+html, body {
+  overflow-x: clip;
+  max-width: 100%;
+}
 body {
   font-family: var(--uv-font-body);
   color: var(--uv-fg-1);
@@ -2683,14 +2691,20 @@ img { display: block; max-width: 100%; }
   width: 56px;
   pointer-events: none;
   z-index: 2;
+  /* Match the ticker's vertical gradient so the fade strip blends at both
+     the top AND the bottom of the strip (the strip itself fades 180deg
+     warm-cream → pink-soft). Without this the edge fade is a visible band. */
+  background: linear-gradient(180deg, #fff7f5 0%, var(--uv-pink-soft) 100%);
 }
 .ticker::before {
   left: 0;
-  background: linear-gradient(90deg, #fff7f5 0%, rgba(255,247,245,0) 100%);
+  -webkit-mask-image: linear-gradient(90deg, #000 0%, transparent 100%);
+          mask-image: linear-gradient(90deg, #000 0%, transparent 100%);
 }
 .ticker::after {
   right: 0;
-  background: linear-gradient(270deg, var(--uv-pink-soft) 0%, rgba(255,241,239,0) 100%);
+  -webkit-mask-image: linear-gradient(270deg, #000 0%, transparent 100%);
+          mask-image: linear-gradient(270deg, #000 0%, transparent 100%);
 }
 
 .ticker-track {
