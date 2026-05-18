@@ -4,6 +4,10 @@ import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
+import { MegaMenu, MEGA_PLATFORMS, type PlatformId } from "./mega-menu";
+
+const PLATFORM_IDS = new Set<string>(MEGA_PLATFORMS.map((p) => p.id));
+const isPlatformId = (v: string): v is PlatformId => PLATFORM_IDS.has(v);
 
 type NavItem = {
   id: string;
@@ -173,79 +177,73 @@ export function Header() {
           />
         </Link>
         <nav className="hdr-desktop-nav">
-            {NAV.map((it) => {
-              const isActive = active === it.id;
-              const hasMenu = !!it.submenu;
-              const labelStyle = {
-                display: "inline-flex" as const,
-                alignItems: "center" as const,
-                gap: 4,
-                padding: "6px 0",
-                cursor: "pointer" as const,
-                color: isActive ? "var(--uv-pink)" : "var(--uv-fg-2)",
-                fontWeight: isActive ? 700 : 500,
-                transition: "color 160ms",
-                textDecoration: "none" as const,
-              };
-              const labelInner = (
-                <>
-                  {it.label}
-                  {hasMenu && (
-                    <svg
-                      width="10"
-                      height="10"
-                      viewBox="0 0 10 10"
-                      fill="none"
-                      style={{ marginTop: 1, opacity: 0.6 }}
-                    >
-                      <path
-                        d="M2 3.5L5 6.5L8 3.5"
-                        stroke="currentColor"
-                        strokeWidth="1.5"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                      />
-                    </svg>
-                  )}
-                </>
-              );
+          {NAV.map((it) => {
+            const isActive = active === it.id;
+            const isPlatform = isPlatformId(it.id);
+            const labelStyle = {
+              display: "inline-flex" as const,
+              alignItems: "center" as const,
+              gap: 6,
+              padding: "6px 0",
+              cursor: "pointer" as const,
+              color: isActive ? "var(--uv-pink)" : "var(--uv-fg-2)",
+              fontWeight: isActive ? 700 : 500,
+              transition: "color 160ms",
+              textDecoration: "none" as const,
+              fontSize: 14,
+            };
+            if (isPlatform) {
+              const platformDef = MEGA_PLATFORMS.find((p) => p.id === it.id)!;
               return (
-                <div
+                <button
                   key={it.id}
-                  onMouseEnter={() => hasMenu && open(it.id)}
+                  type="button"
+                  className="hdr-platform-tab"
+                  onMouseEnter={() => open(it.id)}
+                  onFocus={() => open(it.id)}
                   onMouseLeave={scheduleClose}
-                  style={{ position: "relative" }}
+                  style={{
+                    ...labelStyle,
+                    background: "transparent",
+                    border: "none",
+                  }}
+                  aria-expanded={openMenu === it.id}
+                  aria-haspopup="menu"
                 >
-                  {it.href && !hasMenu ? (
-                    <Link href={it.href} style={labelStyle}>
-                      {labelInner}
-                    </Link>
-                  ) : (
-                    <span style={labelStyle}>{labelInner}</span>
-                  )}
-                  {hasMenu && openMenu === it.id && (
-                    <div
-                      className="nav-menu"
-                      onMouseEnter={() => open(it.id)}
-                      onMouseLeave={scheduleClose}
-                    >
-                      {it.submenu!.map((s) => {
-                        const isCurrent = s.href !== "#" && pathname === s.href;
-                        return (
-                          <Link
-                            key={s.label}
-                            href={s.href}
-                            aria-current={isCurrent ? "page" : undefined}
-                            className={`nav-menu-item${isCurrent ? " is-active" : ""}`}
-                          >
-                            {s.label}
-                          </Link>
-                        );
-                      })}
-                    </div>
-                  )}
-                </div>
+                  {platformDef.brand()}
+                  <span>{it.label}</span>
+                  <svg
+                    width="10"
+                    height="10"
+                    viewBox="0 0 10 10"
+                    fill="none"
+                    style={{
+                      marginTop: 1,
+                      opacity: 0.6,
+                      transform: openMenu === it.id ? "rotate(180deg)" : "none",
+                      transition: "transform 160ms",
+                    }}
+                  >
+                    <path
+                      d="M2 3.5L5 6.5L8 3.5"
+                      stroke="currentColor"
+                      strokeWidth="1.5"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    />
+                  </svg>
+                </button>
               );
+            }
+            return it.href ? (
+              <Link key={it.id} href={it.href} style={labelStyle}>
+                {it.label}
+              </Link>
+            ) : (
+              <span key={it.id} style={labelStyle}>
+                {it.label}
+              </span>
+            );
           })}
         </nav>
         <div className="hdr-desktop-cta">
@@ -289,6 +287,13 @@ export function Header() {
           )}
         </button>
       </div>
+      {openMenu && isPlatformId(openMenu) && (
+        <MegaMenu
+          activeId={openMenu}
+          onPlatformHover={(id) => open(id)}
+          onClose={scheduleClose}
+        />
+      )}
       {mobileOpen && (
         <>
           <div

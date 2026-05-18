@@ -2469,3 +2469,184 @@ img { display: block; max-width: 100%; }
   .blog-cta-band { padding: 24px 0 56px; }
   .blog-meta { font-size: 13px; gap: 8px; margin-bottom: 32px; }
 }
+
+/* ============================================================
+   Mega-menu (desktop platform dropdown)
+   ============================================================ */
+
+.hdr-platform-tab {
+  font-family: inherit;
+  line-height: 1;
+}
+.hdr-platform-tab:hover { color: var(--uv-fg-1); }
+
+/* Platform brand chips used inside the menu sidebar + top tabs */
+.mm-brand {
+  width: 22px;
+  height: 22px;
+  border-radius: 6px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+.mm-brand-instagram {
+  background: linear-gradient(135deg, #feda77 0%, #f58529 35%, #dd2a7b 65%, #8134af 100%);
+}
+.mm-brand-tiktok { background: #000; }
+.mm-brand-youtube { background: #ff0000; }
+.mm-brand-facebook { background: #1877f2; }
+.mm-brand-twitter { background: #000; }
+
+.mm-panel {
+  position: absolute;
+  top: var(--uv-header-h);
+  left: 0;
+  right: 0;
+  background: #fff;
+  border-top: 1px solid var(--uv-line);
+  border-bottom: 1px solid var(--uv-line);
+  box-shadow: 0 24px 48px -24px rgba(11,16,32,0.18);
+  z-index: 28;
+  animation: mm-in 160ms ease-out;
+}
+@keyframes mm-in {
+  from { opacity: 0; transform: translateY(-6px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.mm-grid {
+  display: grid;
+  grid-template-columns: 240px 1fr;
+  gap: 0;
+  padding: 0;
+  min-height: 360px;
+}
+.mm-side {
+  background: var(--uv-bg-lavender);
+  padding: 22px 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  border-right: 1px solid var(--uv-line);
+}
+.mm-side-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 14px;
+  background: transparent;
+  border: none;
+  border-radius: 10px;
+  font-family: var(--uv-font-body);
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--uv-fg-1);
+  cursor: pointer;
+  text-align: left;
+  transition: background 140ms ease, color 140ms ease;
+  position: relative;
+}
+.mm-side-item:hover { background: rgba(255,255,255,0.6); }
+.mm-side-item span:nth-child(2) { flex: 1; }
+.mm-side-arrow {
+  opacity: 0;
+  color: var(--uv-pink);
+  font-size: 16px;
+  font-weight: 700;
+  transform: translateX(-4px);
+  transition: opacity 140ms ease, transform 140ms ease;
+}
+.mm-side-item.is-active {
+  background: #fff;
+  color: var(--uv-pink);
+  box-shadow: 0 4px 12px -8px rgba(11,16,32,0.12);
+}
+.mm-side-item.is-active .mm-side-arrow {
+  opacity: 1;
+  transform: translateX(0);
+}
+
+.mm-content {
+  padding: 28px 32px 32px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+.mm-eyebrow {
+  font-family: var(--uv-font-display);
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.14em;
+  color: var(--uv-fg-3);
+}
+.mm-services {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 14px;
+}
+.mm-service {
+  display: grid;
+  grid-template-columns: 44px 1fr auto;
+  gap: 14px;
+  align-items: flex-start;
+  padding: 16px 18px;
+  border: 1px solid var(--uv-line);
+  border-radius: 14px;
+  background: #fff;
+  text-decoration: none;
+  color: inherit;
+  transition: border-color 160ms ease, transform 160ms ease, box-shadow 160ms ease;
+}
+.mm-service:hover {
+  border-color: var(--uv-pink);
+  transform: translateY(-1px);
+  box-shadow: 0 12px 28px -16px rgba(239,70,85,0.28);
+}
+.mm-service-icon {
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
+  background: var(--uv-pink-soft);
+  color: var(--uv-pink);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+.mm-service-body { min-width: 0; }
+.mm-service-title {
+  font-family: var(--uv-font-display);
+  font-size: 15.5px;
+  font-weight: 800;
+  letter-spacing: -0.015em;
+  color: var(--uv-fg-1);
+  margin-bottom: 4px;
+}
+.mm-service-desc {
+  font-size: 13px;
+  line-height: 1.45;
+  color: var(--uv-fg-3);
+  margin-bottom: 8px;
+  text-wrap: pretty;
+}
+.mm-service-price {
+  font-family: var(--uv-font-display);
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--uv-pink-deep);
+  letter-spacing: -0.005em;
+}
+.mm-service-arrow {
+  color: var(--uv-fg-4);
+  align-self: center;
+  transition: color 160ms ease, transform 160ms ease;
+}
+.mm-service:hover .mm-service-arrow {
+  color: var(--uv-pink);
+  transform: translate(2px, -2px);
+}
+
+/* Mega-menu is desktop-only — hide on mobile where the slide-down sheet
+   replaces it entirely. */
+@media (max-width: 980px) {
+  .mm-panel { display: none; }
+}
