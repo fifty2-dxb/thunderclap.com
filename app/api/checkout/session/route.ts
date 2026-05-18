@@ -46,6 +46,16 @@ const SERVICE_LABEL: Record<string, string> = {
   retweets: "Retweets",
 };
 
+// Redlap fulfillment maps each {platform}-{service} pair to a numeric
+// smmServiceId on its internal SMM panel. Add new ids here as they get
+// provisioned — anything missing is omitted from the Redlap metadata so
+// the gateway can fall back to its default routing.
+const SMM_SERVICE_IDS: Record<string, number> = {
+  "tiktok-followers": 5818,
+  "tiktok-likes": 1126,
+  "tiktok-views": 9121,
+};
+
 function makeOrderId(): string {
   const alpha = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
   let out = "";
@@ -129,6 +139,9 @@ export async function POST(req: Request) {
           profile: target,
           currency: "USD",
           premium,
+          ...(SMM_SERVICE_IDS[`${platform}-${service}`] !== undefined
+            ? { smmServiceId: SMM_SERVICE_IDS[`${platform}-${service}`] }
+            : {}),
         },
         summaryItems: [
           {
