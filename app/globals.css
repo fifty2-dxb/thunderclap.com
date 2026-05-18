@@ -2480,6 +2480,18 @@ img { display: block; max-width: 100%; }
 }
 .hdr-platform-tab:hover { color: var(--uv-fg-1); }
 
+/* Smaller brand chips in the top header tabs only — the chips inside the
+   mega-menu sidebar keep the default 22px size for legibility. */
+.hdr-platform-tab .mm-brand {
+  width: 18px;
+  height: 18px;
+  border-radius: 5px;
+}
+.hdr-platform-tab .mm-brand svg {
+  transform: scale(0.78);
+  transform-origin: center;
+}
+
 /* Platform brand chips used inside the menu sidebar + top tabs */
 .mm-brand {
   width: 22px;
