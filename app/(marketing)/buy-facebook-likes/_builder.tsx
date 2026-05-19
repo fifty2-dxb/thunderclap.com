@@ -25,20 +25,15 @@ const SERVICE_TABS = [
 ] as const;
 
 const PACKAGES = [
-  { qty: 100, price: 0.49, save: 0 },
-  { qty: 250, price: 1.29, save: 0 },
-  { qty: 500, price: 2.49, save: 0 },
-  { qty: 1000, price: 4.49, save: 0 },
-  { qty: 2500, price: 8.99, save: 25, popular: true },
-  { qty: 5000, price: 15.99, save: 30 },
-  { qty: 10000, price: 28.99, save: 35 },
-  { qty: 25000, price: 64.99, save: 38 },
-  { qty: 50000, price: 119.99, save: 42 },
-  { qty: 100000, price: 209.99, save: 45 },
-  { qty: 250000, price: 459.99, save: 48 },
-  { qty: 500000, price: 819.99, save: 50 },
-  { qty: 1000000, price: 1499.99, save: 50 },
-  { qty: 2500000, price: 3299.99, save: 50 },
+  { qty: 100, price: 3.5, save: 0 },
+  { qty: 250, price: 7.5, save: 20 },
+  { qty: 500, price: 11.5, save: 30 },
+  { qty: 1000, price: 17.5, save: 40 },
+  { qty: 2500, price: 39.5, save: 50, popular: true },
+  { qty: 5000, price: 69.5, save: 60 },
+  { qty: 10000, price: 125.5, save: 65 },
+  { qty: 20000, price: 199.5, save: 70 },
+  { qty: 40000, price: 385.5, save: 75 },
 ] as const;
 
 const SIDE_BENEFITS = [

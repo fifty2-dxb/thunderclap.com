@@ -240,7 +240,7 @@ app/(marketing)/buy-<platform>-<service>/
 
 All required component classes already exist in `app/globals.css`. Use them — don't reinvent with Tailwind utility soup.
 
-**Pricing tiers** for the package picker live inside `_builder.tsx` as a `PACKAGES` const (variable tier count per page — Instagram services use 9/10/11 tiers since the user supplied real pricing; the rest still ship 14-tier placeholders). Each entry: `{ qty: number, price: number, save: number, popular?: true }`. When porting:
+**Pricing tiers** for the package picker live inside `_builder.tsx` as a `PACKAGES` const (variable tier count per page, 6–12 tiers each). All 14 service pages now carry real, CSV-grounded prices sourced from the WooCommerce product export (`thunderclapproductprices.numbers`), HQ tier only. Each entry: `{ qty: number, price: number, save: number, popular?: true }`. When porting:
 1. Copy the array shape and swap `qty`/`price`/`save` to match the real pricing
 2. Mark exactly one tier `popular: true` (the value-anchor — middle-of-curve, where save% jumps)
 3. Re-sync `Product.offers` `lowPrice` / `highPrice` / `offerCount` in `page.tsx`
