@@ -837,6 +837,16 @@ img { display: block; max-width: 100%; }
 /* Sub-label ("FOLLOWERS" all-caps) hidden by default — redundant with the
    service name already in the URL input and the header tab above. */
 .pkg-qty-sub { display: none; }
+.pkg-price-orig {
+  font-family: var(--uv-font-display);
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--uv-fg-3);
+  text-decoration: line-through;
+  line-height: 1;
+  margin-top: -2px;
+}
+.pkg-tier.selected .pkg-price-orig { color: var(--uv-pink-deep); opacity: 0.6; }
 .pkg-price {
   font-family: var(--uv-font-display);
   font-size: 13.5px;
@@ -1175,8 +1185,9 @@ img { display: block; max-width: 100%; }
 /* ---- ≤720px: keep pkg-grid at 3 cols; CTA row stacks; tiles stay rectangular ---- */
 @media (max-width: 720px) {
   .pkg-grid { gap: 7px; }
-  .pkg-tier { padding: 14px 6px; gap: 5px; border-radius: 10px; min-height: 82px; }
+  .pkg-tier { padding: 14px 6px; gap: 4px; border-radius: 10px; min-height: 86px; }
   .pkg-qty { font-size: 16px; }
+  .pkg-price-orig { font-size: 10.5px; }
   .pkg-price { font-size: 13px; }
   .pkg-cta-row { flex-direction: column; align-items: stretch; }
   .pkg-cta { width: 100%; }
@@ -1195,11 +1206,12 @@ img { display: block; max-width: 100%; }
   .pkg-grid { grid-template-columns: repeat(3, 1fr); gap: 6px; }
   .pkg-tier {
     padding: 14px 6px;
-    gap: 5px;
-    min-height: 78px;
+    gap: 4px;
+    min-height: 82px;
     border-radius: 10px;
   }
   .pkg-qty { font-size: 15.5px; letter-spacing: -0.02em; }
+  .pkg-price-orig { font-size: 10px; }
   .pkg-price { font-size: 12.5px; }
   .pkg-tier-tag { font-size: 8px; padding: 2px 6px; top: -7px; letter-spacing: 0.05em; }
   .pkg-card { padding: 16px; }
@@ -1282,11 +1294,12 @@ img { display: block; max-width: 100%; }
   .pkg-grid { grid-template-columns: repeat(3, 1fr); gap: 5px; }
   .pkg-tier {
     padding: 12px 4px;
-    gap: 4px;
-    min-height: 72px;
+    gap: 3px;
+    min-height: 76px;
     border-radius: 9px;
   }
   .pkg-qty { font-size: 14px; }
+  .pkg-price-orig { font-size: 9.5px; }
   .pkg-price { font-size: 11.5px; }
   .pkg-tier-tag { font-size: 7.5px; padding: 1px 5px; top: -6px; }
 

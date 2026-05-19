@@ -24,18 +24,18 @@ const SERVICE_TABS = [
 ] as const;
 
 const PACKAGES = [
-  { qty: 50, price: 12.49, save: 0 },
-  { qty: 100, price: 22.49, save: 20 },
-  { qty: 200, price: 29.99, save: 30 },
-  { qty: 500, price: 64.99, save: 40 },
-  { qty: 750, price: 89.99, save: 50 },
-  { qty: 1000, price: 124.99, save: 60, popular: true },
-  { qty: 1500, price: 184.99, save: 65 },
-  { qty: 2000, price: 239.99, save: 70 },
-  { qty: 5000, price: 549.99, save: 75 },
-  { qty: 10000, price: 999.99, save: 78 },
-  { qty: 20000, price: 1999.99, save: 80 },
-  { qty: 50000, price: 4499.99, save: 85 },
+  { qty: 50, price: 12.49, regular: 15.61 },
+  { qty: 100, price: 22.49, regular: 28.11 },
+  { qty: 200, price: 29.99, regular: 37.49 },
+  { qty: 500, price: 64.99, regular: 81.24 },
+  { qty: 750, price: 89.99, regular: 112.49 },
+  { qty: 1000, price: 124.99, regular: 156.24, popular: true },
+  { qty: 1500, price: 184.99, regular: 231.24 },
+  { qty: 2000, price: 239.99, regular: 299.99 },
+  { qty: 5000, price: 549.99, regular: 687.49 },
+  { qty: 10000, price: 999.99, regular: 1249.99 },
+  { qty: 20000, price: 1999.99, regular: 2499.99 },
+  { qty: 50000, price: 4499.99, regular: 5624.99 },
 ] as const;
 
 const SIDE_BENEFITS = [
@@ -53,7 +53,8 @@ export function YouTubeSubscribersHero() {
 
   const pkg = PACKAGES[selected];
   const total = (pkg.price * (premium ? 1.35 : 1)).toFixed(2);
-  const youSave = pkg.save > 0 ? ((pkg.price * pkg.save) / 100).toFixed(2) : "0";
+  const youSave = ((pkg.regular - pkg.price) * (premium ? 1.35 : 1)).toFixed(2);
+  const youSavePct = Math.round((1 - pkg.price / pkg.regular) * 100);
   const checkoutHref = `/checkout?platform=youtube&service=subscribers&qty=${pkg.qty}&price=${pkg.price}&premium=${premium ? 1 : 0}`;
 
   return (
@@ -160,7 +161,7 @@ export function YouTubeSubscribersHero() {
             <div className="pkg-card">
               <div className="pkg-head">
                 <div className="pkg-h-title">Choose your package</div>
-                <span className="pkg-save">Save up to 50%</span>
+                <span className="pkg-save">Save up to 20%</span>
               </div>
               <div className="pkg-grid">
                 {PACKAGES.map((p, i) => (
@@ -178,6 +179,7 @@ export function YouTubeSubscribersHero() {
                     )}
                     <span className="pkg-qty">{formatQty(p.qty)}</span>
                     <span className="pkg-qty-sub">{tab.toUpperCase()}</span>
+                    <span className="pkg-price-orig">${(p.regular * (premium ? 1.35 : 1)).toFixed(2)}</span>
                     <span className="pkg-price">${(p.price * (premium ? 1.35 : 1)).toFixed(2)}</span>
                   </button>
                 ))}
@@ -204,7 +206,7 @@ export function YouTubeSubscribersHero() {
                   <div className="pkg-total-label">Total</div>
                   <div className="pkg-total">${total}</div>
                   {Number(youSave) > 0 && (
-                    <div className="pkg-save-line">You save ${youSave}</div>
+                    <div className="pkg-save-line">You save ${youSave} · {youSavePct}% off</div>
                   )}
                 </div>
                 <Link href={checkoutHref} className="btn btn-primary btn-lg pkg-cta">

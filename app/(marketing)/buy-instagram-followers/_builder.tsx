@@ -25,15 +25,15 @@ const SERVICE_TABS = [
 ] as const;
 
 const PACKAGES = [
-  { qty: 100, price: 3.49, save: 0 },
-  { qty: 250, price: 4.49, save: 35 },
-  { qty: 500, price: 6.89, save: 50 },
-  { qty: 1000, price: 12.49, save: 60 },
-  { qty: 2500, price: 28.99, save: 65, popular: true },
-  { qty: 5000, price: 38.99, save: 75 },
-  { qty: 10000, price: 59.99, save: 80 },
-  { qty: 20000, price: 99.99, save: 85 },
-  { qty: 100000, price: 499.99, save: 85 },
+  { qty: 100, price: 3.49, regular: 3.99 },
+  { qty: 250, price: 4.49, regular: 5.61 },
+  { qty: 500, price: 6.89, regular: 8.61 },
+  { qty: 1000, price: 12.49, regular: 15.61 },
+  { qty: 2500, price: 28.99, regular: 36.24, popular: true },
+  { qty: 5000, price: 38.99, regular: 48.74 },
+  { qty: 10000, price: 59.99, regular: 74.99 },
+  { qty: 20000, price: 99.99, regular: 124.9 },
+  { qty: 100000, price: 499.99, regular: 579.99 },
 ] as const;
 
 const SIDE_BENEFITS = [
@@ -51,7 +51,8 @@ export function FollowersHero() {
 
   const pkg = PACKAGES[selected];
   const total = (pkg.price * (premium ? 1.35 : 1)).toFixed(2);
-  const youSave = pkg.save > 0 ? ((pkg.price * pkg.save) / 100).toFixed(2) : "0";
+  const youSave = ((pkg.regular - pkg.price) * (premium ? 1.35 : 1)).toFixed(2);
+  const youSavePct = Math.round((1 - pkg.price / pkg.regular) * 100);
   const checkoutHref = `/checkout?platform=instagram&service=followers&qty=${pkg.qty}&price=${pkg.price}&premium=${premium ? 1 : 0}`;
 
   return (
@@ -158,7 +159,7 @@ export function FollowersHero() {
             <div className="pkg-card">
               <div className="pkg-head">
                 <div className="pkg-h-title">Choose your package</div>
-                <span className="pkg-save">Save up to 50%</span>
+                <span className="pkg-save">Save up to 20%</span>
               </div>
               <div className="pkg-grid">
                 {PACKAGES.map((p, i) => (
@@ -176,6 +177,7 @@ export function FollowersHero() {
                     )}
                     <span className="pkg-qty">{formatQty(p.qty)}</span>
                     <span className="pkg-qty-sub">{tab.toUpperCase()}</span>
+                    <span className="pkg-price-orig">${(p.regular * (premium ? 1.35 : 1)).toFixed(2)}</span>
                     <span className="pkg-price">${(p.price * (premium ? 1.35 : 1)).toFixed(2)}</span>
                   </button>
                 ))}
@@ -202,7 +204,7 @@ export function FollowersHero() {
                   <div className="pkg-total-label">Total</div>
                   <div className="pkg-total">${total}</div>
                   {Number(youSave) > 0 && (
-                    <div className="pkg-save-line">You save ${youSave}</div>
+                    <div className="pkg-save-line">You save ${youSave} · {youSavePct}% off</div>
                   )}
                 </div>
                 <Link href={checkoutHref} className="btn btn-primary btn-lg pkg-cta">

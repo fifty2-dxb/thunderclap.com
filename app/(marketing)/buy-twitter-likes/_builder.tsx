@@ -25,14 +25,14 @@ const SERVICE_TABS = [
 ] as const;
 
 const PACKAGES = [
-  { qty: 25, price: 2.49, save: 0 },
-  { qty: 50, price: 3.99, save: 20 },
-  { qty: 100, price: 5.49, save: 30 },
-  { qty: 250, price: 11.49, save: 40 },
-  { qty: 500, price: 19.49, save: 50, popular: true },
-  { qty: 1000, price: 35.49, save: 60 },
-  { qty: 2500, price: 69.49, save: 65 },
-  { qty: 5000, price: 129.49, save: 70 },
+  { qty: 25, price: 2.49, regular: 3.11 },
+  { qty: 50, price: 3.99, regular: 4.99 },
+  { qty: 100, price: 5.49, regular: 6.86 },
+  { qty: 250, price: 11.49, regular: 14.36 },
+  { qty: 500, price: 19.49, regular: 24.36, popular: true },
+  { qty: 1000, price: 35.49, regular: 44.36 },
+  { qty: 2500, price: 69.49, regular: 86.86 },
+  { qty: 5000, price: 129.49, regular: 161.86 },
 ] as const;
 
 const SIDE_BENEFITS = [
@@ -50,7 +50,8 @@ export function TwitterLikesHero() {
 
   const pkg = PACKAGES[selected];
   const total = (pkg.price * (premium ? 1.35 : 1)).toFixed(2);
-  const youSave = pkg.save > 0 ? ((pkg.price * pkg.save) / 100).toFixed(2) : "0";
+  const youSave = ((pkg.regular - pkg.price) * (premium ? 1.35 : 1)).toFixed(2);
+  const youSavePct = Math.round((1 - pkg.price / pkg.regular) * 100);
   const checkoutHref = `/checkout?platform=twitter&service=likes&qty=${pkg.qty}&price=${pkg.price}&premium=${premium ? 1 : 0}`;
 
   return (
@@ -157,7 +158,7 @@ export function TwitterLikesHero() {
             <div className="pkg-card">
               <div className="pkg-head">
                 <div className="pkg-h-title">Choose your package</div>
-                <span className="pkg-save">Save up to 50%</span>
+                <span className="pkg-save">Save up to 20%</span>
               </div>
               <div className="pkg-grid">
                 {PACKAGES.map((p, i) => (
@@ -175,6 +176,7 @@ export function TwitterLikesHero() {
                     )}
                     <span className="pkg-qty">{formatQty(p.qty)}</span>
                     <span className="pkg-qty-sub">{tab.toUpperCase()}</span>
+                    <span className="pkg-price-orig">${(p.regular * (premium ? 1.35 : 1)).toFixed(2)}</span>
                     <span className="pkg-price">${(p.price * (premium ? 1.35 : 1)).toFixed(2)}</span>
                   </button>
                 ))}
@@ -201,7 +203,7 @@ export function TwitterLikesHero() {
                   <div className="pkg-total-label">Total</div>
                   <div className="pkg-total">${total}</div>
                   {Number(youSave) > 0 && (
-                    <div className="pkg-save-line">You save ${youSave}</div>
+                    <div className="pkg-save-line">You save ${youSave} · {youSavePct}% off</div>
                   )}
                 </div>
                 <Link href={checkoutHref} className="btn btn-primary btn-lg pkg-cta">

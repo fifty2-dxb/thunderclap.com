@@ -240,18 +240,18 @@ app/(marketing)/buy-<platform>-<service>/
 
 All required component classes already exist in `app/globals.css`. Use them — don't reinvent with Tailwind utility soup.
 
-**Pricing tiers** for the package picker live inside `_builder.tsx` as a `PACKAGES` const (variable tier count per page, 6–12 tiers each). All 14 service pages now carry real, CSV-grounded prices sourced from the WooCommerce product export (`thunderclapproductprices.numbers`), HQ tier only. Each entry: `{ qty: number, price: number, save: number, popular?: true }`. When porting:
-1. Copy the array shape and swap `qty`/`price`/`save` to match the real pricing
-2. Mark exactly one tier `popular: true` (the value-anchor — middle-of-curve, where save% jumps)
+**Pricing tiers** for the package picker live inside `_builder.tsx` as a `PACKAGES` const (variable tier count per page, 6–12 tiers each). All 14 service pages carry real, CSV-grounded prices sourced from the WooCommerce product export (`thunderclapproductprices.numbers`), HQ tier only. Each entry: `{ qty: number, price: number, regular: number, popular?: true }`. `price` is the sale price; `regular` is the WooCommerce "Regular price" (sale ≈ regular × 0.8 for most tiers) — it powers the strikethrough on each tile and the `youSave` / `youSavePct` display below the CTA. When porting:
+1. Copy the array shape and fill in `qty`/`price`/`regular` from the CSV row for the matching qty
+2. Mark exactly one tier `popular: true` (the value-anchor — middle-of-curve)
 3. Re-sync `Product.offers` `lowPrice` / `highPrice` / `offerCount` in `page.tsx`
 4. Re-sync the mega-menu `fromPrice` and homepage `service-table.tsx` price for that service
-5. `save` is decorative; pick a round number that scales 0 → 75-85 across the curve (it's not derived from raw cost — the user wants the visual story, not a calculation)
+5. The "Save up to N%" header pill is hardcoded to 20% across all builders (the CSV's standard discount). Bump it if a service's max actual discount is meaningfully higher.
 
 **Service tabs (`.svc-tabs` strip above the package grid) are real navigation, NOT local state.** Each entry in `SERVICE_TABS` carries an `href` pointing to the matching `/buy-{platform}-{service}` page; the markup uses `<Link href={t.href}>` not `<button onClick={setTab}>`. Clicking a tab loads the new page with its real PACKAGES, prices, H1, and CTA — there's no shared tab-state model. The `tab` useState stays as a read-only constant for the per-tier sub-label and side-summary title (it always equals the current page's service id). Active-tab styling still works via `tab === t.id`. **Don't reintroduce the local-state tab pattern** — the user explicitly rejected it because the prices didn't change when toggling. SERVICE_TABS must list only services that exist on that platform (don't include `Comments` or `Likes` on YouTube etc.).
 
 **Premium toggle** (`+35%`):
 - Held in local `useState` inside the Hero
-- Affects both the cart total (`pkg.price * (premium ? 1.35 : 1)`) AND each per-tier price displayed in `.pkg-grid`: `<span className="pkg-price">${(p.price * (premium ? 1.35 : 1)).toFixed(2)}</span>`
+- Affects the cart total, the per-tier sale price displayed in `.pkg-grid`, AND the strikethrough regular price (`p.regular * (premium ? 1.35 : 1)`). Both prices scale by 1.35 together so the discount % stays constant.
 - Carries through to checkout via the `&premium=1` query param
 
 **CTA wiring (mandatory)**: both "Add to cart" buttons (`pkg-cta` and `side-cta`) are Next.js `<Link>` components, not `<button>`s. They route to:

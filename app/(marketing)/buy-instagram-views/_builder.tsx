@@ -25,16 +25,16 @@ const SERVICE_TABS = [
 ] as const;
 
 const PACKAGES = [
-  { qty: 1000, price: 3.49, save: 0 },
-  { qty: 2500, price: 6.49, save: 25 },
-  { qty: 5000, price: 12.79, save: 25 },
-  { qty: 10000, price: 24.99, save: 30 },
-  { qty: 25000, price: 47.99, save: 45, popular: true },
-  { qty: 50000, price: 72.49, save: 60 },
-  { qty: 100000, price: 134.99, save: 60 },
-  { qty: 200000, price: 292.49, save: 60 },
-  { qty: 500000, price: 639.99, save: 65 },
-  { qty: 1000000, price: 1249.99, save: 65 },
+  { qty: 1000, price: 3.49, regular: 4.36 },
+  { qty: 2500, price: 6.49, regular: 8.11 },
+  { qty: 5000, price: 12.79, regular: 15.99 },
+  { qty: 10000, price: 24.99, regular: 30.61 },
+  { qty: 25000, price: 47.99, regular: 59.99, popular: true },
+  { qty: 50000, price: 72.49, regular: 90.61 },
+  { qty: 100000, price: 134.99, regular: 168.74 },
+  { qty: 200000, price: 292.49, regular: 324.99 },
+  { qty: 500000, price: 639.99, regular: 799.99 },
+  { qty: 1000000, price: 1249.99, regular: 1562.49 },
 ] as const;
 
 const SIDE_BENEFITS = [
@@ -52,7 +52,8 @@ export function ViewsHero() {
 
   const pkg = PACKAGES[selected];
   const total = (pkg.price * (premium ? 1.35 : 1)).toFixed(2);
-  const youSave = pkg.save > 0 ? ((pkg.price * pkg.save) / 100).toFixed(2) : "0";
+  const youSave = ((pkg.regular - pkg.price) * (premium ? 1.35 : 1)).toFixed(2);
+  const youSavePct = Math.round((1 - pkg.price / pkg.regular) * 100);
   const checkoutHref = `/checkout?platform=instagram&service=views&qty=${pkg.qty}&price=${pkg.price}&premium=${premium ? 1 : 0}`;
 
   return (
@@ -159,7 +160,7 @@ export function ViewsHero() {
             <div className="pkg-card">
               <div className="pkg-head">
                 <div className="pkg-h-title">Choose your package</div>
-                <span className="pkg-save">Save up to 50%</span>
+                <span className="pkg-save">Save up to 20%</span>
               </div>
               <div className="pkg-grid">
                 {PACKAGES.map((p, i) => (
@@ -177,6 +178,7 @@ export function ViewsHero() {
                     )}
                     <span className="pkg-qty">{formatQty(p.qty)}</span>
                     <span className="pkg-qty-sub">{tab.toUpperCase()}</span>
+                    <span className="pkg-price-orig">${(p.regular * (premium ? 1.35 : 1)).toFixed(2)}</span>
                     <span className="pkg-price">${(p.price * (premium ? 1.35 : 1)).toFixed(2)}</span>
                   </button>
                 ))}
@@ -203,7 +205,7 @@ export function ViewsHero() {
                   <div className="pkg-total-label">Total</div>
                   <div className="pkg-total">${total}</div>
                   {Number(youSave) > 0 && (
-                    <div className="pkg-save-line">You save ${youSave}</div>
+                    <div className="pkg-save-line">You save ${youSave} · {youSavePct}% off</div>
                   )}
                 </div>
                 <Link href={checkoutHref} className="btn btn-primary btn-lg pkg-cta">

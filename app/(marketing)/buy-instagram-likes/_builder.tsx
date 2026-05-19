@@ -25,17 +25,17 @@ const SERVICE_TABS = [
 ] as const;
 
 const PACKAGES = [
-  { qty: 250, price: 4.79, save: 0 },
-  { qty: 500, price: 6.49, save: 30 },
-  { qty: 1000, price: 12.49, save: 35 },
-  { qty: 2500, price: 23.99, save: 50 },
-  { qty: 5000, price: 43.99, save: 55, popular: true },
-  { qty: 10000, price: 79.99, save: 60 },
-  { qty: 20000, price: 139.99, save: 65 },
-  { qty: 25000, price: 169.99, save: 65 },
-  { qty: 50000, price: 249.99, save: 75 },
-  { qty: 100000, price: 479.99, save: 75 },
-  { qty: 200000, price: 949.99, save: 75 },
+  { qty: 250, price: 4.79, regular: 5.99 },
+  { qty: 500, price: 6.49, regular: 8.11 },
+  { qty: 1000, price: 12.49, regular: 15.61 },
+  { qty: 2500, price: 23.99, regular: 29.99 },
+  { qty: 5000, price: 43.99, regular: 54.99, popular: true },
+  { qty: 10000, price: 79.99, regular: 99.99 },
+  { qty: 20000, price: 139.99, regular: 174.99 },
+  { qty: 25000, price: 169.99, regular: 212.49 },
+  { qty: 50000, price: 249.99, regular: 312.49 },
+  { qty: 100000, price: 479.99, regular: 599.99 },
+  { qty: 200000, price: 949.99, regular: 1187.49 },
 ] as const;
 
 const SIDE_BENEFITS = [
@@ -53,7 +53,8 @@ export function LikesHero() {
 
   const pkg = PACKAGES[selected];
   const total = (pkg.price * (premium ? 1.35 : 1)).toFixed(2);
-  const youSave = pkg.save > 0 ? ((pkg.price * pkg.save) / 100).toFixed(2) : "0";
+  const youSave = ((pkg.regular - pkg.price) * (premium ? 1.35 : 1)).toFixed(2);
+  const youSavePct = Math.round((1 - pkg.price / pkg.regular) * 100);
   const checkoutHref = `/checkout?platform=instagram&service=likes&qty=${pkg.qty}&price=${pkg.price}&premium=${premium ? 1 : 0}`;
 
   return (
@@ -160,7 +161,7 @@ export function LikesHero() {
             <div className="pkg-card">
               <div className="pkg-head">
                 <div className="pkg-h-title">Choose your package</div>
-                <span className="pkg-save">Save up to 50%</span>
+                <span className="pkg-save">Save up to 20%</span>
               </div>
               <div className="pkg-grid">
                 {PACKAGES.map((p, i) => (
@@ -178,6 +179,7 @@ export function LikesHero() {
                     )}
                     <span className="pkg-qty">{formatQty(p.qty)}</span>
                     <span className="pkg-qty-sub">{tab.toUpperCase()}</span>
+                    <span className="pkg-price-orig">${(p.regular * (premium ? 1.35 : 1)).toFixed(2)}</span>
                     <span className="pkg-price">${(p.price * (premium ? 1.35 : 1)).toFixed(2)}</span>
                   </button>
                 ))}
@@ -204,7 +206,7 @@ export function LikesHero() {
                   <div className="pkg-total-label">Total</div>
                   <div className="pkg-total">${total}</div>
                   {Number(youSave) > 0 && (
-                    <div className="pkg-save-line">You save ${youSave}</div>
+                    <div className="pkg-save-line">You save ${youSave} · {youSavePct}% off</div>
                   )}
                 </div>
                 <Link href={checkoutHref} className="btn btn-primary btn-lg pkg-cta">

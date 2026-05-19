@@ -25,17 +25,17 @@ const SERVICE_TABS = [
 ] as const;
 
 const PACKAGES = [
-  { qty: 2000, price: 2.39, save: 0 },
-  { qty: 5000, price: 4.49, save: 20 },
-  { qty: 10000, price: 8.39, save: 30 },
-  { qty: 15000, price: 12.39, save: 40 },
-  { qty: 20000, price: 16.39, save: 50 },
-  { qty: 30000, price: 19.89, save: 60, popular: true },
-  { qty: 40000, price: 24.89, save: 65 },
-  { qty: 50000, price: 29.99, save: 70 },
-  { qty: 100000, price: 48.99, save: 75 },
-  { qty: 150000, price: 78.99, save: 78 },
-  { qty: 200000, price: 99.99, save: 80 },
+  { qty: 2000, price: 2.39, regular: 2.99 },
+  { qty: 5000, price: 4.49, regular: 5.61 },
+  { qty: 10000, price: 8.39, regular: 10.49 },
+  { qty: 15000, price: 12.39, regular: 15.49 },
+  { qty: 20000, price: 16.39, regular: 20.49 },
+  { qty: 30000, price: 19.89, regular: 24.86, popular: true },
+  { qty: 40000, price: 24.89, regular: 31.11 },
+  { qty: 50000, price: 29.99, regular: 37.49 },
+  { qty: 100000, price: 48.99, regular: 61.24 },
+  { qty: 150000, price: 78.99, regular: 98.74 },
+  { qty: 200000, price: 99.99, regular: 124.99 },
 ] as const;
 
 const SIDE_BENEFITS = [
@@ -53,7 +53,8 @@ export function TikTokViewsHero() {
 
   const pkg = PACKAGES[selected];
   const total = (pkg.price * (premium ? 1.35 : 1)).toFixed(2);
-  const youSave = pkg.save > 0 ? ((pkg.price * pkg.save) / 100).toFixed(2) : "0";
+  const youSave = ((pkg.regular - pkg.price) * (premium ? 1.35 : 1)).toFixed(2);
+  const youSavePct = Math.round((1 - pkg.price / pkg.regular) * 100);
   const checkoutHref = `/checkout?platform=tiktok&service=views&qty=${pkg.qty}&price=${pkg.price}&premium=${premium ? 1 : 0}`;
 
   return (
@@ -160,7 +161,7 @@ export function TikTokViewsHero() {
             <div className="pkg-card">
               <div className="pkg-head">
                 <div className="pkg-h-title">Choose your package</div>
-                <span className="pkg-save">Save up to 50%</span>
+                <span className="pkg-save">Save up to 20%</span>
               </div>
               <div className="pkg-grid">
                 {PACKAGES.map((p, i) => (
@@ -178,6 +179,7 @@ export function TikTokViewsHero() {
                     )}
                     <span className="pkg-qty">{formatQty(p.qty)}</span>
                     <span className="pkg-qty-sub">{tab.toUpperCase()}</span>
+                    <span className="pkg-price-orig">${(p.regular * (premium ? 1.35 : 1)).toFixed(2)}</span>
                     <span className="pkg-price">${(p.price * (premium ? 1.35 : 1)).toFixed(2)}</span>
                   </button>
                 ))}
@@ -204,7 +206,7 @@ export function TikTokViewsHero() {
                   <div className="pkg-total-label">Total</div>
                   <div className="pkg-total">${total}</div>
                   {Number(youSave) > 0 && (
-                    <div className="pkg-save-line">You save ${youSave}</div>
+                    <div className="pkg-save-line">You save ${youSave} · {youSavePct}% off</div>
                   )}
                 </div>
                 <Link href={checkoutHref} className="btn btn-primary btn-lg pkg-cta">

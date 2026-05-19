@@ -25,16 +25,16 @@ const SERVICE_TABS = [
 ] as const;
 
 const PACKAGES = [
-  { qty: 100, price: 6.5, save: 0 },
-  { qty: 250, price: 12.5, save: 20 },
-  { qty: 500, price: 14.5, save: 30 },
-  { qty: 1000, price: 19.5, save: 40 },
-  { qty: 2500, price: 39.5, save: 50, popular: true },
-  { qty: 5000, price: 75.5, save: 60 },
-  { qty: 10000, price: 145.5, save: 65 },
-  { qty: 20000, price: 175.5, save: 70 },
-  { qty: 25000, price: 239.5, save: 75 },
-  { qty: 50000, price: 425.5, save: 78 },
+  { qty: 100, price: 6.5, regular: 8.13 },
+  { qty: 250, price: 12.5, regular: 15.63 },
+  { qty: 500, price: 14.5, regular: 18.13 },
+  { qty: 1000, price: 19.5, regular: 24.38 },
+  { qty: 2500, price: 39.5, regular: 49.38, popular: true },
+  { qty: 5000, price: 75.5, regular: 94.38 },
+  { qty: 10000, price: 145.5, regular: 181.88 },
+  { qty: 20000, price: 175.5, regular: 219.38 },
+  { qty: 25000, price: 239.5, regular: 299.38 },
+  { qty: 50000, price: 425.5, regular: 531.88 },
 ] as const;
 
 const SIDE_BENEFITS = [
@@ -52,7 +52,8 @@ export function FacebookFollowersHero() {
 
   const pkg = PACKAGES[selected];
   const total = (pkg.price * (premium ? 1.35 : 1)).toFixed(2);
-  const youSave = pkg.save > 0 ? ((pkg.price * pkg.save) / 100).toFixed(2) : "0";
+  const youSave = ((pkg.regular - pkg.price) * (premium ? 1.35 : 1)).toFixed(2);
+  const youSavePct = Math.round((1 - pkg.price / pkg.regular) * 100);
   const checkoutHref = `/checkout?platform=facebook&service=followers&qty=${pkg.qty}&price=${pkg.price}&premium=${premium ? 1 : 0}`;
 
   return (
@@ -159,7 +160,7 @@ export function FacebookFollowersHero() {
             <div className="pkg-card">
               <div className="pkg-head">
                 <div className="pkg-h-title">Choose your package</div>
-                <span className="pkg-save">Save up to 55%</span>
+                <span className="pkg-save">Save up to 20%</span>
               </div>
               <div className="pkg-grid">
                 {PACKAGES.map((p, i) => (
@@ -177,6 +178,7 @@ export function FacebookFollowersHero() {
                     )}
                     <span className="pkg-qty">{formatQty(p.qty)}</span>
                     <span className="pkg-qty-sub">{tab.toUpperCase()}</span>
+                    <span className="pkg-price-orig">${(p.regular * (premium ? 1.35 : 1)).toFixed(2)}</span>
                     <span className="pkg-price">${(p.price * (premium ? 1.35 : 1)).toFixed(2)}</span>
                   </button>
                 ))}
@@ -203,7 +205,7 @@ export function FacebookFollowersHero() {
                   <div className="pkg-total-label">Total</div>
                   <div className="pkg-total">${total}</div>
                   {Number(youSave) > 0 && (
-                    <div className="pkg-save-line">You save ${youSave}</div>
+                    <div className="pkg-save-line">You save ${youSave} · {youSavePct}% off</div>
                   )}
                 </div>
                 <Link href={checkoutHref} className="btn btn-primary btn-lg pkg-cta">
