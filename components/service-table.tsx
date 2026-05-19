@@ -75,7 +75,7 @@ const SERVICES: Service[] = [
 
 export function ServiceTable() {
   return (
-    <section style={{ background: "var(--uv-bg-lavender)", paddingBottom: 80 }}>
+    <section id="services" style={{ background: "var(--uv-bg-lavender)", paddingBottom: 80, scrollMarginTop: "var(--uv-header-h)" }}>
       <div className="container">
         <div className="service-table">
           <div className="st-head">

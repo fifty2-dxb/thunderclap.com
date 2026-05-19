@@ -1,4 +1,5 @@
-import { ArrowRight, Lock, ShieldCheck, Zap } from "lucide-react";
+import Link from "next/link";
+import { ArrowRight, Lock, ShieldCheck, Star, Zap } from "lucide-react";
 
 export function Hero() {
   return (
@@ -57,20 +58,20 @@ export function Hero() {
             Money-back guaranteed. No password ever required.
           </p>
           <div style={{ display: "flex", justifyContent: "center", gap: 12, flexWrap: "wrap" }}>
-            <button
-              type="button"
+            <Link
+              href="#services"
               className="btn btn-primary btn-lg"
               style={{ borderRadius: 999, padding: "0 32px" }}
             >
               Get Started <ArrowRight size={18} />
-            </button>
-            <button
-              type="button"
+            </Link>
+            <Link
+              href="/buy-instagram-followers"
               className="btn btn-outline btn-lg"
               style={{ borderRadius: 999, padding: "0 28px" }}
             >
-              See pricing
-            </button>
+              <Star size={16} /> Most Popular
+            </Link>
           </div>
           <div
             style={{
