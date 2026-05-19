@@ -57,9 +57,9 @@ const TwitterBrand = (
 const IG_BG = "linear-gradient(135deg,#feda77 0%,#f58529 35%,#dd2a7b 65%,#8134af 100%)";
 
 const SERVICES: Service[] = [
-  { platformId: "instagram", platformName: "Instagram", service: "Followers", href: "/buy-instagram-followers", price: "$0.49", popular: true, brand: InstagramBrand, bg: IG_BG },
-  { platformId: "instagram", platformName: "Instagram", service: "Likes",     href: "/buy-instagram-likes",     price: "$0.99", brand: InstagramBrand, bg: IG_BG },
-  { platformId: "instagram", platformName: "Instagram", service: "Views",     href: "/buy-instagram-views",     price: "$0.99", brand: InstagramBrand, bg: IG_BG },
+  { platformId: "instagram", platformName: "Instagram", service: "Followers", href: "/buy-instagram-followers", price: "$3.49", popular: true, brand: InstagramBrand, bg: IG_BG },
+  { platformId: "instagram", platformName: "Instagram", service: "Likes",     href: "/buy-instagram-likes",     price: "$4.79", brand: InstagramBrand, bg: IG_BG },
+  { platformId: "instagram", platformName: "Instagram", service: "Views",     href: "/buy-instagram-views",     price: "$3.49", brand: InstagramBrand, bg: IG_BG },
   { platformId: "tiktok",    platformName: "TikTok",    service: "Followers", href: "/buy-tiktok-followers",    price: "$0.49", popular: true, brand: TikTokBrand, bg: "#000" },
   { platformId: "tiktok",    platformName: "TikTok",    service: "Likes",     href: "/buy-tiktok-likes",        price: "$0.59", brand: TikTokBrand, bg: "#000" },
   { platformId: "tiktok",    platformName: "TikTok",    service: "Views",     href: "/buy-tiktok-views",        price: "$0.79", brand: TikTokBrand, bg: "#000" },
