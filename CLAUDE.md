@@ -247,6 +247,8 @@ All required component classes already exist in `app/globals.css`. Use them — 
 4. Re-sync the mega-menu `fromPrice` and homepage `service-table.tsx` price for that service
 5. `save` is decorative; pick a round number that scales 0 → 75-85 across the curve (it's not derived from raw cost — the user wants the visual story, not a calculation)
 
+**Service tabs (`.svc-tabs` strip above the package grid) are real navigation, NOT local state.** Each entry in `SERVICE_TABS` carries an `href` pointing to the matching `/buy-{platform}-{service}` page; the markup uses `<Link href={t.href}>` not `<button onClick={setTab}>`. Clicking a tab loads the new page with its real PACKAGES, prices, H1, and CTA — there's no shared tab-state model. The `tab` useState stays as a read-only constant for the per-tier sub-label and side-summary title (it always equals the current page's service id). Active-tab styling still works via `tab === t.id`. **Don't reintroduce the local-state tab pattern** — the user explicitly rejected it because the prices didn't change when toggling. SERVICE_TABS must list only services that exist on that platform (don't include `Comments` or `Likes` on YouTube etc.).
+
 **Premium toggle** (`+35%`):
 - Held in local `useState` inside the Hero
 - Affects both the cart total (`pkg.price * (premium ? 1.35 : 1)`) AND each per-tier price displayed in `.pkg-grid`: `<span className="pkg-price">${(p.price * (premium ? 1.35 : 1)).toFixed(2)}</span>`
@@ -404,5 +406,11 @@ These are the patterns worth lifting wholesale when standing up a similar site:
 10. **3-column pricing grid at every breakpoint** (`.pkg-grid { grid-template-columns: repeat(3, 1fr) }`). Sizing scale: padding 16/8 → 14/6 → 14/6 → 12/4; min-h 92 → 82 → 78 → 72.
 11. **`amplify.yml` env-baking** — inlines selected env vars into `.env.production` at build time so Next.js SSR Lambda actually sees them. Amplify's console env vars don't reach the runtime by default.
 12. **SSH-only git remote** for agent sessions — HTTPS push fails silently. `git remote set-url origin git@github.com:org/repo.git` once.
+13. **Service-tab strip as navigation** — `<Link href>` not `<button onClick>`. Local tab-state without page navigation is a UX trap: prices don't change, copy doesn't change, only the highlight does, and users get confused.
+14. **Three sources of truth for service pricing** (PACKAGES in `_builder.tsx`, mega-menu `fromPrice` in `mega-menu.tsx`, SERVICES in `service-table.tsx`) must stay in sync. The lowest tier of PACKAGES is what the other two show. Until you centralise into `content/packages.ts`, every price change touches three files.
+
+## Workflow rule: keep CLAUDE.md in sync
+
+After every change that introduces a new component, convention, file layout, CSS namespace, data shape, or behaviour rule, **update this CLAUDE.md** in the same commit (or a follow-up `docs:` commit if the original is already large). CLAUDE.md is the portable spec — when it drifts from reality, future sessions waste cycles re-deriving things from code. Add new patterns to the "Portable feature recipes" list when they're worth lifting to another site.
 
 **Don't add fulfillment hooks in the webhook handler.** Fulfillment is the Redlap environment's job. The handler only verifies the signature, records the outcome, and acks 200.
