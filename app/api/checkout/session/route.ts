@@ -54,6 +54,9 @@ const SMM_SERVICE_IDS: Record<string, number> = {
   "tiktok-followers": 5818,
   "tiktok-likes": 1126,
   "tiktok-views": 9121,
+  "instagram-followers": 8072,
+  "instagram-likes": 2916,
+  "instagram-views": 7762,
 };
 
 function makeOrderId(): string {

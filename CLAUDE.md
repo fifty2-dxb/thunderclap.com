@@ -378,7 +378,7 @@ metadata: {
 }
 ```
 
-Currently mapped: `tiktok-followers: 5818`, `tiktok-likes: 1126`, `tiktok-views: 9121`. Add more entries as the user supplies them — unmapped pairs send no `smmData` block and Redlap falls back to its default routing.
+Currently mapped: `tiktok-followers: 5818`, `tiktok-likes: 1126`, `tiktok-views: 9121`, `instagram-followers: 8072`, `instagram-likes: 2916`, `instagram-views: 7762`. Add more entries as the user supplies them — unmapped pairs send no `smmData` block and Redlap falls back to its default routing.
 
 ## Ahrefs SEO grounding (don't change these without re-checking)
 
