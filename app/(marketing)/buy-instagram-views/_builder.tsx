@@ -19,10 +19,9 @@ import { formatQty } from "@/lib/utils";
 import { IG_FAQS } from "./_faqs";
 
 const SERVICE_TABS = [
-  { id: "views", label: "Views", Icon: Play },
-  { id: "followers", label: "Followers", Icon: Users },
-  { id: "likes", label: "Likes", Icon: Heart },
-  { id: "comments", label: "Comments", Icon: MessageSquare },
+  { id: "followers", label: "Followers", Icon: Users, href: "/buy-instagram-followers" },
+  { id: "likes",     label: "Likes",     Icon: Heart, href: "/buy-instagram-likes" },
+  { id: "views",     label: "Views",     Icon: Play,  href: "/buy-instagram-views" },
 ] as const;
 
 const PACKAGES = [
@@ -145,16 +144,15 @@ export function ViewsHero() {
 
             <div className="svc-tabs" role="tablist" aria-label="Service type">
               {SERVICE_TABS.map((t) => (
-                <button
+                <Link
                   key={t.id}
-                  type="button"
+                  href={t.href}
                   role="tab"
                   aria-selected={tab === t.id}
                   className={`svc-tab ${tab === t.id ? "active" : ""}`}
-                  onClick={() => setTab(t.id)}
                 >
                   {t.label}
-                </button>
+                </Link>
               ))}
             </div>
 

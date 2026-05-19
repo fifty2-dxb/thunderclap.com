@@ -19,10 +19,8 @@ import { formatQty } from "@/lib/utils";
 import { YT_FAQS } from "./_faqs";
 
 const SERVICE_TABS = [
-  { id: "subscribers", label: "Subscribers", Icon: Users },
-  { id: "views", label: "Views", Icon: Play },
-  { id: "likes", label: "Likes", Icon: Heart },
-  { id: "comments", label: "Comments", Icon: MessageSquare },
+  { id: "subscribers", label: "Subscribers", Icon: Users, href: "/buy-youtube-subscribers" },
+  { id: "views",       label: "Views",       Icon: Play,  href: "/buy-youtube-views" },
 ] as const;
 
 const PACKAGES = [
@@ -149,16 +147,15 @@ export function YouTubeSubscribersHero() {
 
             <div className="svc-tabs" role="tablist" aria-label="Service type">
               {SERVICE_TABS.map((t) => (
-                <button
+                <Link
                   key={t.id}
-                  type="button"
+                  href={t.href}
                   role="tab"
                   aria-selected={tab === t.id}
                   className={`svc-tab ${tab === t.id ? "active" : ""}`}
-                  onClick={() => setTab(t.id)}
                 >
                   {t.label}
-                </button>
+                </Link>
               ))}
             </div>
 

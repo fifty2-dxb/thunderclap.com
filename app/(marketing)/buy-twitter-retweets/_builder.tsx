@@ -19,10 +19,9 @@ import { formatQty } from "@/lib/utils";
 import { TW_FAQS } from "./_faqs";
 
 const SERVICE_TABS = [
-  { id: "retweets", label: "Retweets", Icon: Repeat2 },
-  { id: "followers", label: "Followers", Icon: Users },
-  { id: "likes", label: "Likes", Icon: Heart },
-  { id: "comments", label: "Comments", Icon: MessageSquare },
+  { id: "followers", label: "Followers", Icon: Users,   href: "/buy-twitter-followers" },
+  { id: "likes",     label: "Likes",     Icon: Heart,   href: "/buy-twitter-likes" },
+  { id: "retweets",  label: "Retweets",  Icon: Repeat2, href: "/buy-twitter-retweets" },
 ] as const;
 
 const PACKAGES = [
@@ -149,16 +148,15 @@ export function TwitterRetweetsHero() {
 
             <div className="svc-tabs" role="tablist" aria-label="Service type">
               {SERVICE_TABS.map((t) => (
-                <button
+                <Link
                   key={t.id}
-                  type="button"
+                  href={t.href}
                   role="tab"
                   aria-selected={tab === t.id}
                   className={`svc-tab ${tab === t.id ? "active" : ""}`}
-                  onClick={() => setTab(t.id)}
                 >
                   {t.label}
-                </button>
+                </Link>
               ))}
             </div>
 

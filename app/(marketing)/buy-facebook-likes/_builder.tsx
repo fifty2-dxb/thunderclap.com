@@ -19,10 +19,9 @@ import { formatQty } from "@/lib/utils";
 import { FB_FAQS } from "./_faqs";
 
 const SERVICE_TABS = [
-  { id: "likes", label: "Likes", Icon: Heart },
-  { id: "followers", label: "Followers", Icon: Users },
-  { id: "views", label: "Views", Icon: Play },
-  { id: "comments", label: "Comments", Icon: MessageSquare },
+  { id: "followers", label: "Followers", Icon: Users, href: "/buy-facebook-followers" },
+  { id: "likes",     label: "Likes",     Icon: Heart, href: "/buy-facebook-likes" },
+  { id: "views",     label: "Views",     Icon: Play,  href: "/buy-facebook-views" },
 ] as const;
 
 const PACKAGES = [
@@ -149,16 +148,15 @@ export function FacebookLikesHero() {
 
             <div className="svc-tabs" role="tablist" aria-label="Service type">
               {SERVICE_TABS.map((t) => (
-                <button
+                <Link
                   key={t.id}
-                  type="button"
+                  href={t.href}
                   role="tab"
                   aria-selected={tab === t.id}
                   className={`svc-tab ${tab === t.id ? "active" : ""}`}
-                  onClick={() => setTab(t.id)}
                 >
                   {t.label}
-                </button>
+                </Link>
               ))}
             </div>
 
