@@ -1,7 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import { useRouter } from "next/navigation";
 import { ArrowRight, Check, ShieldCheck } from "lucide-react";
 
 type Platform = "instagram" | "tiktok" | "youtube" | "facebook" | "twitter";
@@ -85,30 +84,57 @@ export function CheckoutForm({
   initialTarget?: string;
   initialEmail?: string;
 }) {
-  const router = useRouter();
   const [target, setTarget] = useState(initialTarget ?? "");
   const [email, setEmail] = useState(initialEmail ?? "");
   const [promo, setPromo] = useState(true);
   const [submitting, setSubmitting] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
-  const onSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+  const onSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (submitting) return;
+    setError(null);
     setSubmitting(true);
-    const params = new URLSearchParams({
-      platform,
-      service,
-      qty: String(qty),
-      price: String(basePrice),
-      premium: premium ? "1" : "0",
-      target,
-      email,
-    });
-    router.push(`/checkout/payment?${params.toString()}`);
+
+    try {
+      const res = await fetch("/api/checkout/session", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          platform,
+          service,
+          qty,
+          price: basePrice,
+          premium,
+          target,
+          email,
+        }),
+      });
+      const json = (await res.json().catch(() => null)) as
+        | { redirectUrl?: string; error?: string }
+        | null;
+
+      if (!res.ok || !json?.redirectUrl) {
+        setSubmitting(false);
+        setError(
+          json?.error ||
+            "We couldn't start the payment session. Please try again in a moment.",
+        );
+        return;
+      }
+      window.location.href = json.redirectUrl;
+    } catch (err) {
+      setSubmitting(false);
+      setError(
+        err instanceof Error
+          ? err.message
+          : "Network error while contacting the gateway.",
+      );
+    }
   };
 
   return (
-    <form onSubmit={onSubmit} noValidate>
+    <form onSubmit={onSubmit}>
       <div className="co-input-wrap">
         <span className={`co-input-icon platform-${platform}`} aria-hidden>
           <PlatformChipIcon platform={platform} />
@@ -170,8 +196,14 @@ export function CheckoutForm({
         <span onClick={() => setPromo(!promo)}>Send me special promotions and discounts</span>
       </label>
 
+      {error && (
+        <div className="co-pay-err" role="alert">
+          {error}
+        </div>
+      )}
+
       <button type="submit" className="co-cta" disabled={submitting}>
-        {submitting ? "Loading…" : "Continue to payment"}
+        {submitting ? "Opening gateway…" : "Continue to payment"}
         {!submitting && <ArrowRight size={16} />}
       </button>
 

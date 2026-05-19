@@ -140,7 +140,7 @@ export default async function Page({
               Back to package
             </Link>
             <Link
-              href={`/checkout/payment?${retryParams.toString()}`}
+              href={`/checkout?${retryParams.toString()}`}
               className="btn btn-primary btn-md"
             >
               Try payment again

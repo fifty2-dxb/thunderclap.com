@@ -5,7 +5,6 @@ import Link from "next/link";
 import {
   ArrowRight,
   Heart,
-  Link2,
   Lock,
   MessageSquare,
   Play,
@@ -47,7 +46,6 @@ export function TikTokLikesHero() {
   const [tab, setTab] = useState<(typeof SERVICE_TABS)[number]["id"]>("likes");
   const [selected, setSelected] = useState(4); // 2.5K popular
   const [premium, setPremium] = useState(false);
-  const [url, setUrl] = useState("");
 
   const pkg = PACKAGES[selected];
   const total = (pkg.price * (premium ? 1.35 : 1)).toFixed(2);
@@ -182,22 +180,6 @@ export function TikTokLikesHero() {
                   </button>
                 ))}
               </div>
-
-              <label className="pkg-url-wrap">
-                <Link2 size={16} color="var(--uv-fg-3)" />
-                <div style={{ flex: 1 }}>
-                  <div className="pkg-url-label">USERNAME OR VIDEO LINK</div>
-                  <input
-                    className="pkg-url-input"
-                    value={url}
-                    onChange={(e) => setUrl(e.target.value)}
-                    placeholder="You'll paste this at checkout — no password needed."
-                  />
-                </div>
-                <span className="pkg-safe">
-                  <Lock size={11} /> Safe
-                </span>
-              </label>
 
               <div className="pkg-cta-row">
                 <div>

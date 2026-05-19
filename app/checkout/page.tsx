@@ -3,7 +3,6 @@ import Image from "next/image";
 import Link from "next/link";
 import {
   ArrowLeft,
-  ChevronRight,
   Heart,
   MessageSquare,
   Play,
@@ -249,18 +248,6 @@ export default async function Page({
       </div>
 
       <div className="container">
-        <div className="co-stepper" aria-label="Checkout steps">
-          <span className="co-step active">
-            <span className="co-step-num">1</span>
-            Details
-          </span>
-          <ChevronRight size={14} className="co-step-sep" />
-          <span className="co-step">
-            <span className="co-step-num">2</span>
-            Payment
-          </span>
-        </div>
-
         <div className="co-grid">
           <section className="co-card">
             <h1>Get started</h1>

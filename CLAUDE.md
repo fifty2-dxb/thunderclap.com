@@ -26,11 +26,10 @@ Social media growth marketing site (Instagram / TikTok / YouTube / Facebook / Tw
 | `/buy-facebook-{followers,likes,views}` | **Fully built** — Facebook-branded copy. FAQs export `FB_FAQS`. |
 | `/buy-twitter-{followers,likes,retweets}` | **Fully built** — labelled "Twitter / X" everywhere user-facing. FAQs export `TW_FAQS`. Adds the `retweets` service type. |
 | `next.config.ts` redirects | 301s from old `/{platform}/{service}` nested routes AND legacy prod URLs (`/buy-instagram-impressions`, `/free-youtube-subscribers`, `/instagram`, `/tiktok`, `/youtube`, `/facebook`, `/twitter`) → new canonicals. |
-| `/checkout` | **Built** — Step 1 (Details), `noindex, nofollow`. Reads `?platform&service&qty&price&premium`, submits via `router.push` to `/checkout/payment` carrying `target` + `email`. |
-| `/checkout/payment` | **Built** — Step 2 (Payment method picker). On submit POSTs `/api/checkout/session`, then `window.location` redirects to the Redlap-hosted payment page. |
+| `/checkout` | **Built** — single-step "Get started" form, `noindex, nofollow`. Reads `?platform&service&qty&price&premium`, requires `target` (profile/post URL) + valid `email`. On submit POSTs `/api/checkout/session` and `window.location` redirects to the Redlap-hosted payment page. No method picker — Redlap owns card/Apple Pay/etc. |
 | `/checkout/return` | **Built** — landing point for Redlap's redirect. Client island polls `/api/checkout/status` until terminal status, then `router.replace` to `/checkout/success` or `/checkout/failed`. |
 | `/checkout/success` | **Built** — order confirmation. Reads `order_id`, `payment_id` (Redlap session), `order_number` (Redlap gateway ref) from URL. |
-| `/checkout/failed` | **Built** — failure / cancelled / expired / timeout state with a "Try payment again" CTA back to `/checkout/payment`. |
+| `/checkout/failed` | **Built** — failure / cancelled / expired / timeout state with a "Try payment again" CTA back to `/checkout` (single-step). |
 | `/api/checkout/session` | POST — creates a Redlap session, returns `{ sessionId, redirectUrl, orderId }`. |
 | `/api/checkout/status` | GET `?sid=…` — returns `{ status: "pending"\|"paid"\|"failed"\|"expired" }`. Reads from the in-process webhook cache, falls back to Redlap's `GET /api/payments/sessions/:id`. |
 | `/api/redlap/webhook` | POST — verifies `X-Webhook-Signature` HMAC-SHA256 and records the outcome in the in-process cache. **No fulfillment** — that lives inside the Redlap environment. |
@@ -54,9 +53,8 @@ app/
     buy-facebook-{followers,likes,views}/{page.tsx, _builder.tsx, _faqs.ts}
     buy-twitter-{followers,likes,retweets}/{page.tsx, _builder.tsx, _faqs.ts}
   checkout/
-    page.tsx                          Step 1 server shell (details)
-    _form.tsx                         Step 1 client form
-    payment/{page.tsx, _form.tsx}     Step 2 — method picker + POST to /api/checkout/session
+    page.tsx                          single-step "Get started" server shell
+    _form.tsx                         client form — POSTs /api/checkout/session, redirects to Redlap
     return/{page.tsx, _poll.tsx}      gateway return landing + client polling island
     success/page.tsx                  order received state
     failed/page.tsx                   failure / cancelled / expired state
@@ -315,7 +313,7 @@ Responsive: `.blog-grid` 3→2→1, `.blog-featured` stacks at ≤980, hero-imag
 
 The full payment funnel is wired end-to-end. The Thunderclap site only verifies that payment succeeded; **order fulfillment lives inside the Redlap environment** — don't add fulfillment hooks here.
 
-**URL contract (Step 1, `/checkout`)** — all string params:
+**URL contract (`/checkout`)** — all string params:
 
 | param | type | default |
 | --- | --- | --- |
@@ -324,22 +322,20 @@ The full payment funnel is wired end-to-end. The Thunderclap site only verifies 
 | `qty` | number | `1000` |
 | `price` | number (base, USD) | `7.99` |
 | `premium` | `0` \| `1` | `0` |
-| `target` / `email` | strings — optional on Step 1 (set when user comes back from Step 2 via back) | — |
+| `target` / `email` | strings — optional on URL (set when user returns from a failed payment to retry) | — |
 
-`/checkout/page.tsx` validates each, applies sensible fallbacks, computes `subtotal = price * (premium ? 1.35 : 1)`, and renders a two-column grid: form (`<CheckoutForm>`) on left, order summary + bundle upsell + Trustpilot quote on right.
+`/checkout/page.tsx` validates each, applies sensible fallbacks, computes `subtotal = price * (premium ? 1.35 : 1)`, and renders a two-column grid: form (`<CheckoutForm>`) on left, order summary + bundle upsell + Trustpilot quote on right. Both fields are `required` (target = profile/post URL, email = `type="email"`). The form runs native HTML validation — `noValidate` is intentionally off.
 
 - **Per-service input** label and placeholder are looked up from `INPUT_CONFIG[`${platform}-${service}`]` — extend this map when adding new service combos
 - **Platform-coloured input chip** uses `.platform-instagram` / `.platform-tiktok` / `.platform-youtube` / `.platform-facebook` / `.platform-twitter` modifier classes on `.co-input-icon`
 
-On submit Step 1 carries everything (`target`, `email` included) forward as `router.push('/checkout/payment?...')`.
+On submit the form `fetch`es `POST /api/checkout/session`, then on success sets `window.location.href = redirectUrl` to hand off to the Redlap-hosted payment page. There is **no on-site method picker** — Card / Apple Pay / Google Pay / Crypto are presented on the Redlap page. Error messages from the API are surfaced inline via `.co-pay-err`.
 
-**Step 2 (`/checkout/payment`)** is a method picker (Card / Apple Pay / Google Pay / Crypto tabs — UI only; the actual card form lives on the Redlap-hosted page). Submit does `POST /api/checkout/session` and on success sets `window.location.href = redirectUrl` to hand off to Redlap. Error messages from the API are surfaced inline via `.co-pay-err`.
-
-**Step 3 (`/checkout/return`)** is the landing point Redlap redirects back to. It validates Redlap-appended params (`payment_status`, `payment_id`, `order_number`); if `payment_status` is already `failed`/`cancelled`/`expired` it 302s straight to `/checkout/failed`. Otherwise it renders a "Confirming…" UI with a client island (`_poll.tsx`) that polls `/api/checkout/status?sid=...` every 3s for up to ~3 minutes, then `router.replace`s to `/checkout/success` or `/checkout/failed?reason=...`.
+**`/checkout/return`** is the landing point Redlap redirects back to. It validates Redlap-appended params (`payment_status`, `payment_id`, `order_number`); if `payment_status` is already `failed`/`cancelled`/`expired` it 302s straight to `/checkout/failed`. Otherwise it renders a "Confirming…" UI with a client island (`_poll.tsx`) that polls `/api/checkout/status?sid=...` every 3s for up to ~3 minutes, then `router.replace`s to `/checkout/success` or `/checkout/failed?reason=...`.
 
 **`/checkout/success`** displays the confirmed order (`order_id`, `payment_id`, `order_number`, package, total, target). Reads order_id from URL (set by `/api/checkout/session`), falls back to a deterministic hash for legacy paths.
 
-**`/checkout/failed`** shows a reason-specific message (`failed`, `cancelled`, `expired`, `timeout`, `missing_session`, `error`) and a "Try payment again" CTA that round-trips back to `/checkout/payment` with the same params intact.
+**`/checkout/failed`** shows a reason-specific message (`failed`, `cancelled`, `expired`, `timeout`, `missing_session`, `error`) and a "Try payment again" CTA that round-trips back to `/checkout` with the same params intact.
 
 All checkout classes are prefixed `.co-*` and live in the "Checkout" block of `globals.css`. Don't add ad-hoc inline styles for chrome — extend the `.co-*` set instead.
 
@@ -401,7 +397,7 @@ These are the patterns worth lifting wholesale when standing up a similar site:
 5. **Full-screen mobile sheet with internal close X** — not a slide-down. Body scroll-lock + `overscroll-behavior: contain` + Escape key.
 6. **Trust ticker** (`components/ticker.tsx` + `.ticker-*` CSS) — vertical-gradient-masked edges + duplicated rows + `translateX(-50%)` keyframe.
 7. **Blog system** (`content/blog.ts` typed `BlogBlock[]` + `app/blog/_post-body.tsx` renderer + `/blog` index + `/blog/[slug]` dynamic with `generateStaticParams`).
-8. **Redlap checkout flow** (Step 1 details → Step 2 method picker → `/api/checkout/session` → gateway hosted page → `/checkout/return` polling → `/checkout/success` or `/checkout/failed`). The HMAC webhook verifier + in-process status cache + `smmData` metadata block are the reusable bits.
+8. **Redlap checkout flow** (single-step `/checkout` form → `/api/checkout/session` → gateway hosted page → `/checkout/return` polling → `/checkout/success` or `/checkout/failed`). The HMAC webhook verifier + in-process status cache + `smmData` metadata block are the reusable bits.
 9. **Defensive `overflow-x: clip` on `html, body`** — kills mobile horizontal scroll regardless of any descendant.
 10. **3-column pricing grid at every breakpoint** (`.pkg-grid { grid-template-columns: repeat(3, 1fr) }`). Sizing scale: padding 16/8 → 14/6 → 14/6 → 12/4; min-h 92 → 82 → 78 → 72.
 11. **`amplify.yml` env-baking** — inlines selected env vars into `.env.production` at build time so Next.js SSR Lambda actually sees them. Amplify's console env vars don't reach the runtime by default.
