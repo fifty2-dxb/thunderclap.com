@@ -13,7 +13,7 @@ import { SITE_URL } from "@/lib/seo";
 import { TwitterRetweetsHero, TwitterRetweetsFaq } from "./_builder";
 import { TW_FAQS } from "./_faqs";
 
-const URL_PATH = "/buy-twitter-retweets";
+const URL_PATH = "/buy-twitter-retweets/";
 const CANONICAL = `${SITE_URL}${URL_PATH}`;
 
 export const metadata: Metadata = {

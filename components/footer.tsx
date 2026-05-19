@@ -45,19 +45,18 @@ const FOOTER_COLS = [
   {
     title: "Company",
     links: [
-      { label: "About", href: "#" },
+      { label: "About us", href: "/aboutus" },
+      { label: "Team", href: "/team" },
       { label: "Blog", href: "/blog" },
-      { label: "Affiliates", href: "#" },
-      { label: "Contact", href: "#" },
-      { label: "Press", href: "#" },
+      { label: "FAQs", href: "/faqs" },
+      { label: "Contact", href: "/contact" },
     ],
   },
   {
     title: "Legal",
     links: [
-      { label: "Terms", href: "#" },
-      { label: "Privacy", href: "#" },
-      { label: "Refund Policy", href: "#" },
+      { label: "Privacy", href: "/privacy" },
+      { label: "Refund policy", href: "/refund" },
       { label: "Sitemap", href: "/sitemap.xml" },
     ],
   },

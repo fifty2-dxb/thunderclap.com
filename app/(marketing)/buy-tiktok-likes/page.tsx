@@ -12,7 +12,7 @@ import { SITE_URL } from "@/lib/seo";
 import { TikTokLikesHero, TikTokLikesFaq } from "./_builder";
 import { TT_FAQS } from "./_faqs";
 
-const URL_PATH = "/buy-tiktok-likes";
+const URL_PATH = "/buy-tiktok-likes/";
 const CANONICAL = `${SITE_URL}${URL_PATH}`;
 
 export const metadata: Metadata = {

@@ -13,7 +13,7 @@ import { SITE_URL } from "@/lib/seo";
 import { FollowersHero, FollowersFaq } from "./_builder";
 import { IG_FAQS } from "./_faqs";
 
-const URL_PATH = "/buy-instagram-followers";
+const URL_PATH = "/buy-instagram-followers/";
 const CANONICAL = `${SITE_URL}${URL_PATH}`;
 
 export const metadata: Metadata = {

@@ -408,6 +408,9 @@ export function Header() {
                       <div style={{ paddingBottom: 4 }}>
                         {it.submenu!.map((s) => {
                           const isCurrent = s.href !== "#" && pathname === s.href;
+                          const platformDef = PLATFORM_IDS.has(it.id)
+                            ? MEGA_PLATFORMS.find((p) => p.id === it.id)
+                            : null;
                           return (
                             <Link
                               key={s.label}
@@ -416,7 +419,9 @@ export function Header() {
                               aria-current={isCurrent ? "page" : undefined}
                               className={isCurrent ? "is-active" : undefined}
                               style={{
-                                display: "block",
+                                display: "flex",
+                                alignItems: "center",
+                                gap: 12,
                                 padding: "12px 20px 12px 36px",
                                 fontSize: 14,
                                 fontWeight: 500,
@@ -427,7 +432,16 @@ export function Header() {
                                 textDecoration: "none",
                               }}
                             >
-                              {s.label}
+                              {platformDef && (
+                                <span
+                                  className="hdr-mobile-svc-brand"
+                                  aria-hidden
+                                  style={{ flexShrink: 0 }}
+                                >
+                                  {platformDef.brand()}
+                                </span>
+                              )}
+                              <span>{s.label}</span>
                             </Link>
                           );
                         })}

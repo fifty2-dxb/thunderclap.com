@@ -13,7 +13,7 @@ import { SITE_URL } from "@/lib/seo";
 import { YouTubeViewsHero, YouTubeViewsFaq } from "./_builder";
 import { YT_FAQS } from "./_faqs";
 
-const URL_PATH = "/buy-youtube-views";
+const URL_PATH = "/buy-youtube-views/";
 const CANONICAL = `${SITE_URL}${URL_PATH}`;
 
 export const metadata: Metadata = {

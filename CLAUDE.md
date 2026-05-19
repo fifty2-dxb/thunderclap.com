@@ -25,7 +25,7 @@ Social media growth marketing site (Instagram / TikTok / YouTube / Facebook / Tw
 | `/buy-youtube-{subscribers,views}` | **Fully built** — YouTube-branded with YPP threshold framing. FAQs export `YT_FAQS`. |
 | `/buy-facebook-{followers,likes,views}` | **Fully built** — Facebook-branded copy. FAQs export `FB_FAQS`. |
 | `/buy-twitter-{followers,likes,retweets}` | **Fully built** — labelled "Twitter / X" everywhere user-facing. FAQs export `TW_FAQS`. Adds the `retweets` service type. |
-| `next.config.ts` redirects | 301s from old `/{platform}/{service}` nested routes AND legacy prod URLs (`/buy-instagram-impressions`, `/free-youtube-subscribers`, `/instagram`, `/tiktok`, `/youtube`, `/facebook`, `/twitter`) → new canonicals. |
+| `next.config.ts` redirects | 301s from old `/{platform}/{service}` nested routes AND legacy prod URLs (`/buy-instagram-impressions`, `/free-youtube-subscribers`, `/instagram`, `/tiktok`, `/youtube`, `/facebook`, `/twitter`) → new canonicals. **`trailingSlash: true`** is set so every served URL ends in `/` and non-slash variants 308 to the trailing-slash form — needed to match the legacy WordPress URL pattern Google has already indexed. |
 | `/checkout` | **Built** — single-step "Get started" form, `noindex, nofollow`. Reads `?platform&service&qty&price&premium`, requires `target` (profile/post URL) + valid `email`. On submit POSTs `/api/checkout/session` and `window.location` redirects to the Redlap-hosted payment page. No method picker — Redlap owns card/Apple Pay/etc. |
 | `/checkout/return` | **Built** — landing point for Redlap's redirect. Client island polls `/api/checkout/status` until terminal status, then `router.replace` to `/checkout/success` or `/checkout/failed`. |
 | `/checkout/success` | **Built** — order confirmation. Reads `order_id`, `payment_id` (Redlap session), `order_number` (Redlap gateway ref) from URL. |
@@ -34,6 +34,7 @@ Social media growth marketing site (Instagram / TikTok / YouTube / Facebook / Tw
 | `/api/checkout/status` | GET `?sid=…` — returns `{ status: "pending"\|"paid"\|"failed"\|"expired" }`. Reads from the in-process webhook cache, falls back to Redlap's `GET /api/payments/sessions/:id`. |
 | `/api/redlap/webhook` | POST — verifies `X-Webhook-Signature` HMAC-SHA256 and records the outcome in the in-process cache. **No fulfillment** — that lives inside the Redlap environment. |
 | `/blog`, `/blog/[slug]` | Scaffolded — basic pages exist, content TBD |
+| `/aboutus/`, `/team/`, `/faqs/`, `/contact/`, `/refund/`, `/privacy/` | **Built** — ported from the legacy thunderclap.com WordPress site (DR-72) to preserve their indexed URLs. All carry a trailing slash to match the legacy URLs exactly (Google has them indexed that way). |
 | `/api/lead` | POST → webhook lead capture |
 | `content/packages.ts` | **Empty stub** — `PACKAGES = [] as const`. Pricing tiers currently live inline in each `_builder.tsx`. Don't centralize unless you also rewrite all 11 builders. |
 
@@ -158,6 +159,7 @@ Full-screen overlay (`.hdr-mobile-sheet`, `position: fixed; inset: 0; z-index: 6
 - Escape key closes
 - Tapping any menu item or the X closes (`onClick={closeMobile}`)
 - `.hdr-mobile-sheet-body` is its own scroll container with `overscroll-behavior: contain` so swipes don't bleed through to the page underneath
+- Each expanded submenu service row gets a **small platform brand chip** (`.hdr-mobile-svc-brand .mm-brand`, 20×20) on the left of the title so the menu scans like a list of products, not just a list of links. The chip reuses the same SVG/gradient as the desktop top-tab — kept in sync via `MEGA_PLATFORMS[id].brand()`.
 
 Don't reintroduce a partial slide-down sheet that relies on the header behind it for close affordance — users won't find the X. Full-screen overlay is the pattern.
 

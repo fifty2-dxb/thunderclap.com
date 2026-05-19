@@ -12,7 +12,7 @@ import { SITE_URL } from "@/lib/seo";
 import { FacebookViewsHero, FacebookViewsFaq } from "./_builder";
 import { FB_FAQS } from "./_faqs";
 
-const URL_PATH = "/buy-facebook-views";
+const URL_PATH = "/buy-facebook-views/";
 const CANONICAL = `${SITE_URL}${URL_PATH}`;
 
 export const metadata: Metadata = {

@@ -11,7 +11,7 @@ import { SITE_URL } from "@/lib/seo";
 import { FacebookLikesHero, FacebookLikesFaq } from "./_builder";
 import { FB_FAQS } from "./_faqs";
 
-const URL_PATH = "/buy-facebook-likes";
+const URL_PATH = "/buy-facebook-likes/";
 const CANONICAL = `${SITE_URL}${URL_PATH}`;
 
 export const metadata: Metadata = {

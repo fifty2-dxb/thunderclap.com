@@ -3,6 +3,12 @@ import type { NextConfig } from "next";
 const nextConfig: NextConfig = {
   reactStrictMode: true,
   poweredByHeader: false,
+  // Legacy thunderclap.com URLs (the DR-72 domain we're inheriting) all carry
+  // a trailing slash — `/aboutus/`, `/team/`, `/faqs/`, `/contact/`, `/refund/`,
+  // `/privacy/`, etc. Flipping this on makes Next emit canonical URLs with the
+  // trailing slash and 308-redirect the non-trailing variants so we preserve
+  // the existing Google indexing.
+  trailingSlash: true,
   images: {
     formats: ["image/avif", "image/webp"],
     remotePatterns: [

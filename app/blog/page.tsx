@@ -4,7 +4,7 @@ import { ArrowRight } from "lucide-react";
 import { SITE_URL } from "@/lib/seo";
 import { getAllPosts } from "@/content/blog";
 
-const URL_PATH = "/blog";
+const URL_PATH = "/blog/";
 const CANONICAL = `${SITE_URL}${URL_PATH}`;
 
 export const metadata: Metadata = {
