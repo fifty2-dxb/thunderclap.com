@@ -67,7 +67,13 @@ app/
     checkout/session/route.ts         create Redlap session
     checkout/status/route.ts          poll status
     redlap/webhook/route.ts           inbound Redlap webhook (HMAC verified)
-components/                           header (with mobile hamburger), footer, hero, faq, pricing-table, trust-bar, testimonials, cta-section, service-table, how-it-works, announcement
+components/
+  header.tsx                          desktop platform tabs + mega-menu trigger + full-screen mobile sheet
+  mega-menu.tsx                       (client) desktop dropdown panel: sidebar + 2-col service cards
+  ticker.tsx                          right-to-left marquee of trust signals (below the header)
+  footer.tsx                          6-col service grid (link equity), socials, payment badges
+  hero.tsx, faq.tsx, pricing-table.tsx, trust-bar.tsx, testimonials.tsx
+  cta-section.tsx, service-table.tsx (clickable rows → /buy-*), how-it-works.tsx, announcement.tsx
 lib/
   seo.ts                              SITE_URL, SITE_NAME, default metadata
   schema.ts                           JSON-LD generators
@@ -77,6 +83,8 @@ lib/
 content/
   packages.ts                         EMPTY STUB — see Build status note
   faqs.ts                             global FAQ content (homepage)
+  blog.ts                             typed BlogPost[] + helpers (getAllPosts, getPost, getRelatedPosts)
+app/blog/_post-body.tsx               BlogBlock renderer shared by index + [slug]
 public/                               logo.webp at root, images in /images/
 ```
 
@@ -97,23 +105,74 @@ The visual language was locked in via a Claude Design handoff. **All design toke
 The site was bolted onto a desktop-first design; mobile rules are concentrated in **`app/globals.css`**'s `Responsive` section at the bottom. The breakpoints are stacked:
 
 - `@media (max-width: 1080px)` — collapse `.svc-layout` to single column. **First H1 cap** (`clamp(40px, 6.5vw, 60px)`) so the inline `fontSize: 72` on service-page hero H1s scales smoothly on tablets.
-- `@media (max-width: 980px)` — header swaps to **hamburger + slide-down sheet** (logic in `components/header.tsx` driven by `matchMedia`), card grids collapse to 1 column, `.faq-chips` to 1 column, `.co-grid` (checkout) to 1 column, `.hiw-top` (how-it-works hero grid) to 1 column. Second H1 cap (`clamp(36px, 7.5vw, 52px)`) + H2 cap.
-- `@media (max-width: 720px)` — `.pkg-grid` to **2 cols** (not 1), `.pkg-cta-row` stacks, coral-band tightens.
-- `@media (max-width: 640px)` — phone breakpoint, main responsive bulk: container padding 16px, `.pkg-grid` STAYS at 2 cols (gap 8px, tighter padding), `.pkg-tier` keeps vertical qty/price stacking (no horizontal list), `.svc-side` static padding, `.faq-chip` smaller with 48px min-height, `.coral-band h2` 28px, `.persona-img` capped, service-table drops the action column to a 2-col grid, footer to 2 cols with brand full-width on top. **Headline clamps** (`main h1/h2/h3/p` with `clamp()` + `!important`) cap any inline `fontSize` from in-line styles on hero H1s. **iOS Safari**: all inputs forced to 16px (`.uv-input, .pkg-url-input, .co-input, .co-pay-input`) to prevent focus auto-zoom; tap targets bumped to ≥40-48px.
-- `@media (max-width: 480px)` — `.pkg-grid` STAYS at 2 cols (do NOT collapse to a vertical list — explicit user preference), `.pkg-qty-sub` hidden so two tiles always fit, footer collapses to single column, `.footer-bottom` stacks vertically.
+- `@media (max-width: 980px)` — `--uv-header-h` drops `72px → 56px`; `.hdr-desktop-nav` + `.hdr-desktop-cta` hide; `.hdr-mobile-toggle` appears; `.mm-panel` (mega-menu) hidden. Card grids collapse to 1 column, `.faq-chips` to 1 column, `.co-grid` (checkout) to 1 column, `.hiw-top` to 1 column, `.blog-grid` 3→2 cols, `.blog-featured` stacks. Second H1 cap (`clamp(36px, 7.5vw, 52px)`) + H2 cap. Ticker animation tightens 48s → 36s.
+- `@media (max-width: 720px)` — `.pkg-grid` stays at **3 cols** (tighter), `.pkg-cta-row` stacks, coral-band tightens.
+- `@media (max-width: 640px)` — phone breakpoint, main responsive bulk: container padding 16px, `.pkg-grid` stays at **3 cols** (gap 5px, padding 9px 3px), `.svc-side` static padding, `.faq-chip` smaller with 48px min-height, `.coral-band h2` 28px, `.persona-img` capped, service-table drops the action column to a 2-col grid (full row is clickable), footer to 2 cols with brand full-width on top, `.blog-grid` 2→1 cols, ticker fades narrow to 32px. **Headline clamps** (`main h1/h2/h3/p` with `clamp()` + `!important`) cap any inline `fontSize` from in-line styles on hero H1s. **iOS Safari**: all inputs forced to 16px (`.uv-input, .pkg-url-input, .co-input, .co-pay-input`) to prevent focus auto-zoom; tap targets bumped to ≥40-48px.
+- `@media (max-width: 480px)` — `.pkg-grid` stays at **3 cols** (gap 4px, padding 7px 2px — never collapse to a vertical list), footer collapses to single column, `.footer-bottom` stacks vertically, ticker animation tightens to 30s.
 - `@media (max-width: 420px)` — checkout payment-method chips shrink one more notch.
 
-**Don't add a horizontal-list `.pkg-tier { flex-direction: row }` style — the user explicitly rejected that layout.** Keep tiles as a 2-col grid with qty stacked above price.
+**Pricing-tile rule (explicit)**: `.pkg-grid` is `repeat(3, 1fr)` at *every* width. Tile size + type shrink across breakpoints (default `92px` min-h → `82` → `78` → `72`; qty `17px → 15.5 → 14`; price `13.5px → 12.5 → 11.5`). All 14 tiers stay visible as a compact overview. **Don't reintroduce 4-col, 2-col, or horizontal-list variants** — the user has rejected each at least once.
 
-When adding new sections, target ≤ 640px viewport — that's where the bugs hide. If you add inline `fontSize` on a heading inside `<main>`, the global clamp rule already caps it on mobile. If you add a 2-col grid via inline styles (like `.hiw-top`), add a `@media (max-width: 980px)` rule with `grid-template-columns: 1fr !important` so it collapses.
+**Defensive global rules** (in `app/globals.css`):
+- `html, body { overflow-x: clip; max-width: 100%; }` — kills mobile horizontal scroll if any descendant escapes `overflow: hidden`. **`clip` not `hidden`** because `clip` doesn't create a scroll container, so the sticky header still works.
+- `main h1/h2/h3/p` clamp `!important` at ≤640 overrides any inline `fontSize: 72` on hero H1s.
 
-## Header mobile menu
+When adding new sections, target ≤ 640px viewport — that's where the bugs hide. If you add an inline 2-col grid (like `.hiw-top` or `.blog-featured`), add a `@media (max-width: 980px)` rule with `grid-template-columns: 1fr !important` so it collapses.
 
-`components/header.tsx` runs two parallel UIs:
-- **Above 980px**: hover dropdowns (existing desktop behavior). Active page highlighted via `.nav-menu-item.is-active` (lavender bg + pink text), driven by `pathname === s.href`. `aria-current="page"`.
-- **At/below 980px**: hamburger button → fixed full-width sheet with accordion submenus. Body scroll lock, Escape-to-close, scrim. The "Get Started" CTA and "Track order" link both render inside the sheet (they're hidden in the chrome at this width).
+## Header chrome (desktop + mobile, CSS-driven swap)
 
-Don't add a third UI mode. If you change the breakpoint, update the `matchMedia("(max-width: 980px)")` string in `header.tsx` too.
+`components/header.tsx` renders BOTH the desktop nav and the mobile hamburger from a single SSR tree; **visibility is driven by CSS media queries, not React state**. This is non-negotiable — gating with a `useState`+`matchMedia` flag causes the desktop nav to flash on mobile during hydration and clip the logo at narrow widths.
+
+- `.hdr-row` — header height, set from the `--uv-header-h` CSS var (72px desktop, 56px ≤980)
+- `.hdr-desktop-nav` — platform tab row (hover-trigger for the mega-menu) — `display: flex` default, `display: none` at ≤980
+- `.hdr-desktop-cta` — "Track order" + "Get Started" buttons — same behavior
+- `.hdr-mobile-toggle` — hamburger button — `display: none` default, `display: inline-flex` at ≤980
+
+**Inline `style={{ display: ... }}` on these elements is a bug** — it'll beat the `@media display: none` override and the chrome won't hide. Layout props live in the CSS class, not the JSX.
+
+**Active state**: `activeIdForPath(pathname)` returns one of `instagram | tiktok | youtube | facebook | twitter | blog | null`; the matching top tab gets `color: var(--uv-pink)` and `font-weight: 700`.
+
+**NavItem with `href` + no submenu** renders as a `<Link>` (clickable). Without href + without submenu = inert `<span>`. The `NavItem` type: `{ id, label, href?, submenu? }`.
+
+## Mega-menu (desktop platform dropdown)
+
+`components/mega-menu.tsx` (client component) is a full-width panel that drops below the header when the user hovers any platform tab. Data lives in `MEGA_PLATFORMS` inside the same file — exported alongside the component because the header imports it to render the same brand chips next to each top-tab label.
+
+**Layout** (`.mm-panel` is `position: absolute; top: var(--uv-header-h)` inside the sticky header):
+- `.mm-grid` — `240px 1fr` two-column grid
+- `.mm-side` — left platform list on warm-cream (`--uv-bg-lavender`); active row gets white background + pink chevron
+- `.mm-content` — right side eyebrow + `.mm-services` 2-col grid of `.mm-service` cards
+- `.mm-service` — `44px icon + body + arrow` 3-col grid. Icon tile is `.mm-service-icon` (44×44, `--uv-pink-soft` background, coral icon). Card has title + description + `From $X.XX` price anchor.
+
+**Hover handoff**: parent `Header` owns the `openMenu` state. On platform-tab `mouseEnter` → `open(it.id)` cancels close-timer + sets state. On `mouseLeave` → `scheduleClose()` sets a 120ms timer that nulls the state. The mega-menu fires the same handlers from its own `mouseEnter`/`mouseLeave`, so moving the pointer from tab to menu keeps it open. The sidebar items inside the menu fire `onMouseEnter={() => onPlatformHover(p.id)}` to switch the active platform without closing.
+
+**From-price anchors** — `MEGA_PLATFORMS[i].services[j].fromPrice` is hardcoded per service. Keep in sync with the lowest tier of each builder's `PACKAGES` array AND with the homepage `service-table.tsx` prices.
+
+**Smaller brand chips in top tabs**: `.hdr-platform-tab .mm-brand` overrides the default 22px chip to 18px and scales the inner SVG to 0.78. The mega-menu sidebar keeps the default 22px chip.
+
+**Hidden on mobile** via `@media (max-width: 980px) { .mm-panel { display: none; } }`.
+
+## Mobile menu sheet (≤980px)
+
+Full-screen overlay (`.hdr-mobile-sheet`, `position: fixed; inset: 0; z-index: 60`), not a slide-down below the header. The sheet has its own top bar (logo + circular close X button — `.hdr-mobile-close`, 44×44 lavender chip with pink hover) so the close affordance is always visible inside the sheet rather than relying on the underlying hamburger toggle.
+
+- Body scroll lock via `useEffect` that sets `document.body.style.overflow = "hidden"` while `mobileOpen` is true
+- Escape key closes
+- Tapping any menu item or the X closes (`onClick={closeMobile}`)
+- `.hdr-mobile-sheet-body` is its own scroll container with `overscroll-behavior: contain` so swipes don't bleed through to the page underneath
+
+Don't reintroduce a partial slide-down sheet that relies on the header behind it for close affordance — users won't find the X. Full-screen overlay is the pattern.
+
+## Trust ticker (below the header)
+
+`components/ticker.tsx` renders a right-to-left marquee of trust signals (Trustpilot rating, order count, instant delivery, refill guarantee, no-password, etc.). Mounted in `app/layout.tsx` right after `<Header />`.
+
+Pattern:
+- `.ticker` outer: `overflow: hidden; position: relative` with a warm-cream→pink-soft gradient background and ::before/::after edge-fades (vertical gradient + horizontal alpha mask so the fade colour matches at every Y)
+- `.ticker-track` inner: `display: inline-flex; width: max-content; animation: ticker-scroll 48s linear infinite` (`translateX(0) → -50%`). Animation duration tightens at mobile breakpoints (36s, 30s)
+- Two identical `<Row />` instances stacked in the track so when the first scrolls -50% the second is already in place — seamless loop
+- `pause-on-hover` via `.ticker:hover .ticker-track { animation-play-state: paused }`
+- `prefers-reduced-motion`: animation off, content wraps statically
 
 ## SEO rules (must follow)
 
@@ -181,7 +240,12 @@ app/(marketing)/buy-<platform>-<service>/
 
 All required component classes already exist in `app/globals.css`. Use them — don't reinvent with Tailwind utility soup.
 
-**Pricing tiers** for the package picker live inside `_builder.tsx` as a `PACKAGES` const (14 tiers per page). When porting to other services, copy the array shape and swap the `qty`/`price`/`save` values; keep `popular: true` on exactly one tier. Keep `Product.offers` `lowPrice`/`highPrice` in `page.tsx` in sync with this array.
+**Pricing tiers** for the package picker live inside `_builder.tsx` as a `PACKAGES` const (variable tier count per page — Instagram services use 9/10/11 tiers since the user supplied real pricing; the rest still ship 14-tier placeholders). Each entry: `{ qty: number, price: number, save: number, popular?: true }`. When porting:
+1. Copy the array shape and swap `qty`/`price`/`save` to match the real pricing
+2. Mark exactly one tier `popular: true` (the value-anchor — middle-of-curve, where save% jumps)
+3. Re-sync `Product.offers` `lowPrice` / `highPrice` / `offerCount` in `page.tsx`
+4. Re-sync the mega-menu `fromPrice` and homepage `service-table.tsx` price for that service
+5. `save` is decorative; pick a round number that scales 0 → 75-85 across the curve (it's not derived from raw cost — the user wants the visual story, not a calculation)
 
 **Premium toggle** (`+35%`):
 - Held in local `useState` inside the Hero
@@ -202,6 +266,48 @@ const checkoutHref = `/checkout?platform=instagram&service=likes&qty=${pkg.qty}&
 ```
 
 The `price` query param is the **base** tier price (not premium-adjusted). The checkout page re-applies the +35% based on the `premium` flag so the math stays consistent.
+
+## Homepage service-table (single source of "what we sell")
+
+`components/service-table.tsx` lists every buyable service the site offers — 14 rows that mirror the header mega-menu exactly. Each row is a `<Link>` (`.st-row-link` extends `.st-row` with `text-decoration: none; color: inherit; cursor: pointer`) that wraps the whole row, so any click goes to `/buy-{platform}-{service}`. Hover state shifts the Get Started chip to pink-fill so it reads as the active CTA.
+
+When you change a service price in a `_builder.tsx` `PACKAGES` array, the homepage `SERVICES` array AND `MEGA_PLATFORMS[i].services[j].fromPrice` both need the same lowest-tier value. **These three sources of truth aren't centralised yet** — `content/packages.ts` is still an empty stub. If you centralise them, rewrite all three call sites or it'll drift.
+
+## Blog system
+
+The blog is a full content system, not a stub. Three layers:
+
+**Data (`content/blog.ts`)** — typed `BlogPost[]` array. Each post has `slug`, `category`, `title`, `description` (meta), `excerpt` (card blurb), `author`, `publishedAt` (ISO), optional `updatedAt`, `readMinutes`, `heroImage` (Unsplash), `heroAlt`, `primaryCta` (in-body CTA destination), optional `related` (slugs), and `blocks: BlogBlock[]`. Helpers: `getAllPosts()` (sorted by date desc), `getPost(slug)`, `getRelatedPosts(slug)`.
+
+**Block types** for the post body:
+- `p` (HTML allowed inside — `<strong>`, `<em>`, `<a>`)
+- `h2` / `h3` (optional `id` for anchors)
+- `list` (`ordered?: boolean`, `items: string[]` with HTML allowed)
+- `callout` (highlighted aside with optional title)
+- `quote` (with optional `cite`)
+- `cta` (in-content card with title + body + Link → `/buy-*`)
+
+**Renderer (`app/blog/_post-body.tsx`)** — switch on `block.type`, returns the right element with the right class. Used by both `/blog/[slug]` and (potentially) `/blog` previews.
+
+**Pages**:
+- `app/blog/page.tsx` — index. `getAllPosts()`, splits into `[featured, ...rest]`. Hero on warm cream + featured card + 3-col grid for the rest + coral CTA band. Emits `Blog` + `BreadcrumbList` JSON-LD with the full `blogPost` array.
+- `app/blog/[slug]/page.tsx` — dynamic post. `generateStaticParams()` SSGs every post at build time. `generateMetadata()` emits per-post canonical, OG (with `type: "article"`, `publishedTime`, `authors`, hero image), Twitter card. Emits `Article` + `BreadcrumbList` JSON-LD. Body: breadcrumb → eyebrow → H1 → lede → author/date/read-time meta → hero image (`aspect-ratio: 16/9`, transform: translateY for half-overlap with prose) → `<BlogPostBody />` → primary CTA → related-posts grid → coral CTA band.
+
+**CSS namespace** (`.blog-*` in `globals.css`):
+- `.blog-eyebrow`, `.blog-crumbs`, `.blog-card-eyebrow` — category labels
+- `.blog-index-hero`, `.blog-index-title`, `.blog-index-lede` — index hero
+- `.blog-featured`, `.blog-featured-image`, `.blog-featured-body` — top card
+- `.blog-grid`, `.blog-card`, `.blog-card-image`, `.blog-card-body`, `.blog-card-link` — post-card grid
+- `.blog-post-hero`, `.blog-post-title`, `.blog-post-lede`, `.blog-meta`, `.blog-hero-image-wrap`, `.blog-hero-image` — post hero
+- `.blog-prose`, `.blog-p`, `.blog-h2`, `.blog-h3`, `.blog-list` — body typography (line-height 1.75, `--container-narrow` width, pink-deep underline links)
+- `.blog-callout`, `.blog-quote`, `.blog-inline-cta` — body block variants
+- `.blog-post-cta`, `.blog-related-section`, `.blog-related-title`, `.blog-cta-band` — closing chrome
+
+Responsive: `.blog-grid` 3→2→1, `.blog-featured` stacks at ≤980, hero-image transform shrinks, prose padding tightens. Title clamps fall under the global `main h1` rule at ≤640.
+
+**Sitemap**: `next-sitemap.config.js` has a `path.startsWith("/blog/")` guard that emits each post at priority 0.7 with monthly changefreq; the index sits at 0.8.
+
+**Adding a post**: append a new `BlogPost` object to `POSTS` in `content/blog.ts`. The static-params + sitemap pick it up at the next build. No other wiring needed.
 
 ## Checkout flow (Steps 1 → 2 → Redlap → Return → Success/Failed)
 
@@ -256,5 +362,47 @@ Modelled on the WooCommerce PHP plugin (`/tmp/redlap-plugin.php` reference if re
 **Webhook config in Redlap dashboard**: point it at `${NEXT_PUBLIC_SITE_URL}/api/redlap/webhook`.
 
 **Persistence**: there is no database. `lib/redlap-status-cache.ts` keeps an in-process Map (TTL 30 min, cap 2000 entries) so the status route can short-circuit polling when the webhook lands before the user is redirected back. On cold start the map is empty and the status route falls back to a live `GET /api/payments/sessions/:id` — that's always the truth. Don't paper over the lack of persistence with a feature flag; if you need durable storage, add Vercel KV and replace the cache module wholesale.
+
+**SMM fulfillment routing (`metadata.smmData`)**: Redlap routes fulfillment based on a numeric `smmServiceId` keyed off the SMM panel it talks to. `app/api/checkout/session/route.ts` has an `SMM_SERVICE_IDS` map keyed by `${platform}-${service}`. When a session is created for a mapped pair, the metadata payload includes:
+
+```ts
+metadata: {
+  // ... standard fields (tcOrderId, email, profile, currency, premium)
+  smmData: {
+    smmServiceId: 5818,     // from the map
+    amount: 1000,           // qty
+    url: "https://...",     // target profile/post URL
+  },
+}
+```
+
+Currently mapped: `tiktok-followers: 5818`, `tiktok-likes: 1126`, `tiktok-views: 9121`. Add more entries as the user supplies them — unmapped pairs send no `smmData` block and Redlap falls back to its default routing.
+
+## Ahrefs SEO grounding (don't change these without re-checking)
+
+The repo is a real DR-72 domain with established Google rankings. Several decisions are grounded in Ahrefs data and should NOT be reverted without re-running the lookup:
+
+- **URL pattern `/buy-{platform}-{service}`** matches every high-volume commercial keyword in the niche (`buy instagram followers` 34K vol, `buy tiktok followers` 31K, `buy youtube views` 16K). The live `/buy-instagram-followers` URL on the domain already ranks #1 for branded queries — keep it canonical, don't 404 it.
+- **301 redirects in `next.config.ts`** preserve legacy prod URLs (`/buy-instagram-impressions`, `/free-youtube-subscribers`, `/{platform}`) → new canonicals. Don't drop them.
+- **Lowest-difficulty / highest-ROI keywords** (to target with future content): `buy retweets` (KD 0), `buy twitter likes` (KD 3), `buy facebook followers` (KD 13), `buy youtube subscribers` (KD 14), `buy youtube views` (KD 24). Blog posts target these adjacent informational clusters.
+
+When porting this stack to a new domain that doesn't have an existing ranking history, the URL pattern still applies (the exact-match slug is good SEO regardless) but the 301-redirect list should be replaced with whatever legacy URLs that domain has.
+
+## Portable feature recipes (for copying to new sites)
+
+These are the patterns worth lifting wholesale when standing up a similar site:
+
+1. **`/buy-{platform}-{service}` URL pattern** → matches commercial-intent SERPs exactly. File layout `app/(marketing)/buy-{platform}-{service}/{page.tsx,_builder.tsx,_faqs.ts}` with the rule that `_faqs.ts` must NOT live inside the `"use client"` builder.
+2. **Service-page template** (8 sections, see above) — produces tested ~$0.49-anchored, JSON-LD-rich pages that convert.
+3. **Mega-menu** (`components/mega-menu.tsx` + `.mm-*` CSS) — drop-in desktop dropdown. Swap the `MEGA_PLATFORMS` data array for the new site's services.
+4. **CSS-driven mobile/desktop chrome swap** in the header — never gate by `useState(matchMedia)`. Class-based `display: none` at `@media (max-width: 980px)` works on SSR.
+5. **Full-screen mobile sheet with internal close X** — not a slide-down. Body scroll-lock + `overscroll-behavior: contain` + Escape key.
+6. **Trust ticker** (`components/ticker.tsx` + `.ticker-*` CSS) — vertical-gradient-masked edges + duplicated rows + `translateX(-50%)` keyframe.
+7. **Blog system** (`content/blog.ts` typed `BlogBlock[]` + `app/blog/_post-body.tsx` renderer + `/blog` index + `/blog/[slug]` dynamic with `generateStaticParams`).
+8. **Redlap checkout flow** (Step 1 details → Step 2 method picker → `/api/checkout/session` → gateway hosted page → `/checkout/return` polling → `/checkout/success` or `/checkout/failed`). The HMAC webhook verifier + in-process status cache + `smmData` metadata block are the reusable bits.
+9. **Defensive `overflow-x: clip` on `html, body`** — kills mobile horizontal scroll regardless of any descendant.
+10. **3-column pricing grid at every breakpoint** (`.pkg-grid { grid-template-columns: repeat(3, 1fr) }`). Sizing scale: padding 16/8 → 14/6 → 14/6 → 12/4; min-h 92 → 82 → 78 → 72.
+11. **`amplify.yml` env-baking** — inlines selected env vars into `.env.production` at build time so Next.js SSR Lambda actually sees them. Amplify's console env vars don't reach the runtime by default.
+12. **SSH-only git remote** for agent sessions — HTTPS push fails silently. `git remote set-url origin git@github.com:org/repo.git` once.
 
 **Don't add fulfillment hooks in the webhook handler.** Fulfillment is the Redlap environment's job. The handler only verifies the signature, records the outcome, and acks 200.
