@@ -7,11 +7,12 @@ export function Announcement() {
   if (!shown) return null;
   return (
     <div
+      className="hdr-announcement"
       style={{
         background: "var(--uv-fg-1)",
         color: "#fff",
         fontSize: 13,
-        padding: "9px 44px 9px 16px",
+        padding: "9px 48px 9px 16px",
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
@@ -40,6 +41,7 @@ export function Announcement() {
         </span>
       </span>
       <a
+        className="hdr-announcement-link"
         href="#pricing"
         style={{
           color: "#fff",
@@ -57,15 +59,19 @@ export function Announcement() {
         aria-label="Dismiss"
         style={{
           position: "absolute",
-          right: 12,
-          top: "50%",
-          transform: "translateY(-50%)",
+          right: 6,
+          top: 0,
+          bottom: 0,
+          width: 40,
           background: "transparent",
           color: "#fff",
           border: 0,
-          padding: 4,
           cursor: "pointer",
-          opacity: 0.6,
+          opacity: 0.7,
+          display: "inline-flex",
+          alignItems: "center",
+          justifyContent: "center",
+          fontSize: 14,
         }}
       >
         ✕

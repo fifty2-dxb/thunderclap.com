@@ -281,8 +281,43 @@ export function CartDrawer() {
                 <ShoppingCart size={44} />
               </div>
               <h3>Your cart is empty</h3>
-              <p>Pick a platform to start growing.</p>
-              <div className="cart-section-head cart-empty-eyebrow">BROWSE SERVICES</div>
+              <p>Pick a service to start growing.</p>
+
+              <div className="cart-section-head cart-empty-eyebrow">POPULAR PICKS</div>
+              <div className="cart-upsell-list">
+                {SUGGESTION_POOL.slice(0, 4).map((u) => (
+                  <div key={`empty-${u.platform}-${u.service}`} className="cart-upsell-card">
+                    <PlatformChip platform={u.platform} size={36} />
+                    <div className="cart-upsell-body">
+                      <div className="cart-upsell-title">
+                        {formatQty(u.qty)} {PLATFORM_LABEL[u.platform]} {SERVICE_LABEL[u.service]}
+                      </div>
+                      <div className="cart-upsell-meta">
+                        <span className="cart-upsell-price">${u.price.toFixed(2)}</span>
+                        <span className="cart-upsell-regular">${u.regular.toFixed(2)}</span>
+                      </div>
+                    </div>
+                    <button
+                      type="button"
+                      className="cart-upsell-add"
+                      onClick={() =>
+                        addItem({
+                          platform: u.platform,
+                          service: u.service,
+                          qty: u.qty,
+                          price: u.price,
+                          regular: u.regular,
+                          premium: false,
+                        })
+                      }
+                    >
+                      <Plus size={14} aria-hidden /> Add
+                    </button>
+                  </div>
+                ))}
+              </div>
+
+              <div className="cart-section-head cart-empty-eyebrow">BROWSE BY PLATFORM</div>
               <div className="cart-empty-grid">
                 {BROWSE_LINKS.map((b) => (
                   <Link
@@ -291,7 +326,7 @@ export function CartDrawer() {
                     onClick={closeDrawer}
                     className="cart-empty-link"
                   >
-                    <PlatformChip platform={b.platform} size={40} />
+                    <PlatformChip platform={b.platform} size={36} />
                     <span className="cart-empty-link-text">
                       <strong>{PLATFORM_LABEL[b.platform]}</strong>
                       <span className="cart-empty-link-from">From {b.from}</span>

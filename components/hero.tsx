@@ -74,6 +74,7 @@ export function Hero() {
             </Link>
           </div>
           <div
+            className="hero-trust-row"
             style={{
               display: "flex",
               justifyContent: "center",

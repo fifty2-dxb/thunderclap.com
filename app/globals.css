@@ -3148,10 +3148,10 @@ img { display: block; max-width: 100%; }
   pointer-events: none;
 }
 @media (max-width: 980px) {
-  /* The header row has an inline gap of 32px — pull the cart button
-     and the hamburger toggle close together with negative margin so
-     they read as a paired control on mobile. */
-  .hdr-cart-btn { order: 1; margin-right: -22px; }
+  /* Order cart then hamburger. The header row uses clamp() for its
+     gap so they already sit close on narrow viewports — no negative
+     margin needed. */
+  .hdr-cart-btn { order: 1; }
   .hdr-mobile-toggle { order: 2; }
 }
 
@@ -3201,7 +3201,9 @@ img { display: block; max-width: 100%; }
   padding: 20px 22px 16px;
   border-bottom: 1px solid var(--uv-line);
   background: var(--uv-bg-lavender);
+  box-shadow: 0 1px 0 rgba(11,16,32,0.05);
   flex-shrink: 0;
+  z-index: 1;
 }
 .cart-drawer-head-meta {
   display: flex;
@@ -3283,8 +3285,8 @@ img { display: block; max-width: 100%; }
 .cart-line-premium { font-size: 10px; font-weight: 800; letter-spacing: 0.06em; color: var(--uv-pink); padding: 2px 6px; background: rgba(239,70,85,0.10); border-radius: 4px; }
 .cart-line-price { font-weight: 700; font-size: 14px; color: var(--uv-fg-1); }
 .cart-line-remove {
-  width: 32px;
-  height: 32px;
+  width: 36px;
+  height: 36px;
   border-radius: 10px;
   background: transparent;
   color: var(--uv-fg-3);
@@ -3296,6 +3298,9 @@ img { display: block; max-width: 100%; }
   transition: background .15s, color .15s, border-color .15s;
 }
 .cart-line-remove:hover { background: var(--uv-pink-soft); color: var(--uv-pink); border-color: var(--uv-pink-chip); }
+@media (max-width: 640px) {
+  .cart-line-remove { width: 40px; height: 40px; }
+}
 
 .cart-upsell { margin-top: 16px; padding-top: 14px; border-top: 1px dashed var(--uv-line); }
 .cart-upsell-list { display: flex; flex-direction: column; gap: 8px; }
@@ -3415,4 +3420,42 @@ img { display: block; max-width: 100%; }
 
 @media (prefers-reduced-motion: reduce) {
   .cart-drawer, .cart-drawer-backdrop { animation: none; }
+}
+
+/* ---- Mobile polish (post-audit) ---- */
+
+@media (max-width: 640px) {
+  /* Footer cols stack into a 2-col grid — separate categories with a
+     hairline so Instagram/TikTok/etc don't bleed into each other. */
+  .footer-col-light { border-top: 1px solid var(--uv-line); padding-top: 14px; }
+
+  /* Tighten hero trust-row gap so the 3 chips fit on 1-2 lines instead
+     of stair-stepping with too much vertical whitespace. */
+  .hero-trust-row { gap: 14px !important; }
+
+  /* Bump service-page svc-tabs to a 40px tap target. */
+  .svc-tab { padding: 10px 14px !important; min-height: 40px; }
+
+  /* Contact form select inherits .co-input styling — but iOS Safari
+     auto-zooms on a <select> with font-size < 16px. Force 16px. */
+  .contact-select { font-size: 16px !important; }
+}
+
+@media (max-width: 480px) {
+  /* Service-table row at 320–480px: hide the "POPULAR" chip so the
+     name column doesn't blow past 1.5fr and shrink the price column. */
+  .st-popular { display: none; }
+
+  /* "See pricing" link in the announcement steals space at very narrow
+     viewports — hide it so the discount code + dismiss X fit on one line. */
+  .hdr-announcement-link { display: none; }
+
+  /* Reduce announcement padding so it fits the badge + code cleanly. */
+  .hdr-announcement { padding: 8px 44px 8px 12px !important; font-size: 12px !important; }
+}
+
+@media (max-width: 360px) {
+  /* Drop the strikethrough regular price in cart upsell at the very
+     narrowest viewports so the title doesn't wrap to 3 lines. */
+  .cart-upsell-regular { display: none; }
 }

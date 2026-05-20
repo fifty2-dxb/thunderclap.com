@@ -162,7 +162,7 @@ export function Header() {
           display: "flex",
           alignItems: "center",
           justifyContent: "space-between",
-          gap: 32,
+          gap: "clamp(10px, 3vw, 32px)",
         }}
       >
         <Link
@@ -175,7 +175,7 @@ export function Header() {
             alt="Thunderclap"
             width={120}
             height={24}
-            style={{ height: 24, width: "auto", maxWidth: "none" }}
+            style={{ height: 24, width: "auto" }}
             priority
           />
         </Link>
@@ -442,7 +442,8 @@ export function Header() {
                                 display: "flex",
                                 alignItems: "center",
                                 gap: 12,
-                                padding: "12px 20px 12px 36px",
+                                padding: "14px 20px 14px 36px",
+                                minHeight: 44,
                                 fontSize: 14,
                                 fontWeight: 500,
                                 color: isCurrent ? "var(--uv-pink)" : "var(--uv-fg-2)",

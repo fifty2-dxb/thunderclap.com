@@ -103,8 +103,8 @@ export function Footer() {
                   aria-label={s.label}
                   className="footer-social"
                   style={{
-                    width: 36,
-                    height: 36,
+                    width: 40,
+                    height: 40,
                     borderRadius: 999,
                     border: "1px solid var(--uv-line-strong)",
                     display: "inline-flex",
@@ -135,7 +135,15 @@ export function Footer() {
           <span style={{ fontSize: 13, color: "var(--uv-fg-3)" }}>
             © 2026 Thunderclap, Inc. · Strocil LLC
           </span>
-          <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
+          <div
+            style={{
+              display: "flex",
+              gap: 8,
+              alignItems: "center",
+              flexWrap: "wrap",
+              justifyContent: "flex-end",
+            }}
+          >
             {["VISA", "MASTERCARD", "AMEX", "APPLE PAY", "G PAY"].map((p) => (
               <span
                 key={p}

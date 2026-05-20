@@ -216,6 +216,7 @@ export default function ContactForm() {
         </span>
         <span className="co-input-label">Subject</span>
         <select
+          className="contact-select"
           value={subject}
           onChange={(e) => setSubject(e.target.value as Subject)}
           aria-label="Subject"

@@ -100,6 +100,7 @@ export function ServiceTable() {
                 </span>
                 {s.popular && (
                   <span
+                    className="st-popular"
                     style={{
                       fontSize: 10,
                       fontWeight: 800,
