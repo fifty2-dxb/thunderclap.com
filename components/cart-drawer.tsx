@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, type ReactNode } from "react";
+import { useEffect, useMemo, useRef, type ReactNode } from "react";
 import Link from "next/link";
 import {
   ArrowRight,
@@ -200,6 +200,8 @@ export function CartDrawer() {
     lastAddedPlatform,
   } = useCart();
 
+  const bodyRef = useRef<HTMLDivElement>(null);
+
   // Body scroll lock + Escape close.
   useEffect(() => {
     if (!isDrawerOpen) return;
@@ -214,6 +216,15 @@ export function CartDrawer() {
       window.removeEventListener("keydown", onKey);
     };
   }, [isDrawerOpen, closeDrawer]);
+
+  // When the cart drops to 0 items inside the drawer, scroll the body back
+  // to the top so the empty-state browse grid is fully visible — without
+  // this the empty state can render below the previous scroll position.
+  useEffect(() => {
+    if (count === 0 && bodyRef.current) {
+      bodyRef.current.scrollTop = 0;
+    }
+  }, [count]);
 
   const grouped = useMemo(() => {
     const map = new Map<Platform, CartItem[]>();
@@ -236,11 +247,17 @@ export function CartDrawer() {
     <div className="cart-drawer-root" role="dialog" aria-modal="true" aria-label="Cart">
       <div className="cart-drawer-backdrop" onClick={closeDrawer} aria-hidden />
       <aside className="cart-drawer">
+        <span className="cart-drawer-handle" aria-hidden />
         <header className="cart-drawer-head">
-          <h2>
-            Your cart
-            {count > 0 && <span className="cart-count"> ({count})</span>}
-          </h2>
+          <div className="cart-drawer-head-meta">
+            <span className="cart-drawer-eyebrow">
+              <ShoppingCart size={14} aria-hidden /> Cart
+            </span>
+            <h2>
+              Your cart
+              {count > 0 && <span className="cart-count"> · {count}</span>}
+            </h2>
+          </div>
           <button
             type="button"
             onClick={closeDrawer}
@@ -251,7 +268,7 @@ export function CartDrawer() {
           </button>
         </header>
 
-        <div className="cart-drawer-body">
+        <div className="cart-drawer-body" ref={bodyRef}>
           {!hydrated ? (
             <div className="cart-skeleton">
               <div className="cart-skeleton-line" />
@@ -261,10 +278,11 @@ export function CartDrawer() {
           ) : count === 0 ? (
             <div className="cart-empty">
               <div className="cart-empty-icon" aria-hidden>
-                <ShoppingCart size={48} />
+                <ShoppingCart size={44} />
               </div>
               <h3>Your cart is empty</h3>
-              <p>Add a service to get started.</p>
+              <p>Pick a platform to start growing.</p>
+              <div className="cart-section-head cart-empty-eyebrow">BROWSE SERVICES</div>
               <div className="cart-empty-grid">
                 {BROWSE_LINKS.map((b) => (
                   <Link
@@ -273,7 +291,7 @@ export function CartDrawer() {
                     onClick={closeDrawer}
                     className="cart-empty-link"
                   >
-                    <PlatformChip platform={b.platform} size={36} />
+                    <PlatformChip platform={b.platform} size={40} />
                     <span className="cart-empty-link-text">
                       <strong>{PLATFORM_LABEL[b.platform]}</strong>
                       <span className="cart-empty-link-from">From {b.from}</span>

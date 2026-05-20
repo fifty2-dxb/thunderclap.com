@@ -1461,6 +1461,90 @@ img { display: block; max-width: 100%; }
 }
 .co-help:hover { text-decoration: underline; }
 
+/* Per-service checkout cards — one card per cart line item with a clear
+   platform header + qty/premium meta + a dedicated URL input below.
+   Keeps multi-item carts unambiguous about which link belongs to which
+   service. */
+.co-services { display: flex; flex-direction: column; gap: 12px; margin-bottom: 18px; }
+.co-service-card {
+  background: var(--uv-card);
+  border: 1px solid var(--uv-line);
+  border-radius: 16px;
+  padding: 14px 16px 16px;
+}
+.co-service-head {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+.co-service-head .co-input-icon {
+  position: static;
+  transform: none;
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  flex-shrink: 0;
+}
+.co-service-meta { flex: 1; min-width: 0; }
+.co-service-title {
+  font-family: var(--uv-font-display);
+  font-size: 15px;
+  font-weight: 800;
+  color: var(--uv-fg-1);
+  line-height: 1.15;
+  letter-spacing: -0.01em;
+}
+.co-service-sub {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--uv-fg-3);
+  margin-top: 2px;
+}
+.co-service-premium {
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  color: var(--uv-pink);
+  background: rgba(239,70,85,0.10);
+  padding: 2px 6px;
+  border-radius: 4px;
+}
+.co-service-step {
+  font-size: 10.5px;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  color: var(--uv-fg-3);
+  background: var(--uv-bg-lavender);
+  padding: 4px 8px;
+  border-radius: 999px;
+  flex-shrink: 0;
+}
+.co-service-label {
+  display: block;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--uv-fg-3);
+  margin: 0 0 6px;
+}
+.co-service-input {
+  padding: 14px 16px;
+  border-radius: 12px;
+  width: 100%;
+}
+@media (max-width: 640px) {
+  .co-service-card { padding: 12px 14px 14px; border-radius: 14px; }
+  .co-service-head { gap: 10px; margin-bottom: 10px; }
+  .co-service-head .co-input-icon { width: 32px; height: 32px; }
+  .co-service-title { font-size: 14px; }
+  .co-service-step { font-size: 10px; padding: 3px 7px; }
+}
+
 .co-promo-row {
   display: flex; align-items: center; gap: 10px;
   margin: 4px 0 20px;
@@ -3106,6 +3190,9 @@ img { display: block; max-width: 100%; }
   from { transform: translateX(24px); opacity: 0.5; }
   to   { transform: translateX(0); opacity: 1; }
 }
+.cart-drawer-handle {
+  display: none;
+}
 .cart-drawer-head {
   display: flex;
   align-items: center;
@@ -3116,6 +3203,22 @@ img { display: block; max-width: 100%; }
   background: var(--uv-bg-lavender);
   flex-shrink: 0;
 }
+.cart-drawer-head-meta {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+}
+.cart-drawer-eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.1em;
+  color: var(--uv-pink);
+  text-transform: uppercase;
+}
 .cart-drawer-head h2 {
   font-family: var(--font-display);
   font-size: 22px;
@@ -3123,8 +3226,9 @@ img { display: block; max-width: 100%; }
   letter-spacing: -0.02em;
   color: var(--uv-fg-1);
   margin: 0;
+  line-height: 1.1;
 }
-.cart-count { color: var(--uv-fg-3); font-weight: 600; font-size: 18px; margin-left: 4px; }
+.cart-count { color: var(--uv-fg-3); font-weight: 600; font-size: 18px; }
 .cart-close {
   width: 40px;
   height: 40px;
@@ -3231,10 +3335,21 @@ img { display: block; max-width: 100%; }
 .cart-clear { background: transparent; border: 0; color: var(--uv-fg-3); font-size: 13px; font-weight: 600; padding: 4px; cursor: pointer; align-self: center; }
 .cart-clear:hover { color: var(--uv-pink); }
 
-.cart-empty { text-align: center; padding: 28px 8px 16px; }
-.cart-empty-icon { color: var(--uv-fg-4); margin-bottom: 12px; opacity: 0.6; display: inline-flex; }
-.cart-empty h3 { font-family: var(--font-display); font-size: 18px; font-weight: 800; color: var(--uv-fg-1); margin: 0 0 6px; }
-.cart-empty p { color: var(--uv-fg-3); margin: 0 0 18px; font-size: 14px; }
+.cart-empty { text-align: center; padding: 22px 0 8px; }
+.cart-empty-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 76px;
+  height: 76px;
+  border-radius: 50%;
+  background: var(--uv-pink-soft);
+  color: var(--uv-pink);
+  margin-bottom: 14px;
+}
+.cart-empty h3 { font-family: var(--font-display); font-size: 20px; font-weight: 800; color: var(--uv-fg-1); margin: 0 0 6px; letter-spacing: -0.015em; }
+.cart-empty p { color: var(--uv-fg-3); margin: 0 0 20px; font-size: 14px; }
+.cart-empty-eyebrow { text-align: left; margin: 6px 0 10px; }
 .cart-empty-grid { display: flex; flex-direction: column; gap: 8px; }
 .cart-empty-link {
   display: grid;
@@ -3263,7 +3378,9 @@ img { display: block; max-width: 100%; }
     left: 0;
     bottom: 0;
     width: 100vw;
-    height: 92vh;
+    max-height: 92vh;
+    height: auto;
+    min-height: 60vh;
     border-radius: 22px 22px 0 0;
     animation-name: cart-drawer-slide-up;
   }
@@ -3271,9 +3388,29 @@ img { display: block; max-width: 100%; }
     from { transform: translateY(24px); opacity: 0.5; }
     to   { transform: translateY(0); opacity: 1; }
   }
-  .cart-drawer-head { padding: 16px 18px 14px; }
+  /* Drag handle indicator at the very top of the sheet — communicates
+     the sheet-like affordance and gives the user a clear close target. */
+  .cart-drawer-handle {
+    display: block;
+    width: 40px;
+    height: 4px;
+    border-radius: 999px;
+    background: rgba(11,16,32,0.18);
+    margin: 8px auto 0;
+    flex-shrink: 0;
+  }
+  .cart-drawer-head {
+    padding: 12px 18px 14px;
+    border-bottom: 1px solid var(--uv-line);
+  }
+  .cart-drawer-head h2 { font-size: 19px; }
+  .cart-drawer-eyebrow { font-size: 9.5px; }
+  .cart-close { width: 36px; height: 36px; }
   .cart-drawer-body { padding: 14px 18px; }
   .cart-drawer-foot { padding: 12px 18px calc(12px + env(safe-area-inset-bottom)); }
+  .cart-empty { padding: 16px 0 0; }
+  .cart-empty-icon { width: 64px; height: 64px; margin-bottom: 10px; }
+  .cart-empty h3 { font-size: 18px; }
 }
 
 @media (prefers-reduced-motion: reduce) {
