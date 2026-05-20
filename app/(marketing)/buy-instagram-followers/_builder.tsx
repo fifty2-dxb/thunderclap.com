@@ -15,6 +15,7 @@ import {
   Zap,
 } from "lucide-react";
 import { formatQty } from "@/lib/utils";
+import { useCart } from "@/components/cart-context";
 import { IG_FAQS } from "./_faqs";
 
 const SERVICE_TABS = [
@@ -51,7 +52,16 @@ export function FollowersHero() {
   const total = (pkg.price * (premium ? 1.35 : 1)).toFixed(2);
   const youSave = ((pkg.regular - pkg.price) * (premium ? 1.35 : 1)).toFixed(2);
   const youSavePct = Math.round((1 - pkg.price / pkg.regular) * 100);
-  const checkoutHref = `/checkout?platform=instagram&service=followers&qty=${pkg.qty}&price=${pkg.price}&premium=${premium ? 1 : 0}`;
+  const { addItem } = useCart();
+  const onAddToCart = () =>
+    addItem({
+      platform: "instagram",
+      service: "followers",
+      qty: pkg.qty,
+      price: pkg.price,
+      regular: pkg.regular,
+      premium,
+    });
 
   return (
     <section style={{ background: "var(--uv-bg-lavender)", paddingTop: 40, paddingBottom: 96 }}>
@@ -189,9 +199,13 @@ export function FollowersHero() {
                     <div className="pkg-save-line">You save ${youSave} · {youSavePct}% off</div>
                   )}
                 </div>
-                <Link href={checkoutHref} className="btn btn-primary btn-lg pkg-cta">
+                <button
+                  type="button"
+                  onClick={onAddToCart}
+                  className="btn btn-primary btn-lg pkg-cta"
+                >
                   Add to cart <ArrowRight size={16} />
-                </Link>
+                </button>
               </div>
 
               <div className="pkg-trust">
@@ -248,9 +262,13 @@ export function FollowersHero() {
                 </li>
               ))}
             </ul>
-            <Link href={checkoutHref} className="btn btn-primary btn-lg side-cta">
+            <button
+              type="button"
+              onClick={onAddToCart}
+              className="btn btn-primary btn-lg side-cta"
+            >
               Add to cart · ${total}
-            </Link>
+            </button>
             <div className="side-trust">
               <span style={{ display: "inline-flex", gap: 1 }}>
                 {[0, 1, 2, 3, 4].map((i) => (

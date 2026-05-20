@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import { Plus_Jakarta_Sans, Manrope, JetBrains_Mono } from "next/font/google";
 import { Announcement } from "@/components/announcement";
+import { CartProvider } from "@/components/cart-context";
+import { CartToast } from "@/components/cart-toast";
 import { Header } from "@/components/header";
 import { Ticker } from "@/components/ticker";
 import { Footer } from "@/components/footer";
@@ -49,11 +51,14 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             </linearGradient>
           </defs>
         </svg>
-        <Announcement />
-        <Header />
-        <Ticker />
-        {children}
-        <Footer />
+        <CartProvider>
+          <Announcement />
+          <Header />
+          <Ticker />
+          {children}
+          <Footer />
+          <CartToast />
+        </CartProvider>
       </body>
     </html>
   );

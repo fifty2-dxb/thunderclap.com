@@ -26,11 +26,12 @@ Social media growth marketing site (Instagram / TikTok / YouTube / Facebook / Tw
 | `/buy-facebook-{followers,likes,views}` | **Fully built** — Facebook-branded copy. FAQs export `FB_FAQS`. |
 | `/buy-twitter-{followers,likes,retweets}` | **Fully built** — labelled "Twitter / X" everywhere user-facing. FAQs export `TW_FAQS`. Adds the `retweets` service type. |
 | `next.config.ts` redirects | 301s from old `/{platform}/{service}` nested routes AND legacy prod URLs (`/buy-instagram-impressions`, `/free-youtube-subscribers`, `/instagram`, `/tiktok`, `/youtube`, `/facebook`, `/twitter`) → new canonicals. **`trailingSlash: true`** is set so every served URL ends in `/` and non-slash variants 308 to the trailing-slash form — needed to match the legacy WordPress URL pattern Google has already indexed. |
-| `/checkout` | **Built** — single-step "Get started" form, `noindex, nofollow`. Reads `?platform&service&qty&price&premium`, requires `target` (profile/post URL) + valid `email`. On submit POSTs `/api/checkout/session` and `window.location` redirects to the Redlap-hosted payment page. No method picker — Redlap owns card/Apple Pay/etc. |
+| `/cart` | **Built** — `noindex, nofollow`. Reads the cart from the React context (localStorage-persisted), groups line items by platform, shows a "you might like" upsell strip, and ends in a sticky Checkout CTA (subtotal + Link → `/checkout/`). Empty state has a "Browse services" grid. |
+| `/checkout` | **Built** — multi-item server shell + `<CheckoutFlow>` client island, `noindex, nofollow`. Reads the cart from context (NOT URL params), renders one `target` input per cart item (per-service placeholder via `INPUT_CONFIG`), plus a single `email` input. On submit POSTs `{ items: [...], email }` to `/api/checkout/session` and `window.location` redirects to the Redlap-hosted payment page. Empty-cart state when no items. No method picker — Redlap owns card/Apple Pay/etc. |
 | `/checkout/return` | **Built** — landing point for Redlap's redirect. Client island polls `/api/checkout/status` until terminal status, then `router.replace` to `/checkout/success` or `/checkout/failed`. |
 | `/checkout/success` | **Built** — order confirmation. Reads `order_id`, `payment_id` (Redlap session), `order_number` (Redlap gateway ref) from URL. |
 | `/checkout/failed` | **Built** — failure / cancelled / expired / timeout state with a "Try payment again" CTA back to `/checkout` (single-step). |
-| `/api/checkout/session` | POST — creates a Redlap session, returns `{ sessionId, redirectUrl, orderId }`. |
+| `/api/checkout/session` | POST — accepts `{ items: [{ platform, service, qty, price, premium, target }, ...], email }` (with legacy single-item body still supported for back-compat). Sums totals, builds Redlap metadata with `items[]` + `smmDataItems[]` (and a flat `smmData` when there's exactly one mapped item, for legacy Redlap fulfillment code paths). Returns `{ sessionId, redirectUrl, orderId }`. |
 | `/api/checkout/status` | GET `?sid=…` — returns `{ status: "pending"\|"paid"\|"failed"\|"expired" }`. Reads from the in-process webhook cache, falls back to Redlap's `GET /api/payments/sessions/:id`. |
 | `/api/redlap/webhook` | POST — verifies `X-Webhook-Signature` HMAC-SHA256 and records the outcome in the in-process cache. **No fulfillment** — that lives inside the Redlap environment. |
 | `/blog`, `/blog/[slug]` | Scaffolded — basic pages exist, content TBD |
@@ -311,27 +312,32 @@ Responsive: `.blog-grid` 3→2→1, `.blog-featured` stacks at ≤980, hero-imag
 
 **Adding a post**: append a new `BlogPost` object to `POSTS` in `content/blog.ts`. The static-params + sitemap pick it up at the next build. No other wiring needed.
 
-## Checkout flow (Steps 1 → 2 → Redlap → Return → Success/Failed)
+## Cart system (`components/cart-context.tsx`)
+
+`<CartProvider>` wraps `app/layout.tsx` and exposes `useCart()` to every client component below it. State persists in `localStorage` under key `tc:cart:v1`; the provider also renders the bottom `<CartToast>` notification.
+
+- **CartItem shape**: `{ id, platform, service, qty, price, regular, premium, target?, addedAt }`. `id = "${platform}-${service}-${premium ? 'p' : 's'}"` — so adding the same platform+service+premium combo REPLACES the line rather than stacking. Different `premium` is a separate line.
+- **`addItem(input)`** sets the line and fires the "added" toast.
+- **`removeItem(id)`** drops the line and fires the "removed" toast.
+- **`updateTarget(id, target)`** is what the `/checkout` form calls per row.
+- **`clear()`** is wired to the Clear-cart button on `/cart`.
+- **`hydrated`** flips to `true` after the first `localStorage` read so server-rendered components can render an empty-state skeleton without flashing the wrong UI.
+
+Service-page builders all import `useCart` and bind the in-card `.pkg-cta` + sticky `.side-cta` buttons to `onAddToCart` (calls `addItem` with the current `pkg` + `premium` state). The buttons are `<button onClick=…>` now — not Next `<Link>` — because navigation no longer happens there. The toast handles the "what just happened" affordance with a "View cart" CTA → `/cart/`.
+
+The header (`components/header.tsx`) shows a small `.hdr-cart-btn` with `.hdr-cart-badge` (count) next to the rest of the chrome at every breakpoint. Mobile reorders it left of the hamburger.
+
+## Checkout flow (cart → /checkout/ → Redlap → Return → Success/Failed)
 
 The full payment funnel is wired end-to-end. The Thunderclap site only verifies that payment succeeded; **order fulfillment lives inside the Redlap environment** — don't add fulfillment hooks here.
 
-**URL contract (`/checkout`)** — all string params:
+There are no URL params on `/checkout/` anymore. The page reads the cart from `useCart()` and renders one target input per line item, plus a single shared `email`. If the cart is empty, a "Browse services" empty state is shown.
 
-| param | type | default |
-| --- | --- | --- |
-| `platform` | `instagram` \| `tiktok` \| `youtube` \| `facebook` \| `twitter` | `instagram` |
-| `service` | `followers` \| `likes` \| `views` \| `subscribers` \| `comments` \| `retweets` | `followers` |
-| `qty` | number | `1000` |
-| `price` | number (base, USD) | `7.99` |
-| `premium` | `0` \| `1` | `0` |
-| `target` / `email` | strings — optional on URL (set when user returns from a failed payment to retry) | — |
-
-`/checkout/page.tsx` validates each, applies sensible fallbacks, computes `subtotal = price * (premium ? 1.35 : 1)`, and renders a two-column grid: form (`<CheckoutForm>`) on left, order summary + bundle upsell + Trustpilot quote on right. Both fields are `required` (target = profile/post URL, email = `type="email"`). The form runs native HTML validation — `noValidate` is intentionally off.
-
-- **Per-service input** label and placeholder are looked up from `INPUT_CONFIG[`${platform}-${service}`]` — extend this map when adding new service combos
+- **Per-service input** label and placeholder are looked up from `INPUT_CONFIG[`${platform}-${service}`]` in `app/checkout/_config.ts` — extend this map when adding new service combos
 - **Platform-coloured input chip** uses `.platform-instagram` / `.platform-tiktok` / `.platform-youtube` / `.platform-facebook` / `.platform-twitter` modifier classes on `.co-input-icon`
+- The form runs native HTML validation — `noValidate` is intentionally off. The submit handler also explicitly guards that every item has a non-empty target.
 
-On submit the form `fetch`es `POST /api/checkout/session`, then on success sets `window.location.href = redirectUrl` to hand off to the Redlap-hosted payment page. There is **no on-site method picker** — Card / Apple Pay / Google Pay / Crypto are presented on the Redlap page. Error messages from the API are surfaced inline via `.co-pay-err`.
+On submit the form `fetch`es `POST /api/checkout/session` with `{ items: [{ platform, service, qty, price, premium, target }, ...], email }`. The API computes `total = sum(price * (premium ? 1.35 : 1))`, builds the Redlap metadata (see below), and returns `{ redirectUrl }`; the client `window.location.href`s to the Redlap-hosted payment page. There is **no on-site method picker** — Card / Apple Pay / Google Pay / Crypto are presented on the Redlap page. Error messages from the API are surfaced inline via `.co-pay-err`.
 
 **`/checkout/return`** is the landing point Redlap redirects back to. It validates Redlap-appended params (`payment_status`, `payment_id`, `order_number`); if `payment_status` is already `failed`/`cancelled`/`expired` it 302s straight to `/checkout/failed`. Otherwise it renders a "Confirming…" UI with a client island (`_poll.tsx`) that polls `/api/checkout/status?sid=...` every 3s for up to ~3 minutes, then `router.replace`s to `/checkout/success` or `/checkout/failed?reason=...`.
 
@@ -363,20 +369,20 @@ Modelled on the WooCommerce PHP plugin (`/tmp/redlap-plugin.php` reference if re
 
 **Persistence**: there is no database. `lib/redlap-status-cache.ts` keeps an in-process Map (TTL 30 min, cap 2000 entries) so the status route can short-circuit polling when the webhook lands before the user is redirected back. On cold start the map is empty and the status route falls back to a live `GET /api/payments/sessions/:id` — that's always the truth. Don't paper over the lack of persistence with a feature flag; if you need durable storage, add Vercel KV and replace the cache module wholesale.
 
-**SMM fulfillment routing (`metadata.smmData`)**: Redlap routes fulfillment based on a numeric `smmServiceId` keyed off the SMM panel it talks to. `app/api/checkout/session/route.ts` has an `SMM_SERVICE_IDS` map keyed by `${platform}-${service}`. When a session is created for a mapped pair, the metadata payload includes:
+**SMM fulfillment routing**: Redlap routes fulfillment based on a numeric `smmServiceId` keyed off the SMM panel it talks to. `app/api/checkout/session/route.ts` has an `SMM_SERVICE_IDS` map keyed by `${platform}-${service}`. The metadata payload sent to Redlap now carries the full cart:
 
 ```ts
 metadata: {
-  // ... standard fields (tcOrderId, email, profile, currency, premium)
-  smmData: {
-    smmServiceId: 5818,     // from the map
-    amount: 1000,           // qty
-    url: "https://...",     // target profile/post URL
-  },
+  tcOrderId, email, currency, // top-level standards
+  items: [{ platform, service, qty, price, premium, target, smmServiceId? }, ...],
+  smmDataItems: [{ smmServiceId, amount, url }, ...],   // one entry per mapped item
+  // Legacy single-item field — only included when the cart has exactly one mapped item.
+  // Kept around because some downstream Redlap fulfillment code paths still read `smmData` directly.
+  smmData?: { smmServiceId, amount, url },
 }
 ```
 
-Currently mapped: `tiktok-followers: 5818`, `tiktok-likes: 1126`, `tiktok-views: 9121`, `instagram-followers: 8072`, `instagram-likes: 2916`, `instagram-views: 7762`. Add more entries as the user supplies them — unmapped pairs send no `smmData` block and Redlap falls back to its default routing.
+Currently mapped: `tiktok-followers: 5818`, `tiktok-likes: 1126`, `tiktok-views: 9121`, `instagram-followers: 8072`, `instagram-likes: 2916`, `instagram-views: 7762`. Add more entries as the user supplies them — unmapped pairs are included in `items[]` without a `smmServiceId` (and contribute nothing to `smmDataItems`), letting Redlap fall back to its default routing for those lines.
 
 ## Ahrefs SEO grounding (don't change these without re-checking)
 

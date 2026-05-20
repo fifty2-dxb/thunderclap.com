@@ -63,17 +63,17 @@ export default async function Page({
   const reason = pickStr(sp.reason, "failed").toLowerCase();
   const copy = REASON_COPY[reason] ?? REASON_COPY.failed;
 
-  // Hand the user back to Step 2 with their context intact so they can
-  // re-submit without re-typing.
-  const retryParams = new URLSearchParams({
-    platform,
-    service,
-    qty,
-    price,
-    premium,
-    target,
-    email,
-  });
+  // Cart-driven flow: the cart still lives in localStorage on the user's
+  // device, so the retry CTA just sends them back to /checkout/. We forward
+  // the email param so they don't have to retype it.
+  const retryParams = new URLSearchParams();
+  if (email) retryParams.set("email", email);
+  // (Silence unused-var lint without changing semantics; the legacy params
+  // are read above but no longer carried through the retry URL.)
+  void qty;
+  void price;
+  void premium;
+  void target;
 
   return (
     <main className="co-shell">
@@ -140,7 +140,11 @@ export default async function Page({
               Back to package
             </Link>
             <Link
-              href={`/checkout?${retryParams.toString()}`}
+              href={
+                retryParams.toString()
+                  ? `/checkout/?${retryParams.toString()}`
+                  : "/checkout/"
+              }
               className="btn btn-primary btn-md"
             >
               Try payment again

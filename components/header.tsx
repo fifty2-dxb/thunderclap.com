@@ -4,7 +4,9 @@ import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
+import { ShoppingCart } from "lucide-react";
 import { MegaMenu, MEGA_PLATFORMS, type PlatformId } from "./mega-menu";
+import { useCart } from "./cart-context";
 
 const PLATFORM_IDS = new Set<string>(MEGA_PLATFORMS.map((p) => p.id));
 const isPlatformId = (v: string): v is PlatformId => PLATFORM_IDS.has(v);
@@ -79,6 +81,7 @@ function activeIdForPath(pathname: string): string | null {
 export function Header() {
   const pathname = usePathname();
   const active = activeIdForPath(pathname);
+  const { count: cartCount } = useCart();
   const [scrolled, setScrolled] = useState(false);
   const [openMenu, setOpenMenu] = useState<string | null>(null);
   const [isMobile, setIsMobile] = useState(false);
@@ -258,6 +261,22 @@ export function Header() {
             Get Started
           </button>
         </div>
+        <Link
+          href="/cart"
+          className="hdr-cart-btn"
+          aria-label={
+            cartCount > 0
+              ? `Cart, ${cartCount} item${cartCount === 1 ? "" : "s"}`
+              : "Cart"
+          }
+        >
+          <ShoppingCart size={22} aria-hidden="true" />
+          {cartCount > 0 && (
+            <span className="hdr-cart-badge" aria-hidden="true">
+              {cartCount > 99 ? "99+" : cartCount}
+            </span>
+          )}
+        </Link>
         <button
           type="button"
           className="hdr-mobile-toggle"

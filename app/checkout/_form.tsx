@@ -1,16 +1,25 @@
 "use client";
 
 import { useState } from "react";
-import { ArrowRight, Check, ShieldCheck } from "lucide-react";
-
-type Platform = "instagram" | "tiktok" | "youtube" | "facebook" | "twitter";
-type Service =
-  | "followers"
-  | "likes"
-  | "views"
-  | "subscribers"
-  | "comments"
-  | "retweets";
+import Link from "next/link";
+import {
+  ArrowRight,
+  Check,
+  Heart,
+  MessageSquare,
+  Play,
+  Repeat2,
+  ShieldCheck,
+  ShoppingBag,
+  UserPlus,
+} from "lucide-react";
+import { useCart, type CartItem, type Platform, type Service } from "@/components/cart-context";
+import { formatQty } from "@/lib/utils";
+import {
+  PLATFORM_LABEL,
+  SERVICE_LABEL,
+  inputConfigFor,
+} from "./_config";
 
 function PlatformChipIcon({ platform }: { platform: Platform }) {
   if (platform === "instagram") {
@@ -63,52 +72,143 @@ function PlatformChipIcon({ platform }: { platform: Platform }) {
   );
 }
 
-export function CheckoutForm({
-  platform,
-  service,
-  qty,
-  basePrice,
-  premium,
-  label,
-  placeholder,
-  initialTarget,
-  initialEmail,
-}: {
-  platform: Platform;
-  service: Service;
-  qty: number;
-  basePrice: number;
-  premium: boolean;
-  label: string;
-  placeholder: string;
-  initialTarget?: string;
-  initialEmail?: string;
-}) {
-  const [target, setTarget] = useState(initialTarget ?? "");
+const SERVICE_ICON: Record<Service, typeof UserPlus> = {
+  followers: UserPlus,
+  subscribers: UserPlus,
+  likes: Heart,
+  views: Play,
+  comments: MessageSquare,
+  retweets: Repeat2,
+};
+
+function lineSubtotal(item: CartItem): number {
+  return Math.round(item.price * (item.premium ? 1.35 : 1) * 100) / 100;
+}
+
+export function CheckoutFlow({ initialEmail }: { initialEmail?: string }) {
+  const { items, hydrated, subtotal, updateTarget } = useCart();
   const [email, setEmail] = useState(initialEmail ?? "");
   const [promo, setPromo] = useState(true);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
+  // Skeleton state while the cart hydrates from localStorage.
+  if (!hydrated) {
+    return (
+      <div className="co-grid">
+        <section className="co-card">
+          <div
+            aria-hidden
+            style={{
+              height: 28,
+              width: 200,
+              background: "var(--uv-bg-lavender)",
+              borderRadius: 8,
+              marginBottom: 16,
+            }}
+          />
+          <div
+            aria-hidden
+            style={{
+              height: 56,
+              background: "var(--uv-bg-lavender)",
+              borderRadius: 12,
+              marginBottom: 12,
+            }}
+          />
+          <div
+            aria-hidden
+            style={{
+              height: 56,
+              background: "var(--uv-bg-lavender)",
+              borderRadius: 12,
+            }}
+          />
+        </section>
+        <aside>
+          <div
+            aria-hidden
+            className="co-summary"
+            style={{ minHeight: 180, background: "var(--uv-bg-lavender)" }}
+          />
+        </aside>
+      </div>
+    );
+  }
+
+  // Empty-cart state.
+  if (items.length === 0) {
+    return (
+      <section
+        className="co-card"
+        style={{ textAlign: "center", maxWidth: 560, margin: "0 auto" }}
+      >
+        <span
+          aria-hidden
+          style={{
+            display: "inline-flex",
+            alignItems: "center",
+            justifyContent: "center",
+            width: 64,
+            height: 64,
+            borderRadius: "50%",
+            background: "var(--uv-pink-soft)",
+            color: "var(--uv-pink)",
+            margin: "0 auto 16px",
+          }}
+        >
+          <ShoppingBag size={28} />
+        </span>
+        <h2 style={{ marginBottom: 8 }}>Your cart is empty</h2>
+        <p style={{ color: "var(--uv-fg-2)", marginBottom: 20 }}>
+          Add a service before checking out.
+        </p>
+        <Link href="/" className="btn btn-primary btn-lg">
+          Browse services
+        </Link>
+      </section>
+    );
+  }
+
   const onSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (submitting) return;
     setError(null);
+
+    // Per-item validation — every target must be filled.
+    for (const it of items) {
+      if (!it.target || !it.target.trim()) {
+        setError(
+          `Please fill in the ${PLATFORM_LABEL[it.platform]} ${SERVICE_LABEL[
+            it.service
+          ].toLowerCase()} link before continuing.`,
+        );
+        return;
+      }
+    }
+    if (!email.trim()) {
+      setError("Please enter your email address.");
+      return;
+    }
+
     setSubmitting(true);
 
     try {
+      const payload = {
+        items: items.map((it) => ({
+          platform: it.platform,
+          service: it.service,
+          qty: it.qty,
+          price: it.price,
+          premium: it.premium,
+          target: (it.target ?? "").trim(),
+        })),
+        email: email.trim(),
+      };
       const res = await fetch("/api/checkout/session", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          platform,
-          service,
-          qty,
-          price: basePrice,
-          premium,
-          target,
-          email,
-        }),
+        body: JSON.stringify(payload),
       });
       const json = (await res.json().catch(() => null)) as
         | { redirectUrl?: string; error?: string }
@@ -133,84 +233,200 @@ export function CheckoutForm({
     }
   };
 
+  const total = subtotal;
+
   return (
-    <form onSubmit={onSubmit}>
-      <div className="co-input-wrap">
-        <span className={`co-input-icon platform-${platform}`} aria-hidden>
-          <PlatformChipIcon platform={platform} />
-        </span>
-        <span className="co-input-label">{label}</span>
-        <input
-          className="co-input"
-          type="text"
-          inputMode="url"
-          autoComplete="off"
-          spellCheck={false}
-          value={target}
-          onChange={(e) => setTarget(e.target.value)}
-          placeholder={placeholder}
-          aria-label={label}
-          required
-        />
-      </div>
-      <a href="#" className="co-help" onClick={(e) => e.preventDefault()}>
-        Need help? See sample URLs
-      </a>
-
-      <div className="co-input-wrap" style={{ marginTop: 6 }}>
-        <span className="co-input-icon" aria-hidden style={{ background: "var(--uv-pink-soft)", color: "var(--uv-pink)" }}>
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
-            <path
-              d="M3 7l9 6 9-6M3 7v10a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V7M3 7l2-2h14l2 2"
-              stroke="currentColor"
-              strokeWidth="2"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            />
-          </svg>
-        </span>
-        <span className="co-input-label">Email address</span>
-        <input
-          className="co-input"
-          type="email"
-          autoComplete="email"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          placeholder="you@example.com"
-          aria-label="Email address"
-          required
-        />
-      </div>
-
-      <label className="co-promo-row">
-        <button
-          type="button"
-          role="checkbox"
-          aria-checked={promo}
-          onClick={() => setPromo(!promo)}
-          className={`co-check${promo ? " on" : ""}`}
-          aria-label="Send me special promotions and discounts"
-        >
-          {promo && <Check size={13} strokeWidth={3} />}
-        </button>
-        <span onClick={() => setPromo(!promo)}>Send me special promotions and discounts</span>
-      </label>
-
-      {error && (
-        <div className="co-pay-err" role="alert">
-          {error}
+    <div className="co-grid">
+      <section className="co-card">
+        <h1>Get started</h1>
+        <div className="live-pill">
+          <span className="live-dot" />
+          <span>
+            <strong>498 live users</strong> on checkout
+          </span>
         </div>
-      )}
 
-      <button type="submit" className="co-cta" disabled={submitting}>
-        {submitting ? "Opening gateway…" : "Continue to payment"}
-        {!submitting && <ArrowRight size={16} />}
-      </button>
+        <form onSubmit={onSubmit}>
+          {items.map((item) => {
+            const cfg = inputConfigFor(item.platform, item.service);
+            return (
+              <div className="co-input-wrap" key={item.id}>
+                <span
+                  className={`co-input-icon platform-${item.platform}`}
+                  aria-hidden
+                >
+                  <PlatformChipIcon platform={item.platform} />
+                </span>
+                <span className="co-input-label">{cfg.label}</span>
+                <input
+                  className="co-input"
+                  type="text"
+                  inputMode="url"
+                  autoComplete="off"
+                  spellCheck={false}
+                  value={item.target ?? ""}
+                  onChange={(e) => updateTarget(item.id, e.target.value)}
+                  placeholder={cfg.placeholder}
+                  aria-label={cfg.label}
+                  required
+                />
+              </div>
+            );
+          })}
 
-      <div className="co-safe-note">
-        <ShieldCheck size={14} />
-        <span>No password required. Your account stays secure.</span>
-      </div>
-    </form>
+          <div className="co-input-wrap" style={{ marginTop: 6 }}>
+            <span
+              className="co-input-icon"
+              aria-hidden
+              style={{
+                background: "var(--uv-pink-soft)",
+                color: "var(--uv-pink)",
+              }}
+            >
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+                <path
+                  d="M3 7l9 6 9-6M3 7v10a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V7M3 7l2-2h14l2 2"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
+              </svg>
+            </span>
+            <span className="co-input-label">Email address</span>
+            <input
+              className="co-input"
+              type="email"
+              autoComplete="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              placeholder="you@example.com"
+              aria-label="Email address"
+              required
+            />
+          </div>
+
+          <label className="co-promo-row">
+            <button
+              type="button"
+              role="checkbox"
+              aria-checked={promo}
+              onClick={() => setPromo(!promo)}
+              className={`co-check${promo ? " on" : ""}`}
+              aria-label="Send me special promotions and discounts"
+            >
+              {promo && <Check size={13} strokeWidth={3} />}
+            </button>
+            <span onClick={() => setPromo(!promo)}>
+              Send me special promotions and discounts
+            </span>
+          </label>
+
+          {error && (
+            <div className="co-pay-err" role="alert">
+              {error}
+            </div>
+          )}
+
+          <button type="submit" className="co-cta" disabled={submitting}>
+            {submitting
+              ? "Opening gateway…"
+              : `Continue to payment · $${total.toFixed(2)}`}
+            {!submitting && <ArrowRight size={16} />}
+          </button>
+
+          <div className="co-safe-note">
+            <ShieldCheck size={14} />
+            <span>No password required. Your account stays secure.</span>
+          </div>
+        </form>
+
+        <div className="co-trust-row">
+          <span className="co-trust-stars" aria-hidden>
+            {[0, 1, 2, 3, 4].map((i) => (
+              <span key={i}>★</span>
+            ))}
+          </span>
+          <span>
+            <strong style={{ color: "var(--uv-fg-1)" }}>4.7</strong> · 12,743
+            reviews on Trustpilot
+          </span>
+        </div>
+      </section>
+
+      <aside>
+        <div className="co-summary">
+          <div className="co-sum-head">
+            <ShoppingBag size={16} aria-hidden />
+            <span>
+              {items.length === 1 ? "Your order" : `Your order · ${items.length} items`}
+            </span>
+          </div>
+
+          {items.map((item) => {
+            const Icon = SERVICE_ICON[item.service];
+            const value = lineSubtotal(item);
+            return (
+              <div className="co-sum-line" key={item.id}>
+                <span className="co-sum-qty">
+                  <Icon size={16} />
+                  {formatQty(item.qty)} {PLATFORM_LABEL[item.platform]}{" "}
+                  {SERVICE_LABEL[item.service]}
+                  {item.premium && <span className="co-sum-premium">Premium</span>}
+                </span>
+                <span style={{ color: "var(--uv-fg-1)", fontWeight: 600 }}>
+                  ${value.toFixed(2)}
+                </span>
+              </div>
+            );
+          })}
+
+          <div className="co-sum-line">
+            <span>Subtotal</span>
+            <span style={{ color: "var(--uv-fg-1)", fontWeight: 600 }}>
+              ${subtotal.toFixed(2)}
+            </span>
+          </div>
+          <div className="co-sum-total">
+            <span>Total</span>
+            <span>
+              <span className="co-sum-currency">USD</span>${total.toFixed(2)}
+            </span>
+          </div>
+        </div>
+
+        <Link
+          href="/cart"
+          className="co-bundle"
+          aria-label="Review or add more items in your cart"
+        >
+          <span className="co-bundle-icon">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+              <path
+                d="M8 8a2 2 0 1 1-4 0 2 2 0 0 1 4 0zM20 16a2 2 0 1 1-4 0 2 2 0 0 1 4 0zM18.5 5.5l-13 13"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+              />
+            </svg>
+          </span>
+          <div>
+            <div className="co-bundle-title">Need to change your order?</div>
+            <div className="co-bundle-sub">Review or add more items in your cart</div>
+          </div>
+          <span className="co-bundle-plus" aria-hidden>
+            <ArrowRight size={18} />
+          </span>
+        </Link>
+
+        <blockquote className="co-quote">
+          &ldquo;When you want to accomplish your social media goals, Thunderclap is
+          the place to turn.&rdquo;
+          <cite>
+            DENVER 7<span className="co-quote-stars">★★★★★</span>
+          </cite>
+        </blockquote>
+      </aside>
+    </div>
   );
 }
