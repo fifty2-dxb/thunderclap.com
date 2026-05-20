@@ -1149,6 +1149,11 @@ img { display: block; max-width: 100%; }
   .footer-top { grid-template-columns: 1.4fr repeat(3, 1fr); }
   .svc-layout { grid-template-columns: 1fr; }
   .svc-side { position: static; }
+  /* Order summary stacks below the package card on mobile/tablet — the
+     in-card .pkg-cta is already visible right above it, so hide the
+     duplicate "Add to cart" button inside the summary to avoid two
+     redundant CTAs stacked one after the other. */
+  .side-cta { display: none; }
   /* H1 with inline fontSize: 72 overflows on tablet widths — cap it here.
      Doesn't touch the ≤640 clamp() rule that already exists below. */
   main h1 { font-size: clamp(40px, 6.5vw, 60px) !important; line-height: 1.06 !important; }
