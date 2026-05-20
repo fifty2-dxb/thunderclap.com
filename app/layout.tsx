@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { Plus_Jakarta_Sans, Manrope, JetBrains_Mono } from "next/font/google";
 import { Announcement } from "@/components/announcement";
 import { CartProvider } from "@/components/cart-context";
-import { CartToast } from "@/components/cart-toast";
+import { CartDrawer } from "@/components/cart-drawer";
 import { Header } from "@/components/header";
 import { Ticker } from "@/components/ticker";
 import { Footer } from "@/components/footer";
@@ -57,7 +57,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           <Ticker />
           {children}
           <Footer />
-          <CartToast />
+          <CartDrawer />
         </CartProvider>
       </body>
     </html>

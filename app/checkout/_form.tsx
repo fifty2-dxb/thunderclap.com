@@ -13,6 +13,7 @@ import {
   ShoppingBag,
   UserPlus,
 } from "lucide-react";
+import { useEffect } from "react";
 import { useCart, type CartItem, type Platform, type Service } from "@/components/cart-context";
 import { formatQty } from "@/lib/utils";
 import {
@@ -86,11 +87,20 @@ function lineSubtotal(item: CartItem): number {
 }
 
 export function CheckoutFlow({ initialEmail }: { initialEmail?: string }) {
-  const { items, hydrated, subtotal, updateTarget } = useCart();
+  const { items, hydrated, subtotal, setAllTargets, openDrawer } = useCart();
+  const [target, setTarget] = useState("");
   const [email, setEmail] = useState(initialEmail ?? "");
   const [promo, setPromo] = useState(true);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  // If the cart already has a target on its items (e.g. user retried after
+  // a failed payment), pick it up into the local input.
+  useEffect(() => {
+    if (!hydrated) return;
+    const first = items.find((it) => it.target && it.target.trim());
+    if (first?.target) setTarget((curr) => curr || (first.target ?? ""));
+  }, [hydrated, items]);
 
   // Skeleton state while the cart hydrates from localStorage.
   if (!hydrated) {
@@ -175,22 +185,19 @@ export function CheckoutFlow({ initialEmail }: { initialEmail?: string }) {
     if (submitting) return;
     setError(null);
 
-    // Per-item validation — every target must be filled.
-    for (const it of items) {
-      if (!it.target || !it.target.trim()) {
-        setError(
-          `Please fill in the ${PLATFORM_LABEL[it.platform]} ${SERVICE_LABEL[
-            it.service
-          ].toLowerCase()} link before continuing.`,
-        );
-        return;
-      }
+    const trimmedTarget = target.trim();
+    if (!trimmedTarget) {
+      setError("Please enter your social media link or username.");
+      return;
     }
     if (!email.trim()) {
       setError("Please enter your email address.");
       return;
     }
 
+    // Apply the shared target to every cart item so the order summary
+    // and Redlap metadata each carry the value.
+    setAllTargets(trimmedTarget);
     setSubmitting(true);
 
     try {
@@ -201,7 +208,7 @@ export function CheckoutFlow({ initialEmail }: { initialEmail?: string }) {
           qty: it.qty,
           price: it.price,
           premium: it.premium,
-          target: (it.target ?? "").trim(),
+          target: trimmedTarget,
         })),
         email: email.trim(),
       };
@@ -247,15 +254,27 @@ export function CheckoutFlow({ initialEmail }: { initialEmail?: string }) {
         </div>
 
         <form onSubmit={onSubmit}>
-          {items.map((item) => {
-            const cfg = inputConfigFor(item.platform, item.service);
+          {(() => {
+            // One shared target input — the same URL/handle applies to every
+            // line item in the cart. Use the first item's platform/service for
+            // the label + placeholder so the prompt is concrete; if the cart
+            // mixes platforms we fall back to a generic prompt.
+            const first = items[0];
+            const platforms = new Set(items.map((it) => it.platform));
+            const mixed = platforms.size > 1;
+            const cfg = mixed
+              ? {
+                  label: "Your social media link or username",
+                  placeholder: "https://instagram.com/yourusername",
+                }
+              : inputConfigFor(first.platform, first.service);
             return (
-              <div className="co-input-wrap" key={item.id}>
+              <div className="co-input-wrap">
                 <span
-                  className={`co-input-icon platform-${item.platform}`}
+                  className={`co-input-icon platform-${first.platform}`}
                   aria-hidden
                 >
-                  <PlatformChipIcon platform={item.platform} />
+                  <PlatformChipIcon platform={first.platform} />
                 </span>
                 <span className="co-input-label">{cfg.label}</span>
                 <input
@@ -264,15 +283,15 @@ export function CheckoutFlow({ initialEmail }: { initialEmail?: string }) {
                   inputMode="url"
                   autoComplete="off"
                   spellCheck={false}
-                  value={item.target ?? ""}
-                  onChange={(e) => updateTarget(item.id, e.target.value)}
+                  value={target}
+                  onChange={(e) => setTarget(e.target.value)}
                   placeholder={cfg.placeholder}
                   aria-label={cfg.label}
                   required
                 />
               </div>
             );
-          })}
+          })()}
 
           <div className="co-input-wrap" style={{ marginTop: 6 }}>
             <span
@@ -395,8 +414,9 @@ export function CheckoutFlow({ initialEmail }: { initialEmail?: string }) {
           </div>
         </div>
 
-        <Link
-          href="/cart"
+        <button
+          type="button"
+          onClick={openDrawer}
           className="co-bundle"
           aria-label="Review or add more items in your cart"
         >
@@ -417,7 +437,7 @@ export function CheckoutFlow({ initialEmail }: { initialEmail?: string }) {
           <span className="co-bundle-plus" aria-hidden>
             <ArrowRight size={18} />
           </span>
-        </Link>
+        </button>
 
         <blockquote className="co-quote">
           &ldquo;When you want to accomplish your social media goals, Thunderclap is

@@ -26,7 +26,7 @@ Social media growth marketing site (Instagram / TikTok / YouTube / Facebook / Tw
 | `/buy-facebook-{followers,likes,views}` | **Fully built** — Facebook-branded copy. FAQs export `FB_FAQS`. |
 | `/buy-twitter-{followers,likes,retweets}` | **Fully built** — labelled "Twitter / X" everywhere user-facing. FAQs export `TW_FAQS`. Adds the `retweets` service type. |
 | `next.config.ts` redirects | 301s from old `/{platform}/{service}` nested routes AND legacy prod URLs (`/buy-instagram-impressions`, `/free-youtube-subscribers`, `/instagram`, `/tiktok`, `/youtube`, `/facebook`, `/twitter`) → new canonicals. **`trailingSlash: true`** is set so every served URL ends in `/` and non-slash variants 308 to the trailing-slash form — needed to match the legacy WordPress URL pattern Google has already indexed. |
-| `/cart` | **Built** — `noindex, nofollow`. Reads the cart from the React context (localStorage-persisted), groups line items by platform, shows a "you might like" upsell strip, and ends in a sticky Checkout CTA (subtotal + Link → `/checkout/`). Empty state has a "Browse services" grid. |
+| `components/cart-drawer.tsx` | **Built** — there is NO `/cart` page anymore. The cart lives in a slide-in drawer (right rail on desktop, bottom sheet on mobile) mounted globally in `app/layout.tsx`. Auto-opens whenever an item is added, with a "MORE FROM {platform}" upsell row whose Add buttons call `addItem` directly (one-tap stacking from the drawer). Header cart icon opens it via `openDrawer()`. |
 | `/checkout` | **Built** — multi-item server shell + `<CheckoutFlow>` client island, `noindex, nofollow`. Reads the cart from context (NOT URL params), renders one `target` input per cart item (per-service placeholder via `INPUT_CONFIG`), plus a single `email` input. On submit POSTs `{ items: [...], email }` to `/api/checkout/session` and `window.location` redirects to the Redlap-hosted payment page. Empty-cart state when no items. No method picker — Redlap owns card/Apple Pay/etc. |
 | `/checkout/return` | **Built** — landing point for Redlap's redirect. Client island polls `/api/checkout/status` until terminal status, then `router.replace` to `/checkout/success` or `/checkout/failed`. |
 | `/checkout/success` | **Built** — order confirmation. Reads `order_id`, `payment_id` (Redlap session), `order_number` (Redlap gateway ref) from URL. |
@@ -314,28 +314,31 @@ Responsive: `.blog-grid` 3→2→1, `.blog-featured` stacks at ≤980, hero-imag
 
 ## Cart system (`components/cart-context.tsx`)
 
-`<CartProvider>` wraps `app/layout.tsx` and exposes `useCart()` to every client component below it. State persists in `localStorage` under key `tc:cart:v1`; the provider also renders the bottom `<CartToast>` notification.
+`<CartProvider>` wraps `app/layout.tsx` and exposes `useCart()` to every client component below it. State persists in `localStorage` under key `tc:cart:v1`; the provider also tracks `isDrawerOpen` and the `lastAddedPlatform` so the drawer can spotlight "more from {platform}" upsells right after an add.
 
 - **CartItem shape**: `{ id, platform, service, qty, price, regular, premium, target?, addedAt }`. `id = "${platform}-${service}-${premium ? 'p' : 's'}"` — so adding the same platform+service+premium combo REPLACES the line rather than stacking. Different `premium` is a separate line.
-- **`addItem(input)`** sets the line and fires the "added" toast.
-- **`removeItem(id)`** drops the line and fires the "removed" toast.
-- **`updateTarget(id, target)`** is what the `/checkout` form calls per row.
-- **`clear()`** is wired to the Clear-cart button on `/cart`.
+- **`addItem(input)`** sets the line, records `lastAddedPlatform`, and **auto-opens the drawer**. This is the "feedback + upsell" affordance — there's no separate toast.
+- **`removeItem(id)`** drops the line in place.
+- **`updateTarget(id, target)`** / **`setAllTargets(target)`** — the checkout form uses `setAllTargets` since the form collects a single shared target for the whole order.
+- **`openDrawer()` / `closeDrawer()`** — the header cart button calls `openDrawer`; the drawer's X / backdrop / Escape call `closeDrawer`.
+- **`clear()`** is wired to the Clear-cart button inside the drawer.
 - **`hydrated`** flips to `true` after the first `localStorage` read so server-rendered components can render an empty-state skeleton without flashing the wrong UI.
 
-Service-page builders all import `useCart` and bind the in-card `.pkg-cta` + sticky `.side-cta` buttons to `onAddToCart` (calls `addItem` with the current `pkg` + `premium` state). The buttons are `<button onClick=…>` now — not Next `<Link>` — because navigation no longer happens there. The toast handles the "what just happened" affordance with a "View cart" CTA → `/cart/`.
+Service-page builders all import `useCart` and bind the in-card `.pkg-cta` + sticky `.side-cta` buttons to `onAddToCart` (calls `addItem` with the current `pkg` + `premium` state). The buttons are `<button onClick=…>` now — not Next `<Link>` — because navigation no longer happens there. The drawer auto-opens to confirm the add and show same-platform upsells.
 
-The header (`components/header.tsx`) shows a small `.hdr-cart-btn` with `.hdr-cart-badge` (count) next to the rest of the chrome at every breakpoint. Mobile reorders it left of the hamburger.
+The drawer (`components/cart-drawer.tsx`) is the only cart UI — there is **no `/cart` page**. Desktop: right-rail slide-in panel (480px wide). Mobile (≤640): bottom-sheet (full-width, 92vh tall). Backdrop click / Escape / X all close it. Body scroll lock + `overscroll-behavior: contain`. The "MORE FROM {platform}" upsell row sits below the line items and uses `<button onClick={() => addItem(…)}>` Add buttons (no navigation) so users can stack same-platform services without leaving the drawer.
+
+The header (`components/header.tsx`) shows a small `.hdr-cart-btn` (a `<button>`, not a Link) with `.hdr-cart-badge` (count) next to the rest of the chrome at every breakpoint. On mobile it has `margin-right: -22px` so it sits flush against the hamburger toggle (the container has inline `gap: 32` that can't be overridden by a media query, so the negative margin pulls them together visually).
 
 ## Checkout flow (cart → /checkout/ → Redlap → Return → Success/Failed)
 
 The full payment funnel is wired end-to-end. The Thunderclap site only verifies that payment succeeded; **order fulfillment lives inside the Redlap environment** — don't add fulfillment hooks here.
 
-There are no URL params on `/checkout/` anymore. The page reads the cart from `useCart()` and renders one target input per line item, plus a single shared `email`. If the cart is empty, a "Browse services" empty state is shown.
+There are no URL params on `/checkout/` anymore. The page reads the cart from `useCart()` and renders **one shared target input for the whole order** (label/placeholder pulled from the first item's `INPUT_CONFIG` entry; falls back to a generic "Your social media link or username" when the cart mixes platforms), plus a single shared `email`. On submit the form calls `setAllTargets(target)` so every cart item carries that value into the API payload. If the cart is empty, a "Browse services" empty state is shown.
 
 - **Per-service input** label and placeholder are looked up from `INPUT_CONFIG[`${platform}-${service}`]` in `app/checkout/_config.ts` — extend this map when adding new service combos
 - **Platform-coloured input chip** uses `.platform-instagram` / `.platform-tiktok` / `.platform-youtube` / `.platform-facebook` / `.platform-twitter` modifier classes on `.co-input-icon`
-- The form runs native HTML validation — `noValidate` is intentionally off. The submit handler also explicitly guards that every item has a non-empty target.
+- The form runs native HTML validation — `noValidate` is intentionally off. The submit handler also explicitly guards that target + email are non-empty.
 
 On submit the form `fetch`es `POST /api/checkout/session` with `{ items: [{ platform, service, qty, price, premium, target }, ...], email }`. The API computes `total = sum(price * (premium ? 1.35 : 1))`, builds the Redlap metadata (see below), and returns `{ redirectUrl }`; the client `window.location.href`s to the Redlap-hosted payment page. There is **no on-site method picker** — Card / Apple Pay / Google Pay / Crypto are presented on the Redlap page. Error messages from the API are surfaced inline via `.co-pay-err`.
 

@@ -6,7 +6,6 @@ import {
   useContext,
   useEffect,
   useMemo,
-  useRef,
   useState,
 } from "react";
 
@@ -31,22 +30,20 @@ export type CartItem = {
   addedAt: number;
 };
 
-type ToastState =
-  | { kind: "added"; item: CartItem }
-  | { kind: "removed"; itemId: string }
-  | null;
-
 type CartContextValue = {
   items: CartItem[];
   count: number;
   subtotal: number;
   hydrated: boolean;
+  lastAddedPlatform: Platform | null;
   addItem: (input: Omit<CartItem, "id" | "addedAt">) => void;
   removeItem: (id: string) => void;
   updateTarget: (id: string, target: string) => void;
+  setAllTargets: (target: string) => void;
   clear: () => void;
-  toast: ToastState;
-  dismissToast: () => void;
+  isDrawerOpen: boolean;
+  openDrawer: () => void;
+  closeDrawer: () => void;
 };
 
 const STORAGE_KEY = "tc:cart:v1";
@@ -64,8 +61,8 @@ function lineTotal(item: CartItem): number {
 export function CartProvider({ children }: { children: React.ReactNode }) {
   const [items, setItems] = useState<CartItem[]>([]);
   const [hydrated, setHydrated] = useState(false);
-  const [toast, setToast] = useState<ToastState>(null);
-  const toastTimer = useRef<number | null>(null);
+  const [isDrawerOpen, setIsDrawerOpen] = useState(false);
+  const [lastAddedPlatform, setLastAddedPlatform] = useState<Platform | null>(null);
 
   useEffect(() => {
     try {
@@ -89,49 +86,32 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
     }
   }, [items, hydrated]);
 
-  const showToast = useCallback((next: ToastState) => {
-    if (toastTimer.current !== null) {
-      window.clearTimeout(toastTimer.current);
-    }
-    setToast(next);
-    if (next) {
-      toastTimer.current = window.setTimeout(() => setToast(null), 4500);
-    }
+  const openDrawer = useCallback(() => setIsDrawerOpen(true), []);
+  const closeDrawer = useCallback(() => setIsDrawerOpen(false), []);
+
+  const addItem = useCallback<CartContextValue["addItem"]>((input) => {
+    const id = buildId(input.platform, input.service, input.premium);
+    const next: CartItem = { ...input, id, addedAt: Date.now() };
+    setItems((curr) => {
+      const without = curr.filter((it) => it.id !== id);
+      return [...without, next];
+    });
+    setLastAddedPlatform(input.platform);
+    setIsDrawerOpen(true);
   }, []);
 
-  const dismissToast = useCallback(() => {
-    if (toastTimer.current !== null) {
-      window.clearTimeout(toastTimer.current);
-      toastTimer.current = null;
-    }
-    setToast(null);
+  const removeItem = useCallback<CartContextValue["removeItem"]>((id) => {
+    setItems((curr) => curr.filter((it) => it.id !== id));
   }, []);
-
-  const addItem = useCallback<CartContextValue["addItem"]>(
-    (input) => {
-      const id = buildId(input.platform, input.service, input.premium);
-      const next: CartItem = { ...input, id, addedAt: Date.now() };
-      setItems((curr) => {
-        const without = curr.filter((it) => it.id !== id);
-        return [...without, next];
-      });
-      showToast({ kind: "added", item: next });
-    },
-    [showToast],
-  );
-
-  const removeItem = useCallback<CartContextValue["removeItem"]>(
-    (id) => {
-      setItems((curr) => curr.filter((it) => it.id !== id));
-      showToast({ kind: "removed", itemId: id });
-    },
-    [showToast],
-  );
 
   const updateTarget = useCallback<CartContextValue["updateTarget"]>((id, target) => {
     setItems((curr) =>
       curr.map((it) => (it.id === id ? { ...it, target } : it)),
     );
+  }, []);
+
+  const setAllTargets = useCallback<CartContextValue["setAllTargets"]>((target) => {
+    setItems((curr) => curr.map((it) => ({ ...it, target })));
   }, []);
 
   const clear = useCallback(() => {
@@ -146,14 +126,29 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
       count,
       subtotal: Math.round(subtotal * 100) / 100,
       hydrated,
+      lastAddedPlatform,
       addItem,
       removeItem,
       updateTarget,
+      setAllTargets,
       clear,
-      toast,
-      dismissToast,
+      isDrawerOpen,
+      openDrawer,
+      closeDrawer,
     };
-  }, [items, hydrated, addItem, removeItem, updateTarget, clear, toast, dismissToast]);
+  }, [
+    items,
+    hydrated,
+    lastAddedPlatform,
+    addItem,
+    removeItem,
+    updateTarget,
+    setAllTargets,
+    clear,
+    isDrawerOpen,
+    openDrawer,
+    closeDrawer,
+  ]);
 
   return <CartContext.Provider value={value}>{children}</CartContext.Provider>;
 }

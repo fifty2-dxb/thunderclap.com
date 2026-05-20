@@ -81,7 +81,7 @@ function activeIdForPath(pathname: string): string | null {
 export function Header() {
   const pathname = usePathname();
   const active = activeIdForPath(pathname);
-  const { count: cartCount } = useCart();
+  const { count: cartCount, openDrawer } = useCart();
   const [scrolled, setScrolled] = useState(false);
   const [openMenu, setOpenMenu] = useState<string | null>(null);
   const [isMobile, setIsMobile] = useState(false);
@@ -261,8 +261,9 @@ export function Header() {
             Get Started
           </button>
         </div>
-        <Link
-          href="/cart"
+        <button
+          type="button"
+          onClick={openDrawer}
           className="hdr-cart-btn"
           aria-label={
             cartCount > 0
@@ -276,7 +277,7 @@ export function Header() {
               {cartCount > 99 ? "99+" : cartCount}
             </span>
           )}
-        </Link>
+        </button>
         <button
           type="button"
           className="hdr-mobile-toggle"
