@@ -63,9 +63,8 @@ const NAV: NavItem[] = [
       { label: "Buy Twitter Retweets", href: "/buy-twitter-retweets" },
     ],
   },
-  { id: "tools", label: "Free Tools" },
   { id: "blog", label: "Blog", href: "/blog" },
-  { id: "support", label: "Support" },
+  { id: "support", label: "Support", href: "/contact" },
 ];
 
 function activeIdForPath(pathname: string): string | null {
@@ -250,16 +249,19 @@ export function Header() {
           })}
         </nav>
         <div className="hdr-desktop-cta">
-          <a href="#" style={{ fontSize: 14, fontWeight: 500, color: "var(--uv-fg-2)" }}>
-            Track order
-          </a>
-          <button
-            type="button"
+          <Link
+            href="/#services"
             className="btn btn-primary btn-sm"
-            style={{ borderRadius: 999, padding: "0 18px", height: 38 }}
+            style={{
+              borderRadius: 999,
+              padding: "0 18px",
+              height: 38,
+              display: "inline-flex",
+              alignItems: "center",
+            }}
           >
             Get Started
-          </button>
+          </Link>
         </div>
         <button
           type="button"
@@ -471,34 +473,22 @@ export function Header() {
                   </div>
                 );
               })}
-              <Link
-                href="#"
-                onClick={closeMobile}
-                style={{
-                  display: "block",
-                  padding: "16px 20px",
-                  fontFamily: "var(--font-display)",
-                  fontSize: 14,
-                  fontWeight: 800,
-                  color: "var(--uv-fg-1)",
-                  textDecoration: "none",
-                }}
-              >
-                Track order
-              </Link>
-              <div style={{ padding: "12px 20px 32px" }}>
-                <button
-                  type="button"
+              <div style={{ padding: "16px 20px 32px" }}>
+                <Link
+                  href="/#services"
                   onClick={closeMobile}
                   className="btn btn-primary"
                   style={{
                     width: "100%",
                     borderRadius: 999,
                     height: 48,
+                    display: "inline-flex",
+                    alignItems: "center",
+                    justifyContent: "center",
                   }}
                 >
                   Get Started
-                </button>
+                </Link>
               </div>
             </nav>
           </div>
