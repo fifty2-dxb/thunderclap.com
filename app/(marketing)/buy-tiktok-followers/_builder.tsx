@@ -53,7 +53,6 @@ export function TikTokFollowersHero() {
   const pkg = PACKAGES[selected];
   const total = (pkg.price * (premium ? 1.35 : 1)).toFixed(2);
   const youSave = ((pkg.regular - pkg.price) * (premium ? 1.35 : 1)).toFixed(2);
-  const youSavePct = Math.round((1 - pkg.price / pkg.regular) * 100);
   const { addItem } = useCart();
   const onAddToCart = () =>
     addItem({
@@ -198,7 +197,7 @@ export function TikTokFollowersHero() {
                   <div className="pkg-total-label">Total</div>
                   <div className="pkg-total">${total}</div>
                   {Number(youSave) > 0 && (
-                    <div className="pkg-save-line">You save ${youSave} · {youSavePct}% off</div>
+                    <div className="pkg-save-line">You save ${youSave}</div>
                   )}
                 </div>
                 <button
