@@ -22,7 +22,7 @@ Social media growth marketing site (Instagram / TikTok / YouTube / Facebook / Tw
 | `/` | Built — hero, trust bar, service table, pricing, FAQ, testimonials, CTA |
 | `/buy-instagram-{followers,likes,views}` | **Fully built** — full service-page pattern (see below). Flat `buy-{platform}-{service}` slug chosen to match the exact-match SERP cluster ("buy instagram followers" 34K vol etc., per Ahrefs) and to preserve the live `/buy-instagram-followers` ranking. |
 | `/buy-tiktok-{followers,likes,views}` | **Fully built** — same pattern, TikTok-branded |
-| `/buy-youtube-{subscribers,views}` | **Fully built** — YouTube-branded with YPP threshold framing. FAQs export `YT_FAQS`. |
+| `/buy-youtube-{subscribers,likes,views}` | **Fully built** — YouTube-branded with YPP threshold framing. FAQs export `YT_FAQS`. |
 | `/buy-facebook-{followers,likes,views}` | **Fully built** — Facebook-branded copy. FAQs export `FB_FAQS`. |
 | `/buy-twitter-{followers,likes,retweets}` | **Fully built** — labelled "Twitter / X" everywhere user-facing. FAQs export `TW_FAQS`. Adds the `retweets` service type. |
 | `next.config.ts` redirects | 301s from old `/{platform}/{service}` nested routes AND legacy prod URLs (`/buy-instagram-impressions`, `/free-youtube-subscribers`, `/instagram`, `/tiktok`, `/youtube`, `/facebook`, `/twitter`) → new canonicals. **`trailingSlash: true`** is set so every served URL ends in `/` and non-slash variants 308 to the trailing-slash form — needed to match the legacy WordPress URL pattern Google has already indexed. |
@@ -51,7 +51,7 @@ app/
   (marketing)/                        grouped service pages (no URL segment)
     buy-instagram-{followers,likes,views}/{page.tsx, _builder.tsx, _faqs.ts}
     buy-tiktok-{followers,likes,views}/{page.tsx, _builder.tsx, _faqs.ts}
-    buy-youtube-{subscribers,views}/{page.tsx, _builder.tsx, _faqs.ts}
+    buy-youtube-{subscribers,likes,views}/{page.tsx, _builder.tsx, _faqs.ts}
     buy-facebook-{followers,likes,views}/{page.tsx, _builder.tsx, _faqs.ts}
     buy-twitter-{followers,likes,retweets}/{page.tsx, _builder.tsx, _faqs.ts}
   checkout/
@@ -214,7 +214,7 @@ Pattern:
 
 ## Service page pattern (Buy Instagram Likes is the canonical reference)
 
-The `/buy-instagram-likes` route is the original template. All 14 service pages (IG x3, TT x3, YT x2, FB x3, TW x3) follow it identically.
+The `/buy-instagram-likes` route is the original template. All 15 service pages (IG x3, TT x3, YT x3, FB x3, TW x3) follow it identically.
 
 **File layout per service page:**
 
@@ -241,7 +241,7 @@ app/(marketing)/buy-<platform>-<service>/
 
 All required component classes already exist in `app/globals.css`. Use them — don't reinvent with Tailwind utility soup.
 
-**Pricing tiers** for the package picker live inside `_builder.tsx` as a `PACKAGES` const (variable tier count per page, 6–12 tiers each). All 14 service pages carry real, CSV-grounded prices sourced from the WooCommerce product export (`thunderclapproductprices.numbers`), HQ tier only. Each entry: `{ qty: number, price: number, regular: number, popular?: true }`. `price` is the sale price; `regular` is the WooCommerce "Regular price" (sale ≈ regular × 0.8 for most tiers) — it powers the strikethrough on each tile and the `youSave` / `youSavePct` display below the CTA. When porting:
+**Pricing tiers** for the package picker live inside `_builder.tsx` as a `PACKAGES` const (variable tier count per page, 6–12 tiers each). All 15 service pages carry real, CSV-grounded prices sourced from the WooCommerce product export (`thunderclapproductprices.numbers`), HQ tier only. Each entry: `{ qty: number, price: number, regular: number, popular?: true }`. `price` is the sale price; `regular` is the WooCommerce "Regular price" (sale ≈ regular × 0.8 for most tiers) — it powers the strikethrough on each tile and the `youSave` amount ("You save $X") shown below the CTA. When porting:
 1. Copy the array shape and fill in `qty`/`price`/`regular` from the CSV row for the matching qty
 2. Mark exactly one tier `popular: true` (the value-anchor — middle-of-curve)
 3. Re-sync `Product.offers` `lowPrice` / `highPrice` / `offerCount` in `page.tsx`

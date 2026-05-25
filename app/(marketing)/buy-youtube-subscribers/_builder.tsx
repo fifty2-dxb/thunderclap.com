@@ -20,6 +20,7 @@ import { YT_FAQS } from "./_faqs";
 
 const SERVICE_TABS = [
   { id: "subscribers", label: "Subscribers", Icon: Users, href: "/buy-youtube-subscribers" },
+  { id: "likes",       label: "Likes",       Icon: Heart, href: "/buy-youtube-likes" },
   { id: "views",       label: "Views",       Icon: Play,  href: "/buy-youtube-views" },
 ] as const;
 

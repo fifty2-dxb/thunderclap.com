@@ -131,6 +131,13 @@ export const MEGA_PLATFORMS: PlatformDef[] = [
         Icon: Users,
       },
       {
+        label: "Buy Likes",
+        description: "Boost engagement ratio and signal quality to the algorithm.",
+        href: "/buy-youtube-likes",
+        fromPrice: "$3.99",
+        Icon: Heart,
+      },
+      {
         label: "Buy Views",
         description: "30-second-plus watch sessions that count toward YPP watch hours.",
         href: "/buy-youtube-views",

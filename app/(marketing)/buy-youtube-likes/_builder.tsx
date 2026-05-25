@@ -6,7 +6,6 @@ import {
   ArrowRight,
   Heart,
   Lock,
-  MessageSquare,
   Play,
   ShieldCheck,
   Sparkles,
@@ -25,30 +24,26 @@ const SERVICE_TABS = [
 ] as const;
 
 const PACKAGES = [
-  { qty: 250, price: 4.39, regular: 5.49 },
-  { qty: 500, price: 6.39, regular: 7.99 },
-  { qty: 1000, price: 8.39, regular: 10.49 },
-  { qty: 2500, price: 15.39, regular: 19.24 },
-  { qty: 5000, price: 28.39, regular: 35.49 },
-  { qty: 10000, price: 56.39, regular: 70.49, popular: true },
-  { qty: 25000, price: 134.99, regular: 168.74 },
-  { qty: 50000, price: 258.99, regular: 323.74 },
-  { qty: 100000, price: 499.99, regular: 624.99 },
-  { qty: 250000, price: 1224.99, regular: 1531.24 },
-  { qty: 500000, price: 2449.99, regular: 3062.49 },
-  { qty: 1000000, price: 4799.99, regular: 5999.99 },
+  { qty: 50, price: 3.99, regular: 4.99 },
+  { qty: 100, price: 6.49, regular: 8.11 },
+  { qty: 250, price: 12.99, regular: 16.24 },
+  { qty: 500, price: 22.99, regular: 28.74 },
+  { qty: 1000, price: 39.99, regular: 49.99, popular: true },
+  { qty: 2500, price: 89.99, regular: 112.49 },
+  { qty: 5000, price: 169.99, regular: 212.49 },
+  { qty: 10000, price: 319.99, regular: 399.99 },
 ] as const;
 
 const SIDE_BENEFITS = [
-  { title: "Real watch time", desc: "30s+ sessions from active YouTube accounts" },
-  { title: "Starts in 15 min", desc: "drip-fed over 4-48 hours for a natural curve" },
-  { title: "Counts toward YPP", desc: "watch hours apply to your 4,000-hour threshold" },
+  { title: "Real accounts", desc: "likes from real, active YouTube users" },
+  { title: "Starts in 5 min", desc: "drip-fed over 1-24 hours for a natural curve" },
+  { title: "30-day refill", desc: "free top-up if any likes drop" },
   { title: "24/7 support", desc: "real humans, 7-min average reply time" },
 ];
 
-export function YouTubeViewsHero() {
-  const [tab, setTab] = useState<(typeof SERVICE_TABS)[number]["id"]>("views");
-  const [selected, setSelected] = useState(4); // 25K popular
+export function YouTubeLikesHero() {
+  const [tab, setTab] = useState<(typeof SERVICE_TABS)[number]["id"]>("likes");
+  const [selected, setSelected] = useState(4); // 1K popular
   const [premium, setPremium] = useState(false);
 
   const pkg = PACKAGES[selected];
@@ -58,7 +53,7 @@ export function YouTubeViewsHero() {
   const onAddToCart = () =>
     addItem({
       platform: "youtube",
-      service: "views",
+      service: "likes",
       qty: pkg.qty,
       price: pkg.price,
       regular: pkg.regular,
@@ -86,7 +81,7 @@ export function YouTubeViewsHero() {
             YouTube
           </a>
           <span style={{ opacity: 0.4 }}>›</span>
-          <span style={{ color: "var(--uv-fg-1)", fontWeight: 600 }}>Views</span>
+          <span style={{ color: "var(--uv-fg-1)", fontWeight: 600 }}>Likes</span>
         </nav>
 
         <h1
@@ -100,8 +95,8 @@ export function YouTubeViewsHero() {
             textWrap: "balance",
           }}
         >
-          Buy YouTube Views <span style={{ color: "var(--uv-fg-3)", fontWeight: 500 }}>—</span>{" "}
-          <span className="grad-text">that surface you in Suggested</span>
+          Buy YouTube Likes <span style={{ color: "var(--uv-fg-3)", fontWeight: 500 }}>—</span>{" "}
+          <span className="grad-text">that boost your video's reach</span>
         </h1>
         <p
           style={{
@@ -113,14 +108,14 @@ export function YouTubeViewsHero() {
             textWrap: "pretty",
           }}
         >
-          Buy YouTube Views for any video or Short. Real watch sessions, drip-fed for a natural
-          curve, counted toward your monetization watch hours.
+          Buy YouTube Likes from real, active accounts. 30-day refill guarantee, no password
+          needed, drip-fed for a safe, natural-looking engagement curve.
         </p>
 
         <div className="live-pill">
           <span className="live-dot" />
           <span>
-            <strong>638 live users</strong> on this page right now
+            <strong>387 live users</strong> on this page right now
           </span>
         </div>
 
@@ -137,7 +132,7 @@ export function YouTubeViewsHero() {
                     <span className="prem-tag">+35%</span>
                   </div>
                   <div className="prem-sub">
-                    Longer watch time · faster delivery · lifetime refill
+                    High-activity accounts · faster delivery · lifetime refill
                   </div>
                 </div>
               </div>
@@ -212,10 +207,10 @@ export function YouTubeViewsHero() {
 
               <div className="pkg-trust">
                 <span>
-                  <ShieldCheck size={14} color="var(--uv-success-text)" /> Money-back
+                  <ShieldCheck size={14} color="var(--uv-success-text)" /> 30-day refill
                 </span>
                 <span>
-                  <Zap size={14} color="var(--uv-pink)" /> 15-min start
+                  <Zap size={14} color="var(--uv-pink)" /> 5-min start
                 </span>
                 <span>
                   <Lock size={14} color="var(--uv-fg-2)" /> No password
@@ -302,7 +297,7 @@ export function YouTubeViewsHero() {
   );
 }
 
-export function YouTubeViewsFaq() {
+export function YouTubeLikesFaq() {
   const [active, setActive] = useState<number>(0);
 
   return (
@@ -321,7 +316,7 @@ export function YouTubeViewsFaq() {
               margin: "10px 0 8px",
             }}
           >
-            About YouTube views.
+            About YouTube likes.
           </h2>
           <p style={{ color: "var(--uv-fg-3)", fontSize: 14, margin: 0 }}>
             Everything most people ask before placing their first order.
