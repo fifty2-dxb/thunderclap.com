@@ -127,9 +127,9 @@ const productJsonLd = {
   offers: {
     "@type": "AggregateOffer",
     priceCurrency: "USD",
-    lowPrice: "3.49",
-    highPrice: "1249.99",
-    offerCount: 10,
+    lowPrice: "2.49",
+    highPrice: "79.99",
+    offerCount: 6,
     availability: "https://schema.org/InStock",
     url: CANONICAL,
   },
