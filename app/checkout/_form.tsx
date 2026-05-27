@@ -12,9 +12,14 @@ import {
   ShoppingBag,
   UserPlus,
 } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useCart, type CartItem, type Platform, type Service } from "@/components/cart-context";
 import { formatQty } from "@/lib/utils";
+import {
+  trackCheckoutStarted,
+  trackOrderInitiated,
+  trackNewsletterSubscribed,
+} from "@/lib/webengage-client";
 import {
   PLATFORM_LABEL,
   SERVICE_LABEL,
@@ -91,6 +96,15 @@ export function CheckoutFlow({ initialEmail }: { initialEmail?: string }) {
   const [promo, setPromo] = useState(true);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [trackedCheckout, setTrackedCheckout] = useState(false);
+
+  // Track "Checkout Started" once when cart is hydrated with items
+  useEffect(() => {
+    if (hydrated && items.length > 0 && !trackedCheckout) {
+      trackCheckoutStarted(items, subtotal);
+      setTrackedCheckout(true);
+    }
+  }, [hydrated, items, subtotal, trackedCheckout]);
 
   // Skeleton state while the cart hydrates from localStorage.
   if (!hydrated) {
@@ -189,6 +203,14 @@ export function CheckoutFlow({ initialEmail }: { initialEmail?: string }) {
     }
 
     setSubmitting(true);
+
+    // Track Order Initiated
+    trackOrderInitiated(items, subtotal);
+
+    // Track newsletter subscription if opted in
+    if (promo && email.trim()) {
+      trackNewsletterSubscribed(email.trim());
+    }
 
     try {
       const payload = {

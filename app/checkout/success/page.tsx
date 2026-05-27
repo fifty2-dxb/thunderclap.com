@@ -3,6 +3,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { Check, ShieldCheck } from "lucide-react";
 import { formatQty } from "@/lib/utils";
+import { PurchaseTracker } from "./_track";
 
 export const metadata: Metadata = {
   title: "Order received · Thunderclap",
@@ -98,6 +99,12 @@ export default async function Page({
 
   return (
     <main className="co-shell">
+      <PurchaseTracker
+        orderId={orderId}
+        total={total}
+        email={email}
+        items={[{ platform, service, qty, price: basePrice, premium }]}
+      />
       <div className="co-top">
         <div className="container" style={{ position: "relative" }}>
           <div className="co-top-inner">

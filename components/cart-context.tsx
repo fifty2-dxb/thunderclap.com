@@ -8,6 +8,7 @@ import {
   useMemo,
   useState,
 } from "react";
+import { trackAddedToCart } from "@/lib/webengage-client";
 
 export type Platform = "instagram" | "tiktok" | "youtube" | "facebook" | "twitter";
 export type Service =
@@ -98,6 +99,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
     });
     setLastAddedPlatform(input.platform);
     setIsDrawerOpen(true);
+    trackAddedToCart(input);
   }, []);
 
   const removeItem = useCallback<CartContextValue["removeItem"]>((id) => {
