@@ -31,6 +31,8 @@ function getAnonymousId(): string {
 export function trackEvent(payload: TrackEventPayload): void {
   const anonymousId = payload.anonymousId || getAnonymousId();
 
+  console.log("[WebEngage]", payload.eventName, payload.eventData ?? {});
+
   fetch("/api/webengage/track", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
