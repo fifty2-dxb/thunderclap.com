@@ -398,7 +398,7 @@ metadata: {
 }
 ```
 
-Currently mapped: `tiktok-followers: 5818`, `tiktok-likes: 1126`, `tiktok-views: 9121`, `instagram-followers: 8072`, `instagram-likes: 2916`, `instagram-views: 7762`, `facebook-followers: 4139`, `facebook-likes: 4704`, `facebook-views: 4715`, `youtube-subscribers: 8125`, `youtube-likes: 9538`, `youtube-views: 1573`. Add more entries as the user supplies them — unmapped pairs are included in `items[]` without a `smmServiceId` (and contribute nothing to `smmDataItems`), letting Redlap fall back to its default routing for those lines.
+Currently mapped: `tiktok-followers: 5818`, `tiktok-likes: 1126`, `tiktok-views: 9121`, `instagram-followers: 8072`, `instagram-likes: 2916`, `instagram-views: 7762`, `facebook-followers: 4139`, `facebook-likes: 4704`, `facebook-views: 4715`, `youtube-subscribers: 8125`, `youtube-likes: 9538`, `youtube-views: 1573`, `twitter-followers: 2594`, `twitter-likes: 970`, `twitter-retweets: 3308`. All 5 platforms × their services are now mapped. Add more entries as the user supplies them — unmapped pairs are included in `items[]` without a `smmServiceId` (and contribute nothing to `smmDataItems`), letting Redlap fall back to its default routing for those lines.
 
 ## WebEngage event tracking
 
