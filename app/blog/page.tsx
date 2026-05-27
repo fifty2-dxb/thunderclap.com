@@ -3,29 +3,48 @@ import Link from "next/link";
 import { ArrowRight } from "lucide-react";
 import { SITE_URL } from "@/lib/seo";
 import { getAllPosts } from "@/content/blog";
+import { Pagination } from "@/components/pagination";
 
 const URL_PATH = "/blog/";
 const CANONICAL = `${SITE_URL}${URL_PATH}`;
+const PAGE_SIZE = 24;
 
-export const metadata: Metadata = {
-  title: "Blog — Growth playbooks for Instagram, TikTok & YouTube · Thunderclap",
-  description:
-    "Practical, no-fluff growth playbooks for creators and brands building on Instagram, TikTok, YouTube, Facebook and X. Real tactics, no shortcuts that get you banned.",
-  alternates: { canonical: CANONICAL },
-  openGraph: {
-    title: "Blog — Growth playbooks · Thunderclap",
-    description:
-      "Practical, no-fluff growth playbooks for creators and brands.",
-    url: CANONICAL,
-    siteName: "Thunderclap",
-    type: "website",
-  },
-  twitter: {
-    card: "summary_large_image",
-    title: "Blog — Growth playbooks · Thunderclap",
-    description: "Practical growth playbooks for creators and brands.",
-  },
-};
+function pageFromParam(v?: string): number {
+  const n = parseInt(v ?? "1", 10);
+  return Number.isFinite(n) && n > 1 ? n : 1;
+}
+
+export async function generateMetadata({
+  searchParams,
+}: {
+  searchParams: Promise<{ page?: string }>;
+}): Promise<Metadata> {
+  const page = pageFromParam((await searchParams).page);
+  const canonical = page > 1 ? `${CANONICAL}?page=${page}` : CANONICAL;
+  const title =
+    page > 1
+      ? `Blog (page ${page}) — Growth playbooks · Thunderclap`
+      : "Blog — Growth playbooks for Instagram, TikTok & YouTube · Thunderclap";
+  const description =
+    "Practical, no-fluff growth playbooks for creators and brands building on Instagram, TikTok, YouTube, Facebook and X. Real tactics, no shortcuts that get you banned.";
+  return {
+    title,
+    description,
+    alternates: { canonical },
+    openGraph: {
+      title: "Blog — Growth playbooks · Thunderclap",
+      description: "Practical, no-fluff growth playbooks for creators and brands.",
+      url: canonical,
+      siteName: "Thunderclap",
+      type: "website",
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: "Blog — Growth playbooks · Thunderclap",
+      description: "Practical growth playbooks for creators and brands.",
+    },
+  };
+}
 
 function formatDate(iso: string): string {
   const d = new Date(iso + "T00:00:00Z");
@@ -37,17 +56,29 @@ function formatDate(iso: string): string {
   });
 }
 
-export default function Page() {
-  const posts = getAllPosts();
-  const [featured, ...rest] = posts;
+export default async function Page({
+  searchParams,
+}: {
+  searchParams: Promise<{ page?: string }>;
+}) {
+  const all = getAllPosts();
+  const [featured, ...rest] = all;
 
+  const totalPages = Math.max(1, Math.ceil(rest.length / PAGE_SIZE));
+  const page = Math.min(pageFromParam((await searchParams).page), totalPages);
+  const start = (page - 1) * PAGE_SIZE;
+  const pagePosts = rest.slice(start, start + PAGE_SIZE);
+  const showFeatured = page === 1 && Boolean(featured);
+
+  // JSON-LD lists only the posts visible on this page.
+  const visible = showFeatured ? [featured, ...pagePosts] : pagePosts;
   const blogJsonLd = {
     "@context": "https://schema.org",
     "@type": "Blog",
     name: "Thunderclap Blog",
     url: CANONICAL,
     description: "Growth playbooks for Instagram, TikTok, YouTube, Facebook and X.",
-    blogPost: posts.map((p) => ({
+    blogPost: visible.map((p) => ({
       "@type": "BlogPosting",
       headline: p.title,
       description: p.description,
@@ -100,7 +131,7 @@ export default function Page() {
         </div>
       </section>
 
-      {featured && (
+      {showFeatured && (
         <section className="blog-featured-section">
           <div className="container">
             <Link href={`/${featured.slug}`} className="blog-featured">
@@ -128,12 +159,14 @@ export default function Page() {
         </section>
       )}
 
-      {rest.length > 0 && (
+      {pagePosts.length > 0 && (
         <section className="blog-list-section">
           <div className="container">
-            <h2 className="blog-list-title">All posts</h2>
+            <h2 className="blog-list-title">
+              {page > 1 ? `All posts — page ${page}` : "All posts"}
+            </h2>
             <div className="blog-grid">
-              {rest.map((p) => (
+              {pagePosts.map((p) => (
                 <Link key={p.slug} href={`/${p.slug}`} className="blog-card">
                   <div
                     className="blog-card-image"
@@ -155,6 +188,8 @@ export default function Page() {
                 </Link>
               ))}
             </div>
+
+            <Pagination currentPage={page} totalPages={totalPages} basePath={URL_PATH} />
           </div>
         </section>
       )}
