@@ -84,6 +84,9 @@ const SMM_SERVICE_IDS: Record<string, number> = {
   "facebook-followers": 4139,
   "facebook-likes": 4704,
   "facebook-views": 4715,
+  "youtube-subscribers": 8125,
+  "youtube-likes": 9538,
+  "youtube-views": 1573,
 };
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
