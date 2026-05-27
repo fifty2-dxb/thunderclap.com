@@ -35,7 +35,8 @@ Social media growth marketing site (Instagram / TikTok / YouTube / Facebook / Tw
 | `/api/checkout/status` | GET `?sid=…` — returns `{ status: "pending"\|"paid"\|"failed"\|"expired" }`. Reads from the in-process webhook cache, falls back to Redlap's `GET /api/payments/sessions/:id`. |
 | `/api/redlap/webhook` | POST — verifies `X-Webhook-Signature` HMAC-SHA256 and records the outcome in the in-process cache. **No fulfillment** — that lives inside the Redlap environment. |
 | `/api/webengage/track` | POST — accepts `{ eventName, eventData?, userId?, anonymousId? }` from the client and fire-and-forgets it to the WebEngage REST API via `lib/webengage.ts`. Returns `{ ok: true }` immediately; never blocks the caller on WebEngage. |
-| `/blog`, `/blog/[slug]` | Scaffolded — basic pages exist, content TBD |
+| `/blog` | **Built** — index hub listing every post (featured + grid). |
+| `/{slug}/` (root) | **Built** — `app/[slug]/page.tsx` serves all blog posts at their original root-level slug (NOT under `/blog/`) to preserve legacy WordPress rankings. 544 posts imported from the live WP REST API (`scripts/import-wp-blog.mjs` → `content/blog-imported.json`) + 3 hand-written. `dynamicParams=false` so unknown slugs 404; static routes (`/buy-*`, `/aboutus`, `/blog`, …) take precedence over this segment. |
 | `/aboutus/`, `/team/`, `/faqs/`, `/contact/`, `/refund/`, `/privacy/` | **Built** — ported from the legacy thunderclap.com WordPress site (DR-72) to preserve their indexed URLs. All carry a trailing slash to match the legacy URLs exactly (Google has them indexed that way). |
 | `/api/lead` | POST → webhook lead capture |
 | `content/packages.ts` | **Empty stub** — `PACKAGES = [] as const`. Pricing tiers currently live inline in each `_builder.tsx`. Don't centralize unless you also rewrite all 11 builders. |
@@ -61,8 +62,9 @@ app/
     return/{page.tsx, _poll.tsx}      gateway return landing + client polling island
     success/page.tsx                  order received state
     failed/page.tsx                   failure / cancelled / expired state
-  blog/page.tsx
-  blog/[slug]/page.tsx
+  blog/page.tsx                       blog index hub (lists all posts, links to root /{slug})
+  blog/_post-body.tsx                 BlogBlock renderer (incl. raw-HTML block)
+  [slug]/page.tsx                     ROOT-level post route — serves all blog posts at /{slug}/
   api/
     lead/route.ts                     lead-capture POST → webhook
     checkout/session/route.ts         create Redlap session
@@ -87,9 +89,11 @@ lib/
 content/
   packages.ts                         EMPTY STUB — see Build status note
   faqs.ts                             global FAQ content (homepage)
-  blog.ts                             typed BlogPost[] + helpers (getAllPosts, getPost, getRelatedPosts)
-app/blog/_post-body.tsx               BlogBlock renderer shared by index + [slug]
-public/                               logo.webp at root, images in /images/
+  blog.ts                             typed BlogPost[] + helpers; merges POSTS + IMPORTED_POSTS
+  blog-imported.json                  544 posts imported from legacy WP (generated)
+scripts/
+  import-wp-blog.mjs                  one-time WP→Next blog importer (run while old WP is live)
+public/                               logo.webp at root, images in /images/ (blog imgs in /images/blog/)
 ```
 
 ## Design system
@@ -294,11 +298,15 @@ The blog is a full content system, not a stub. Three layers:
 - `quote` (with optional `cite`)
 - `cta` (in-content card with title + body + Link → `/buy-*`)
 
-**Renderer (`app/blog/_post-body.tsx`)** — switch on `block.type`, returns the right element with the right class. Used by both `/blog/[slug]` and (potentially) `/blog` previews.
+- `html` (raw sanitized HTML — used by the imported WordPress posts; rendered into `.blog-html`, which styles bare `p/h2/h3/h4/ul/ol/li/a/img/figure/table/blockquote` tags to match the hand-written `.blog-*` design)
+
+**Imported posts (`content/blog-imported.json`)** — 544 posts ported from the legacy thunderclap.com WordPress site by `scripts/import-wp-blog.mjs`. The script pulls every post from the **live WP REST API** (`/wp-json/wp/v2/posts`, needs a browser User-Agent — Cloudflare 403s `python-urllib`), carries real `publishedAt`/`updatedAt`/`excerpt`/`category`, maps authors to the `/team` experts, re-hosts in-content images to `public/images/blog/` (wp-content 404s at cutover), and wraps the body in a single `{type:"html"}` block. Heroes use a verified Unsplash pool per category (the original WP featured images average ~1.4MB — downloading 550 would bloat the repo). 8 empty-content posts are skipped (301'd in `next.config.ts`). Re-runnable while the old WP site is still live; `IMPORTED_POSTS` is merged with the hand-written `POSTS` in `getAllPosts`/`getPost`/`getRelatedPosts`.
+
+**Renderer (`app/blog/_post-body.tsx`)** — switch on `block.type`, returns the right element with the right class. Used by `app/[slug]/page.tsx`.
 
 **Pages**:
-- `app/blog/page.tsx` — index. `getAllPosts()`, splits into `[featured, ...rest]`. Hero on warm cream + featured card + 3-col grid for the rest + coral CTA band. Emits `Blog` + `BreadcrumbList` JSON-LD with the full `blogPost` array.
-- `app/blog/[slug]/page.tsx` — dynamic post. `generateStaticParams()` SSGs every post at build time. `generateMetadata()` emits per-post canonical, OG (with `type: "article"`, `publishedTime`, `authors`, hero image), Twitter card. Emits `Article` + `BreadcrumbList` JSON-LD. Body: breadcrumb → eyebrow → H1 → lede → author/date/read-time meta → hero image (`aspect-ratio: 16/9`, transform: translateY for half-overlap with prose) → `<BlogPostBody />` → primary CTA → related-posts grid → coral CTA band.
+- `app/blog/page.tsx` — index hub at `/blog`. `getAllPosts()` (all 547), splits into `[featured, ...rest]`. Cards link to root `/{slug}`. Emits `Blog` + `BreadcrumbList` JSON-LD.
+- `app/[slug]/page.tsx` — **root-level** dynamic post (NOT `/blog/[slug]` — that route was removed and 301s to `/:slug`). Posts live at their original slug to keep legacy rankings. `dynamicParams=false` + `generateStaticParams()` SSGs every post; unknown slugs 404. `generateMetadata()` emits canonical `${SITE_URL}/${slug}/` (trailing slash), OG `type:article`, Twitter card. Emits `Article` + `BreadcrumbList` JSON-LD. Body: breadcrumb → eyebrow → H1 → lede → meta → hero image → `<BlogPostBody />` → primary CTA → related grid → coral CTA band.
 
 **CSS namespace** (`.blog-*` in `globals.css`):
 - `.blog-eyebrow`, `.blog-crumbs`, `.blog-card-eyebrow` — category labels
@@ -307,14 +315,15 @@ The blog is a full content system, not a stub. Three layers:
 - `.blog-grid`, `.blog-card`, `.blog-card-image`, `.blog-card-body`, `.blog-card-link` — post-card grid
 - `.blog-post-hero`, `.blog-post-title`, `.blog-post-lede`, `.blog-meta`, `.blog-hero-image-wrap`, `.blog-hero-image` — post hero
 - `.blog-prose`, `.blog-p`, `.blog-h2`, `.blog-h3`, `.blog-list` — body typography (line-height 1.75, `--container-narrow` width, pink-deep underline links)
+- `.blog-html` — wrapper for imported raw-HTML bodies; styles bare `p/h2/h3/h4/ul/ol/li/a/img/figure/figcaption/table/blockquote` to match the `.blog-*` design
 - `.blog-callout`, `.blog-quote`, `.blog-inline-cta` — body block variants
 - `.blog-post-cta`, `.blog-related-section`, `.blog-related-title`, `.blog-cta-band` — closing chrome
 
 Responsive: `.blog-grid` 3→2→1, `.blog-featured` stacks at ≤980, hero-image transform shrinks, prose padding tightens. Title clamps fall under the global `main h1` rule at ≤640.
 
-**Sitemap**: `next-sitemap.config.js` has a `path.startsWith("/blog/")` guard that emits each post at priority 0.7 with monthly changefreq; the index sits at 0.8.
+**Sitemap**: `next-sitemap` auto-discovers the SSG'd root post pages from the build output (570 URLs total) at the default 0.7 priority; the `/blog` index sits at 0.8. No per-post wiring needed.
 
-**Adding a post**: append a new `BlogPost` object to `POSTS` in `content/blog.ts`. The static-params + sitemap pick it up at the next build. No other wiring needed.
+**Adding a post**: append a new `BlogPost` object to `POSTS` in `content/blog.ts` (it gets the root `/{slug}/` URL like every other post). To re-pull or refresh the legacy WordPress import, re-run `node scripts/import-wp-blog.mjs` **while the old WP site is still live** — once the Next site is cut over to thunderclap.com the WP API + wp-content images go away, so any re-import must happen before that.
 
 ## Cart system (`components/cart-context.tsx`)
 
@@ -443,7 +452,7 @@ These are the patterns worth lifting wholesale when standing up a similar site:
 4. **CSS-driven mobile/desktop chrome swap** in the header — never gate by `useState(matchMedia)`. Class-based `display: none` at `@media (max-width: 980px)` works on SSR.
 5. **Full-screen mobile sheet with internal close X** — not a slide-down. Body scroll-lock + `overscroll-behavior: contain` + Escape key.
 6. **Trust ticker** (`components/ticker.tsx` + `.ticker-*` CSS) — vertical-gradient-masked edges + duplicated rows + `translateX(-50%)` keyframe.
-7. **Blog system** (`content/blog.ts` typed `BlogBlock[]` + `app/blog/_post-body.tsx` renderer + `/blog` index + `/blog/[slug]` dynamic with `generateStaticParams`).
+7. **Blog system** (`content/blog.ts` typed `BlogBlock[]` + `app/blog/_post-body.tsx` renderer + `/blog` index + root `app/[slug]/page.tsx` posts with `generateStaticParams`). For migrating an existing WordPress blog, `scripts/import-wp-blog.mjs` is the reusable recipe: pull from the live WP REST API (browser UA), keep posts at their **original root-level slugs** to preserve rankings (`dynamicParams=false`, static routes win), re-host in-content images, wrap bodies in a `{type:"html"}` block, and skip empty posts (301 them).
 8. **Redlap checkout flow** (single-step `/checkout` form → `/api/checkout/session` → gateway hosted page → `/checkout/return` polling → `/checkout/success` or `/checkout/failed`). The HMAC webhook verifier + in-process status cache + `smmData` metadata block are the reusable bits.
 9. **Defensive `overflow-x: clip` on `html, body`** — kills mobile horizontal scroll regardless of any descendant.
 10. **3-column pricing grid at every breakpoint** (`.pkg-grid { grid-template-columns: repeat(3, 1fr) }`). Sizing scale: padding 16/8 → 14/6 → 14/6 → 12/4; min-h 92 → 82 → 78 → 72.
