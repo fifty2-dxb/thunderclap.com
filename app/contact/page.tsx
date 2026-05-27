@@ -6,7 +6,6 @@ import {
   CreditCard,
   HelpCircle,
   Mail,
-  MessageCircle,
   Package,
   ShieldCheck,
   Star,
@@ -381,54 +380,6 @@ export default function Page() {
                     </div>
                   </div>
                 </li>
-
-                <li
-                  style={{
-                    display: "grid",
-                    gridTemplateColumns: "44px 1fr",
-                    gap: 16,
-                    alignItems: "start",
-                    background: "var(--uv-bg-lavender)",
-                    borderRadius: 16,
-                    padding: "18px 18px",
-                  }}
-                >
-                  <span
-                    style={{
-                      width: 44,
-                      height: 44,
-                      borderRadius: 12,
-                      background: "var(--uv-pink-soft)",
-                      color: "var(--uv-pink)",
-                      display: "inline-flex",
-                      alignItems: "center",
-                      justifyContent: "center",
-                    }}
-                  >
-                    <MessageCircle size={18} />
-                  </span>
-                  <div>
-                    <div
-                      style={{
-                        fontWeight: 700,
-                        fontSize: 15,
-                        color: "var(--uv-fg-1)",
-                        marginBottom: 2,
-                      }}
-                    >
-                      Live chat
-                    </div>
-                    <div
-                      style={{
-                        fontSize: 14.5,
-                        color: "var(--uv-fg-2)",
-                        lineHeight: 1.5,
-                      }}
-                    >
-                      Click the chat bubble bottom-right.
-                    </div>
-                  </div>
-                </li>
               </ul>
 
               <div
@@ -460,7 +411,7 @@ export default function Page() {
                       fontWeight: 600,
                     }}
                   >
-                    Trustpilot · 4.7 / 5
+                    Trustpilot · 4.9 / 5
                   </span>
                 </div>
                 <p

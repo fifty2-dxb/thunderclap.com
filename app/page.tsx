@@ -13,7 +13,7 @@ import { SITE_URL } from "@/lib/seo";
 export const metadata: Metadata = {
   title: "Thunderclap — Real Social Media Growth: Followers, Likes & Views",
   description:
-    "Boost your TikTok, Instagram, YouTube, Facebook and Twitter accounts with real followers, likes and views from active users. Money-back guaranteed. Trusted by 200K+ creators.",
+    "Boost your TikTok, Instagram, YouTube, Facebook and Twitter / X accounts with real followers, likes and views from active users. Money-back guaranteed. Trusted by 200K+ creators.",
   alternates: { canonical: SITE_URL },
   openGraph: {
     title: "Thunderclap — Real Social Media Growth",

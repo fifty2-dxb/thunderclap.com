@@ -35,7 +35,7 @@ export const metadata: Metadata = {
     template: "%s · Thunderclap",
   },
   description:
-    "Boost your TikTok, Instagram, YouTube, Facebook and Twitter accounts with real followers, likes and views from active users. Money-back guaranteed. Trusted by 200K+ creators.",
+    "Boost your TikTok, Instagram, YouTube, Facebook and Twitter / X accounts with real followers, likes and views from active users. Money-back guaranteed. Trusted by 200K+ creators.",
   icons: { icon: "/logo.webp" },
 };
 

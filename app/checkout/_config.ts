@@ -25,7 +25,7 @@ export const PLATFORM_LABEL: Record<Platform, string> = {
   tiktok: "TikTok",
   youtube: "YouTube",
   facebook: "Facebook",
-  twitter: "Twitter",
+  twitter: "Twitter / X",
 };
 
 export const SERVICE_LABEL: Record<Service, string> = {

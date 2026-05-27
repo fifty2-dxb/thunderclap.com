@@ -30,7 +30,7 @@ export function Testimonials() {
       <div className="container">
         <div style={{ textAlign: "center", marginBottom: 36 }}>
           <span className="uv-eyebrow" style={{ color: "var(--uv-pink)" }}>
-            ★ TRUSTPILOT · 4.7 / 5
+            ★ TRUSTPILOT · 4.9 / 5
           </span>
           <h2
             style={{
@@ -73,7 +73,7 @@ export function Testimonials() {
               ))}
             </span>
             <span>
-              Rated <strong style={{ color: "var(--uv-fg-1)" }}>4.7</strong> by{" "}
+              Rated <strong style={{ color: "var(--uv-fg-1)" }}>4.9</strong> by{" "}
               <strong style={{ color: "var(--uv-fg-1)" }}>992</strong> reviewers
             </span>
           </div>

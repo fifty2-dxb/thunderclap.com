@@ -288,7 +288,7 @@ export function TwitterRetweetsHero() {
                 ))}
               </span>
               <span>
-                <strong>4.7</strong> · 12,743 reviews
+                <strong>4.9</strong> · 12,743 reviews
               </span>
             </div>
           </aside>

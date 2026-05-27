@@ -1,3 +1,4 @@
+import type { ReactNode } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { Facebook, Instagram, Music2, Twitter, Youtube } from "lucide-react";
@@ -57,7 +58,6 @@ const FOOTER_COLS = [
     links: [
       { label: "Privacy", href: "/privacy" },
       { label: "Refund policy", href: "/refund" },
-      { label: "Sitemap", href: "/sitemap.xml" },
     ],
   },
 ];
@@ -66,8 +66,92 @@ const SOCIALS = [
   { label: "Instagram", Icon: Instagram },
   { label: "TikTok", Icon: Music2 },
   { label: "Facebook", Icon: Facebook },
-  { label: "Twitter", Icon: Twitter },
+  { label: "Twitter / X", Icon: Twitter },
   { label: "YouTube", Icon: Youtube },
+];
+
+// Real brand payment marks (inline SVG) rendered in the footer-bottom row.
+const PAYMENTS: { label: string; mark: ReactNode }[] = [
+  {
+    label: "Visa",
+    mark: (
+      <svg viewBox="0 0 48 16" height={15} role="img" aria-label="Visa">
+        <text
+          x="24"
+          y="13"
+          textAnchor="middle"
+          fontFamily="Arial, Helvetica, sans-serif"
+          fontSize="15"
+          fontWeight="700"
+          fontStyle="italic"
+          letterSpacing="0.5"
+          fill="#1434CB"
+        >
+          VISA
+        </text>
+      </svg>
+    ),
+  },
+  {
+    label: "Mastercard",
+    mark: (
+      <svg viewBox="0 0 36 24" height={18} role="img" aria-label="Mastercard">
+        <circle cx="14" cy="12" r="9" fill="#EB001B" />
+        <circle cx="22" cy="12" r="9" fill="#F79E1B" />
+        <path d="M18 5.1a9 9 0 0 0 0 13.8 9 9 0 0 0 0-13.8Z" fill="#FF5F00" />
+      </svg>
+    ),
+  },
+  {
+    label: "American Express",
+    mark: (
+      <svg viewBox="0 0 40 24" height={18} role="img" aria-label="American Express">
+        <rect width="40" height="24" rx="3" fill="#1F72CD" />
+        <text
+          x="20"
+          y="15.5"
+          textAnchor="middle"
+          fontFamily="Arial, Helvetica, sans-serif"
+          fontSize="9"
+          fontWeight="800"
+          letterSpacing="0.4"
+          fill="#fff"
+        >
+          AMEX
+        </text>
+      </svg>
+    ),
+  },
+  {
+    label: "Apple Pay",
+    mark: (
+      <svg viewBox="0 0 58 24" height={17} role="img" aria-label="Apple Pay">
+        <path
+          fill="#000"
+          d="M14.47 4.34c.72-.87 1.2-2.07 1.07-3.27-1.03.04-2.28.69-3.02 1.55-.66.76-1.24 1.99-1.08 3.16 1.15.09 2.32-.58 3.03-1.44M17.05 12.04c-.03-2.6 2.13-3.85 2.22-3.91-1.21-1.77-3.1-2.01-3.77-2.04-1.6-.16-3.13.94-3.94.94-.81 0-1.85-.92-3.05-.9-1.57.03-3.02.91-3.83 2.32-1.63 2.83-.42 7.02 1.17 9.32.78 1.13 1.7 2.39 2.91 2.34 1.17-.05 1.61-.76 3.02-.76 1.41 0 1.81.76 3.05.73 1.26-.02 2.06-1.14 2.83-2.28.89-1.31 1.26-2.58 1.28-2.65-.03-.01-2.45-.94-2.47-3.72"
+        />
+        <text x="24" y="17" fontFamily="Arial, Helvetica, sans-serif" fontSize="15" fontWeight="600" fill="#000">
+          Pay
+        </text>
+      </svg>
+    ),
+  },
+  {
+    label: "Google Pay",
+    mark: (
+      <svg viewBox="0 0 58 24" height={17} role="img" aria-label="Google Pay">
+        <g transform="translate(0,1) scale(0.46)">
+          <path fill="#4285F4" d="M45.12 24.5c0-1.56-.14-3.06-.4-4.5H24v8.51h11.84c-.51 2.75-2.06 5.08-4.39 6.64v5.52h7.11c4.16-3.83 6.56-9.47 6.56-16.17z" />
+          <path fill="#34A853" d="M24 46c5.94 0 10.92-1.97 14.56-5.33l-7.11-5.52c-1.97 1.32-4.49 2.1-7.45 2.1-5.73 0-10.58-3.87-12.31-9.07H4.34v5.7C7.96 41.07 15.4 46 24 46z" />
+          <path fill="#FBBC05" d="M11.69 28.18C11.25 26.86 11 25.45 11 24s.25-2.86.69-4.18v-5.7H4.34C2.85 17.09 2 20.45 2 24s.85 6.91 2.34 9.88l7.35-5.7z" />
+          <path fill="#EA4335" d="M24 10.75c3.23 0 6.13 1.11 8.41 3.29l6.31-6.31C34.91 4.18 29.93 2 24 2 15.4 2 7.96 6.93 4.34 14.12l7.35 5.7c1.73-5.2 6.58-9.07 12.31-9.07z" />
+        </g>
+        <text x="25" y="17" fontFamily="Arial, Helvetica, sans-serif" fontSize="14" fontWeight="500" fill="#5F6368">
+          Pay
+        </text>
+      </svg>
+    ),
+  },
 ];
 
 export function Footer() {
@@ -144,21 +228,22 @@ export function Footer() {
               justifyContent: "flex-end",
             }}
           >
-            {["VISA", "MASTERCARD", "AMEX", "APPLE PAY", "G PAY"].map((p) => (
+            {PAYMENTS.map((p) => (
               <span
-                key={p}
+                key={p.label}
+                title={p.label}
                 style={{
-                  padding: "4px 10px",
+                  display: "inline-flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  height: 30,
+                  padding: "0 9px",
                   background: "#fff",
                   border: "1px solid var(--uv-line)",
                   borderRadius: 6,
-                  fontSize: 10,
-                  fontWeight: 800,
-                  letterSpacing: "0.06em",
-                  color: "var(--uv-fg-2)",
                 }}
               >
-                {p}
+                {p.mark}
               </span>
             ))}
           </div>

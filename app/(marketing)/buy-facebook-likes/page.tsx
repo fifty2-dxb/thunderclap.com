@@ -132,7 +132,7 @@ const productJsonLd = {
   },
   aggregateRating: {
     "@type": "AggregateRating",
-    ratingValue: "4.7",
+    ratingValue: "4.9",
     reviewCount: "12743",
     bestRating: "5",
     worstRating: "1",
@@ -325,7 +325,7 @@ export default function Page() {
         <div className="container">
           <div style={{ textAlign: "center", marginBottom: 36 }}>
             <span className="uv-eyebrow" style={{ color: "var(--uv-pink)" }}>
-              ★ TRUSTPILOT · 4.7 / 5
+              ★ TRUSTPILOT · 4.9 / 5
             </span>
             <h2
               style={{

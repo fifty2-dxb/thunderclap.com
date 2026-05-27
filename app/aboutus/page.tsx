@@ -53,7 +53,7 @@ const STATS: { value: string; label: string; Icon: typeof Users }[] = [
   { value: "100+", label: "Support agents", Icon: Headphones },
   { value: "7-day", label: "Refund policy", Icon: RotateCcw },
   { value: "100%", label: "Privacy assurance", Icon: Lock },
-  { value: "4.7", label: "Trustpilot rating", Icon: Star },
+  { value: "4.9", label: "Trustpilot rating", Icon: Star },
 ];
 
 const WHY_CARDS: { Icon: typeof Zap; title: string; body: string }[] = [

@@ -95,7 +95,7 @@ export default function Page() {
           <p className="blog-index-lede">
             Practical, no-fluff playbooks for creators and brands building on Instagram,
             TikTok, YouTube, Facebook and X. We write about what actually moves the algorithm
-            — not what fits a Twitter thread.
+            — not what fits a Twitter / X thread.
           </p>
         </div>
       </section>

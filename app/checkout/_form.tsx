@@ -389,7 +389,7 @@ export function CheckoutFlow({ initialEmail }: { initialEmail?: string }) {
             ))}
           </span>
           <span>
-            <strong style={{ color: "var(--uv-fg-1)" }}>4.7</strong> · 12,743
+            <strong style={{ color: "var(--uv-fg-1)" }}>4.9</strong> · 12,743
             reviews on Trustpilot
           </span>
         </div>

@@ -24,7 +24,7 @@ export function Hero() {
           >
             <Stars size={11} />
             <span>
-              <strong style={{ color: "var(--uv-fg-1)" }}>4.7</strong> · Trusted by 200,000+ creators
+              <strong style={{ color: "var(--uv-fg-1)" }}>4.9</strong> · Trusted by 200,000+ creators
               &amp; brands
             </span>
           </div>
@@ -54,7 +54,7 @@ export function Hero() {
               textWrap: "pretty",
             }}
           >
-            Real followers, likes &amp; views on TikTok, Instagram, YouTube, Twitter and more.
+            Real followers, likes &amp; views on TikTok, Instagram, YouTube, Twitter / X and more.
             Money-back guaranteed. No password ever required.
           </p>
           <div style={{ display: "flex", justifyContent: "center", gap: 12, flexWrap: "wrap" }}>
