@@ -1,14 +1,18 @@
+import Link from "next/link";
 import { ArrowUpRight, Check } from "lucide-react";
 
+// Mirrors the real Instagram Followers tiers in
+// app/(marketing)/buy-instagram-followers/_builder.tsx — keep in sync.
+const HREF = "/buy-instagram-followers";
 const TIERS = [
   {
     qty: "500",
-    price: 4.99,
+    price: 7.99,
     perks: ["Real, active accounts", "Starts in 30 min", "Delivered in 24 h", "30-day refill guarantee"],
   },
   {
-    qty: "2,500",
-    price: 19.99,
+    qty: "5,000",
+    price: 39.99,
     featured: true,
     perks: [
       "Real, active accounts",
@@ -20,7 +24,7 @@ const TIERS = [
   },
   {
     qty: "10,000",
-    price: 69.99,
+    price: 59.99,
     perks: [
       "Real, active accounts",
       "Drip delivery",
@@ -69,13 +73,13 @@ export function PricingTable() {
               Same pricing pattern across every platform. No hidden fees.
             </p>
           </div>
-          <a
+          <Link
             className="btn btn-outline btn-md"
             style={{ borderRadius: 999 }}
-            href="/buy-instagram-followers"
+            href={HREF}
           >
             See all packages <ArrowUpRight size={16} />
-          </a>
+          </Link>
         </div>
         <div className="pricing-grid">
           {TIERS.map((t) => (
@@ -95,13 +99,13 @@ export function PricingTable() {
                   </li>
                 ))}
               </ul>
-              <button
-                type="button"
+              <Link
+                href={HREF}
                 className={t.featured ? "btn btn-primary btn-md" : "btn btn-outline btn-md"}
                 style={{ width: "100%", borderRadius: 10, marginTop: "auto" }}
               >
                 Choose this package
-              </button>
+              </Link>
             </div>
           ))}
         </div>
