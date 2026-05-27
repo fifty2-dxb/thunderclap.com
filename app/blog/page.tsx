@@ -53,7 +53,7 @@ export default function Page() {
       description: p.description,
       datePublished: p.publishedAt,
       author: { "@type": "Person", name: p.author },
-      url: `${SITE_URL}/blog/${p.slug}`,
+      url: `${SITE_URL}/${p.slug}/`,
       image: p.heroImage,
     })),
   };
@@ -103,7 +103,7 @@ export default function Page() {
       {featured && (
         <section className="blog-featured-section">
           <div className="container">
-            <Link href={`/blog/${featured.slug}`} className="blog-featured">
+            <Link href={`/${featured.slug}`} className="blog-featured">
               <div
                 className="blog-featured-image"
                 style={{ backgroundImage: `url(${featured.heroImage})` }}
@@ -134,7 +134,7 @@ export default function Page() {
             <h2 className="blog-list-title">All posts</h2>
             <div className="blog-grid">
               {rest.map((p) => (
-                <Link key={p.slug} href={`/blog/${p.slug}`} className="blog-card">
+                <Link key={p.slug} href={`/${p.slug}`} className="blog-card">
                   <div
                     className="blog-card-image"
                     style={{ backgroundImage: `url(${p.heroImage})` }}

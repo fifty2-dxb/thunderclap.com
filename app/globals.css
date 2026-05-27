@@ -2498,6 +2498,105 @@ img { display: block; max-width: 100%; }
   font-style: normal;
   color: var(--uv-fg-3);
 }
+/* Raw imported WordPress body (type:"html" blocks). Styles bare tags to match
+   the hand-written .blog-* design since the imported HTML carries no classes. */
+.blog-html { color: var(--uv-fg-1); }
+.blog-html p {
+  font-size: 17px;
+  line-height: 1.75;
+  color: var(--uv-fg-2);
+  margin: 0 0 22px;
+  text-wrap: pretty;
+}
+.blog-html a {
+  color: var(--uv-pink-deep);
+  font-weight: 600;
+  text-decoration: underline;
+  text-decoration-color: var(--uv-pink-soft);
+  text-underline-offset: 3px;
+}
+.blog-html a:hover { text-decoration-color: var(--uv-pink); }
+.blog-html strong, .blog-html b { color: var(--uv-fg-1); font-weight: 700; }
+.blog-html em, .blog-html i { font-style: italic; }
+.blog-html h2 {
+  font-family: var(--uv-font-display);
+  font-size: clamp(22px, 2.4vw, 28px);
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  line-height: 1.18;
+  margin: 44px 0 16px;
+  color: var(--uv-fg-1);
+  text-wrap: balance;
+}
+.blog-html h3 {
+  font-family: var(--uv-font-display);
+  font-size: clamp(18px, 1.7vw, 20px);
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  line-height: 1.25;
+  margin: 32px 0 12px;
+  color: var(--uv-fg-1);
+  text-wrap: balance;
+}
+.blog-html h4 {
+  font-family: var(--uv-font-display);
+  font-size: 17px;
+  font-weight: 700;
+  margin: 26px 0 10px;
+  color: var(--uv-fg-1);
+}
+.blog-html ul, .blog-html ol {
+  margin: 0 0 24px;
+  padding-left: 26px;
+  color: var(--uv-fg-2);
+}
+.blog-html li {
+  font-size: 16px;
+  line-height: 1.7;
+  margin-bottom: 12px;
+  padding-left: 4px;
+}
+.blog-html li::marker { color: var(--uv-pink); }
+.blog-html li strong { color: var(--uv-fg-1); }
+.blog-html figure { margin: 28px 0; }
+.blog-html img {
+  display: block;
+  max-width: 100%;
+  height: auto;
+  border-radius: 12px;
+  margin: 28px auto;
+}
+.blog-html figure img { margin: 0 auto; }
+.blog-html figcaption {
+  margin-top: 8px;
+  font-size: 13px;
+  color: var(--uv-fg-3);
+  text-align: center;
+}
+.blog-html blockquote {
+  margin: 32px 0;
+  padding: 20px 24px;
+  border-left: 3px solid var(--uv-fg-3);
+  background: var(--uv-bg-tint);
+  border-radius: 0 10px 10px 0;
+  font-style: italic;
+  color: var(--uv-fg-1);
+}
+.blog-html blockquote p:last-child { margin-bottom: 0; }
+.blog-html table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 28px 0;
+  font-size: 15px;
+}
+.blog-html th, .blog-html td {
+  border: 1px solid var(--uv-line);
+  padding: 10px 14px;
+  text-align: left;
+  vertical-align: top;
+}
+.blog-html th { background: var(--uv-bg-lavender); font-weight: 700; color: var(--uv-fg-1); }
+.blog-html h2:first-child, .blog-html h3:first-child, .blog-html p:first-child { margin-top: 0; }
 .blog-inline-cta {
   background: linear-gradient(180deg, var(--uv-pink-soft) 0%, #fff 100%);
   border: 1px solid var(--uv-pink-soft);
@@ -2573,11 +2672,13 @@ img { display: block; max-width: 100%; }
   .blog-card-body p { font-size: 13.5px; -webkit-line-clamp: 2; }
   .blog-hero-image-wrap { transform: translateY(28px); border-radius: 14px; }
   .blog-prose { padding-top: 48px; padding-bottom: 24px; }
-  .blog-p { font-size: 16px; line-height: 1.7; margin-bottom: 18px; }
-  .blog-h2 { margin: 36px 0 14px; }
-  .blog-h3 { margin: 26px 0 10px; }
-  .blog-list { padding-left: 22px; }
-  .blog-list li { font-size: 15px; line-height: 1.65; margin-bottom: 10px; }
+  .blog-p, .blog-html p { font-size: 16px; line-height: 1.7; margin-bottom: 18px; }
+  .blog-h2, .blog-html h2 { margin: 36px 0 14px; }
+  .blog-h3, .blog-html h3 { margin: 26px 0 10px; }
+  .blog-list, .blog-html ul, .blog-html ol { padding-left: 22px; }
+  .blog-list li, .blog-html li { font-size: 15px; line-height: 1.65; margin-bottom: 10px; }
+  .blog-html table { font-size: 13.5px; }
+  .blog-html th, .blog-html td { padding: 8px 10px; }
   .blog-callout { padding: 16px 18px; margin: 22px 0; }
   .blog-callout p { font-size: 14.5px; }
   .blog-quote { padding: 16px 18px; margin: 24px 0; }

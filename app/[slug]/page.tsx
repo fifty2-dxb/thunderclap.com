@@ -5,7 +5,14 @@ import { notFound } from "next/navigation";
 import { ArrowRight, Clock, User } from "lucide-react";
 import { SITE_URL } from "@/lib/seo";
 import { getAllPosts, getPost, getRelatedPosts } from "@/content/blog";
-import { BlogPostBody } from "../_post-body";
+import { BlogPostBody } from "../blog/_post-body";
+
+// Blog posts are served at their original root-level slugs (e.g.
+// /10-ways-to-use-instagram-stories-for-business/) to preserve the rankings the
+// legacy WordPress site already holds. Only known slugs render — everything
+// else 404s — so this dynamic segment doesn't shadow arbitrary paths. Static
+// routes (/blog, /aboutus, /buy-*, …) take precedence over this segment.
+export const dynamicParams = false;
 
 export function generateStaticParams() {
   return getAllPosts().map((p) => ({ slug: p.slug }));
@@ -20,9 +27,9 @@ export async function generateMetadata({
   const post = getPost(slug);
   if (!post) return { title: "Not found · Thunderclap" };
 
-  const canonical = `${SITE_URL}/blog/${post.slug}`;
+  const canonical = `${SITE_URL}/${post.slug}/`;
   return {
-    title: `${post.title} · Thunderclap Blog`,
+    title: `${post.title} · Thunderclap`,
     description: post.description,
     alternates: { canonical },
     openGraph: {
@@ -64,7 +71,7 @@ export default async function Page({
   const post = getPost(slug);
   if (!post) notFound();
 
-  const canonical = `${SITE_URL}/blog/${post.slug}`;
+  const canonical = `${SITE_URL}/${post.slug}/`;
   const related = getRelatedPosts(post.slug);
 
   const articleJsonLd = {
@@ -92,7 +99,7 @@ export default async function Page({
     "@type": "BreadcrumbList",
     itemListElement: [
       { "@type": "ListItem", position: 1, name: "Home", item: SITE_URL },
-      { "@type": "ListItem", position: 2, name: "Blog", item: `${SITE_URL}/blog` },
+      { "@type": "ListItem", position: 2, name: "Blog", item: `${SITE_URL}/blog/` },
       { "@type": "ListItem", position: 3, name: post.title, item: canonical },
     ],
   };
@@ -176,7 +183,7 @@ export default async function Page({
             <h2 className="blog-related-title">More growth playbooks</h2>
             <div className="blog-grid">
               {related.map((r) => (
-                <Link key={r.slug} href={`/blog/${r.slug}`} className="blog-card">
+                <Link key={r.slug} href={`/${r.slug}`} className="blog-card">
                   <div
                     className="blog-card-image"
                     style={{ backgroundImage: `url(${r.heroImage})` }}

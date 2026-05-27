@@ -47,6 +47,22 @@ const nextConfig: NextConfig = {
       { source: "/youtube", destination: "/buy-youtube-subscribers", permanent: true },
       { source: "/facebook", destination: "/buy-facebook-followers", permanent: true },
       { source: "/twitter", destination: "/buy-twitter-followers", permanent: true },
+
+      // The 3 hand-written posts moved from /blog/{slug} to the unified
+      // root-level /{slug} pattern the 544 imported posts use. Send any
+      // remaining /blog/{slug} request to the root slug.
+      { source: "/blog/:slug", destination: "/:slug", permanent: true },
+
+      // 8 legacy posts with empty content were skipped on import — 301 each to
+      // its most relevant page so any existing link equity is preserved.
+      { source: "/social-viral-review-is-it-a-scam-we-tried-it-read-first", destination: "/buy-instagram-followers", permanent: true },
+      { source: "/viralyft-alternative", destination: "/buy-instagram-followers", permanent: true },
+      { source: "/love-captions-for-instagram", destination: "/buy-instagram-likes", permanent: true },
+      { source: "/smihub-review-instagram-story-viewer-anonymous-downloader", destination: "/buy-instagram-followers", permanent: true },
+      { source: "/guide-on-instagram-verification", destination: "/buy-instagram-followers", permanent: true },
+      { source: "/youtube-shorts-views-impact-monetization-in-the-uk", destination: "/buy-youtube-views", permanent: true },
+      { source: "/youtube-views-france-vs-global", destination: "/buy-youtube-views", permanent: true },
+      { source: "/trending-tiktok-challenges-in-canada", destination: "/buy-tiktok-followers", permanent: true },
     ];
   },
 };

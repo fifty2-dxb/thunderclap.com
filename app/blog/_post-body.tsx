@@ -75,6 +75,15 @@ export function BlogPostBody({ blocks }: { blocks: BlogBlock[] }) {
                 </Link>
               </aside>
             );
+          case "html":
+            return (
+              <div
+                key={i}
+                className="blog-html"
+                // eslint-disable-next-line react/no-danger
+                dangerouslySetInnerHTML={{ __html: block.html }}
+              />
+            );
           default:
             return null;
         }
