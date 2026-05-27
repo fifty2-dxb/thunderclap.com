@@ -34,6 +34,7 @@ Social media growth marketing site (Instagram / TikTok / YouTube / Facebook / Tw
 | `/api/checkout/session` | POST — accepts `{ items: [{ platform, service, qty, price, premium, target }, ...], email }` (with legacy single-item body still supported for back-compat). Sums totals, builds Redlap metadata with `items[]` + `smmDataItems[]` (and a flat `smmData` when there's exactly one mapped item, for legacy Redlap fulfillment code paths). Returns `{ sessionId, redirectUrl, orderId }`. |
 | `/api/checkout/status` | GET `?sid=…` — returns `{ status: "pending"\|"paid"\|"failed"\|"expired" }`. Reads from the in-process webhook cache, falls back to Redlap's `GET /api/payments/sessions/:id`. |
 | `/api/redlap/webhook` | POST — verifies `X-Webhook-Signature` HMAC-SHA256 and records the outcome in the in-process cache. **No fulfillment** — that lives inside the Redlap environment. |
+| `/api/webengage/track` | POST — accepts `{ eventName, eventData?, userId?, anonymousId? }` from the client and fire-and-forgets it to the WebEngage REST API via `lib/webengage.ts`. Returns `{ ok: true }` immediately; never blocks the caller on WebEngage. |
 | `/blog`, `/blog/[slug]` | Scaffolded — basic pages exist, content TBD |
 | `/aboutus/`, `/team/`, `/faqs/`, `/contact/`, `/refund/`, `/privacy/` | **Built** — ported from the legacy thunderclap.com WordPress site (DR-72) to preserve their indexed URLs. All carry a trailing slash to match the legacy URLs exactly (Google has them indexed that way). |
 | `/api/lead` | POST → webhook lead capture |
@@ -67,6 +68,7 @@ app/
     checkout/session/route.ts         create Redlap session
     checkout/status/route.ts          poll status
     redlap/webhook/route.ts           inbound Redlap webhook (HMAC verified)
+    webengage/track/route.ts          forwards client events → WebEngage REST API
 components/
   header.tsx                          desktop platform tabs + mega-menu trigger + full-screen mobile sheet
   mega-menu.tsx                       (client) desktop dropdown panel: sidebar + 2-col service cards
@@ -80,6 +82,8 @@ lib/
   utils.ts                            cn() + formatQty()
   redlap.ts                           Redlap API client + HMAC verifier
   redlap-status-cache.ts              in-process Map of session → outcome
+  webengage.ts                        server-side WebEngage REST client (trackEvent / trackUser) + WE_EVENTS names
+  webengage-client.ts                 client-side track* helpers → POST /api/webengage/track
 content/
   packages.ts                         EMPTY STUB — see Build status note
   faqs.ts                             global FAQ content (homepage)
@@ -387,6 +391,38 @@ metadata: {
 
 Currently mapped: `tiktok-followers: 5818`, `tiktok-likes: 1126`, `tiktok-views: 9121`, `instagram-followers: 8072`, `instagram-likes: 2916`, `instagram-views: 7762`. Add more entries as the user supplies them — unmapped pairs are included in `items[]` without a `smmServiceId` (and contribute nothing to `smmDataItems`), letting Redlap fall back to its default routing for those lines.
 
+## WebEngage event tracking
+
+Behavioural analytics is wired through WebEngage's REST API. The flow is always **client helper → `POST /api/webengage/track` → WebEngage REST API** — the browser never calls WebEngage directly (keeps the API key server-side, dodges CORS).
+
+**Two modules:**
+- `lib/webengage.ts` — server-only. `trackEvent({ userId?, anonymousId?, eventName, eventTime?, eventData? })` POSTs to `${WEBENGAGE_API_HOST}/v1/accounts/${WEBENGAGE_LICENSE_CODE}/events` with a `Bearer ${WEBENGAGE_API_KEY}` header. `trackUser(...)` hits the `/users` endpoint. Both **return `false` instead of throwing** when credentials are missing or the call fails — analytics must never break a request. Exports `WE_EVENTS` (the canonical event-name constants).
+- `lib/webengage-client.ts` — `"use client"` helpers. Each `track*` function builds the right `eventData` shape and fire-and-forgets a `fetch` to `/api/webengage/track`. An **anonymous id** is minted once per browser (`localStorage` key `tc:we_anon_id`, format `anon_<ts>_<rand>`) and attached to every event; events tied to a known user (newsletter, checkout completed) also pass `userId: email`.
+
+**Event catalogue** (names must match the WebEngage dashboard exactly — note the capital-N `NewsLetter`):
+
+| Event | Helper | Fires from |
+| --- | --- | --- |
+| `Added To Cart` | `trackAddedToCart` | `cart-context.tsx` `addItem()` — wired ✅ |
+| `Checkout Started` | `trackCheckoutStarted` | `app/checkout/_form.tsx` `useEffect` (once, when cart hydrates with items) — wired ✅ |
+| `Order Initiated` | `trackOrderInitiated` | `_form.tsx` `onSubmit` (before creating the Redlap session) — wired ✅ |
+| `NewsLetter Subscribed` | `trackNewsletterSubscribed` | `_form.tsx` `onSubmit` when the promo opt-in box is checked — wired ✅ |
+| `Checkout Completed` | `trackCheckoutCompleted` | `app/checkout/success/_track.tsx` `<PurchaseTracker>` (mounted by `success/page.tsx`, dedups via a `useRef`) — wired ✅ |
+| `Category Selected` | `trackCategorySelected` | helper ready — not yet bound to a UI surface |
+| `Package Selected` | `trackPackageSelected` | helper ready — not yet bound |
+| `Top Menu Clicked` | `trackTopMenuClicked` | helper ready — not yet bound |
+| `Cart Viewed` | `trackCartViewed` | helper ready — not yet bound |
+| `Homepage CTA Clicked` | `trackHomepageCTAClicked` | helper ready — not yet bound |
+
+The last five helpers exist with the correct `eventData` contract but aren't called from any component yet — wire them to the relevant click/view handlers when those surfaces get tracked.
+
+**Env vars** (in `.env.example`, must be baked into `.env.production` via `amplify.yml` like the Redlap ones — Amplify console env vars don't reach the SSR runtime):
+- `WEBENGAGE_API_HOST` — defaults to `https://api.webengage.com`
+- `WEBENGAGE_LICENSE_CODE` — account license code (part of the events URL)
+- `WEBENGAGE_API_KEY` — REST API bearer token
+
+When credentials are absent the server client silently no-ops (logs a skip line in dev), so the site runs fine locally without WebEngage configured.
+
 ## Ahrefs SEO grounding (don't change these without re-checking)
 
 The repo is a real DR-72 domain with established Google rankings. Several decisions are grounded in Ahrefs data and should NOT be reverted without re-running the lookup:
@@ -415,6 +451,7 @@ These are the patterns worth lifting wholesale when standing up a similar site:
 12. **SSH-only git remote** for agent sessions — HTTPS push fails silently. `git remote set-url origin git@github.com:org/repo.git` once.
 13. **Service-tab strip as navigation** — `<Link href>` not `<button onClick>`. Local tab-state without page navigation is a UX trap: prices don't change, copy doesn't change, only the highlight does, and users get confused.
 14. **Three sources of truth for service pricing** (PACKAGES in `_builder.tsx`, mega-menu `fromPrice` in `mega-menu.tsx`, SERVICES in `service-table.tsx`) must stay in sync. The lowest tier of PACKAGES is what the other two show. Until you centralise into `content/packages.ts`, every price change touches three files.
+15. **WebEngage event tracking** (`lib/webengage.ts` server client + `lib/webengage-client.ts` browser helpers + `/api/webengage/track` proxy). Client never calls WebEngage directly — key stays server-side. Anonymous id in `localStorage`, fire-and-forget fetches, server client no-ops without credentials. Drop-in: swap the `eventData` shapes in `webengage-client.ts` for the new site's event schema.
 
 ## Workflow rule: keep CLAUDE.md in sync
 
