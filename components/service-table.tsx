@@ -66,7 +66,7 @@ const SERVICES: Service[] = [
   { platformId: "youtube",   platformName: "YouTube",   service: "Subscribers", href: "/buy-youtube-subscribers", price: "$6.99", brand: YouTubeBrand, bg: "#FF0000" },
   { platformId: "youtube",   platformName: "YouTube",   service: "Likes",     href: "/buy-youtube-likes",       price: "$2.99", brand: YouTubeBrand, bg: "#FF0000" },
   { platformId: "youtube",   platformName: "YouTube",   service: "Views",     href: "/buy-youtube-views",       price: "$2.49", brand: YouTubeBrand, bg: "#FF0000" },
-  { platformId: "facebook",  platformName: "Facebook",  service: "Followers", href: "/buy-facebook-followers",  price: "$6.50", brand: FacebookBrand, bg: "#1877F2" },
+  { platformId: "facebook",  platformName: "Facebook",  service: "Followers", href: "/buy-facebook-followers",  price: "$3.49", brand: FacebookBrand, bg: "#1877F2" },
   { platformId: "facebook",  platformName: "Facebook",  service: "Likes",     href: "/buy-facebook-likes",      price: "$3.50", brand: FacebookBrand, bg: "#1877F2" },
   { platformId: "facebook",  platformName: "Facebook",  service: "Views",     href: "/buy-facebook-views",      price: "$2.99", brand: FacebookBrand, bg: "#1877F2" },
   { platformId: "twitter",   platformName: "Twitter / X", service: "Followers", href: "/buy-twitter-followers", price: "$3.99", brand: TwitterBrand, bg: "#000" },

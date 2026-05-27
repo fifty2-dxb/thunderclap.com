@@ -164,7 +164,7 @@ export const MEGA_PLATFORMS: PlatformDef[] = [
         label: "Buy Followers",
         description: "Make your Page look like an industry leader to every visitor.",
         href: "/buy-facebook-followers",
-        fromPrice: "$6.50",
+        fromPrice: "$3.49",
         Icon: UserPlus,
       },
       {
