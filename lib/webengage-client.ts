@@ -47,6 +47,22 @@ export function trackEvent(payload: TrackEventPayload): void {
 
 // Event tracking functions matching WebEngage dashboard events
 
+/**
+ * Global page-view event. Fired on every route change by <PageViewTracker>
+ * (mounted in app/layout.tsx). `path` includes the query string when present.
+ */
+export function trackPageViewed(path: string, title?: string): void {
+  trackEvent({
+    eventName: "Page Viewed",
+    eventData: {
+      Path: path,
+      URL: typeof window !== "undefined" ? window.location.href : path,
+      Title: title ?? (typeof document !== "undefined" ? document.title : ""),
+      Referrer: typeof document !== "undefined" ? document.referrer : "",
+    },
+  });
+}
+
 export function trackCategorySelected(platform: Platform): void {
   trackEvent({
     eventName: "Category Selected",

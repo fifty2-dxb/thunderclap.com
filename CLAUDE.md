@@ -412,6 +412,7 @@ Behavioural analytics is wired through WebEngage's REST API. The flow is always 
 
 | Event | Helper | Fires from |
 | --- | --- | --- |
+| `Page Viewed` | `trackPageViewed` | `components/page-view-tracker.tsx` `<PageViewTracker>` — mounted once in `app/layout.tsx` (Suspense-wrapped, since it uses `useSearchParams`). Fires on initial load + every client route change; `eventData` carries `Path`/`URL`/`Title`/`Referrer`, deduped via a `useRef`. Tracks ALL pages globally — wired ✅ |
 | `Added To Cart` | `trackAddedToCart` | `cart-context.tsx` `addItem()` — wired ✅ |
 | `Checkout Started` | `trackCheckoutStarted` | `app/checkout/_form.tsx` `useEffect` (once, when cart hydrates with items) — wired ✅ |
 | `Order Initiated` | `trackOrderInitiated` | `_form.tsx` `onSubmit` (before creating the Redlap session) — wired ✅ |

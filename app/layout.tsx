@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { Suspense } from "react";
 import { Plus_Jakarta_Sans, Manrope, JetBrains_Mono } from "next/font/google";
 import { Announcement } from "@/components/announcement";
 import { CartProvider } from "@/components/cart-context";
@@ -6,6 +7,7 @@ import { CartDrawer } from "@/components/cart-drawer";
 import { Header } from "@/components/header";
 import { Ticker } from "@/components/ticker";
 import { Footer } from "@/components/footer";
+import { PageViewTracker } from "@/components/page-view-tracker";
 import { SITE_URL } from "@/lib/seo";
 import "./globals.css";
 
@@ -52,6 +54,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           </defs>
         </svg>
         <CartProvider>
+          <Suspense fallback={null}>
+            <PageViewTracker />
+          </Suspense>
           <Announcement />
           <Header />
           <Ticker />

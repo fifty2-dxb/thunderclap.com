@@ -109,6 +109,7 @@ export async function trackUser(data: {
 
 // Pre-defined event names matching WebEngage dashboard
 export const WE_EVENTS = {
+  PAGE_VIEWED: "Page Viewed",
   CATEGORY_SELECTED: "Category Selected",
   PACKAGE_SELECTED: "Package Selected",
   TOP_MENU_CLICKED: "Top Menu Clicked",
