@@ -43,7 +43,7 @@ const SIDE_BENEFITS = [
 
 export function YouTubeLikesHero() {
   const [tab, setTab] = useState<(typeof SERVICE_TABS)[number]["id"]>("likes");
-  const [selected, setSelected] = useState(4); // 1K popular
+  const [selected, setSelected] = useState(0); // default to the first (smallest) tier
   const [premium, setPremium] = useState(false);
 
   const pkg = PACKAGES[selected];

@@ -44,7 +44,7 @@ const SIDE_BENEFITS = [
 
 export function TwitterRetweetsHero() {
   const [tab, setTab] = useState<(typeof SERVICE_TABS)[number]["id"]>("retweets");
-  const [selected, setSelected] = useState(5); // 2.5K popular
+  const [selected, setSelected] = useState(0); // default to the first (smallest) tier
   const [premium, setPremium] = useState(false);
 
   const pkg = PACKAGES[selected];

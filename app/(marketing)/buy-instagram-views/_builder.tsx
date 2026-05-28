@@ -42,7 +42,7 @@ const SIDE_BENEFITS = [
 
 export function ViewsHero() {
   const [tab, setTab] = useState<(typeof SERVICE_TABS)[number]["id"]>("views");
-  const [selected, setSelected] = useState(4); // 10K
+  const [selected, setSelected] = useState(0); // default to the first (smallest) tier
   const [premium, setPremium] = useState(false);
 
   const pkg = PACKAGES[selected];

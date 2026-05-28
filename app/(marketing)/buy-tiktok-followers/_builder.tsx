@@ -42,7 +42,7 @@ const SIDE_BENEFITS = [
 
 export function TikTokFollowersHero() {
   const [tab, setTab] = useState<(typeof SERVICE_TABS)[number]["id"]>("followers");
-  const [selected, setSelected] = useState(4); // 1K
+  const [selected, setSelected] = useState(0); // default to the first (smallest) tier
   const [premium, setPremium] = useState(false);
 
   const pkg = PACKAGES[selected];
