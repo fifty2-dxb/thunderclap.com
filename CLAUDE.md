@@ -38,7 +38,8 @@ Social media growth marketing site (Instagram / TikTok / YouTube / Facebook / Tw
 | `/blog` | **Built** — index hub listing every post (featured + grid). |
 | `/{slug}/` (root) | **Built** — `app/[slug]/page.tsx` serves all blog posts at their original root-level slug (NOT under `/blog/`) to preserve legacy WordPress rankings. 544 posts imported from the live WP REST API (`scripts/import-wp-blog.mjs` → `content/blog-imported.json`) + 3 hand-written. `dynamicParams=false` so unknown slugs 404; static routes (`/buy-*`, `/aboutus`, `/blog`, …) take precedence over this segment. |
 | `/aboutus/`, `/team/`, `/faqs/`, `/contact/`, `/refund/`, `/privacy/` | **Built** — ported from the legacy thunderclap.com WordPress site (DR-72) to preserve their indexed URLs. All carry a trailing slash to match the legacy URLs exactly (Google has them indexed that way). |
-| `/api/lead` | POST → webhook lead capture |
+| `/api/lead` | POST → webhook lead capture (placeholder stub; the contact form no longer uses it) |
+| `/api/contact` | POST — the contact form (`app/contact/_form.tsx`) target. Validates `{ name, email, subject, message }`, sends via **nodemailer + Zoho SMTP** (`smtp.zoho.com:465`) to `CONTACT_TO` (default `support@thunderclap.com`) with the visitor's email as `replyTo`. Recipient is fixed server-side (NOT a generic `/api/send` relay). `runtime = "nodejs"`. No-ops with a friendly 503 when `ZOHO_EMAIL`/`ZOHO_PASSWORD` are unset. CR/LF stripped from header fields to block injection. |
 | `content/packages.ts` | **Empty stub** — `PACKAGES = [] as const`. Pricing tiers currently live inline in each `_builder.tsx`. Don't centralize unless you also rewrite all 11 builders. |
 
 ## Folder structure
@@ -66,7 +67,8 @@ app/
   blog/_post-body.tsx                 BlogBlock renderer (incl. raw-HTML block)
   [slug]/page.tsx                     ROOT-level post route — serves all blog posts at /{slug}/
   api/
-    lead/route.ts                     lead-capture POST → webhook
+    lead/route.ts                     lead-capture POST → webhook (placeholder)
+    contact/route.ts                  contact form → nodemailer + Zoho SMTP
     checkout/session/route.ts         create Redlap session
     checkout/status/route.ts          poll status
     redlap/webhook/route.ts           inbound Redlap webhook (HMAC verified)

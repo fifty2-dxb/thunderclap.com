@@ -21,7 +21,14 @@ frontend:
             REDLAP_WEBHOOK_SECRET \
             REDLAP_WEBSITE_ID \
             REDLAP_WEBSITE_ORIGIN \
-            REDLAP_EXPIRES_IN ; do
+            REDLAP_EXPIRES_IN \
+            WEBENGAGE_API_HOST \
+            WEBENGAGE_LICENSE_CODE \
+            WEBENGAGE_API_KEY \
+            ZOHO_EMAIL \
+            ZOHO_PASSWORD \
+            CONTACT_TO \
+            ZOHO_SMTP_HOST ; do
             val=$(printenv "$var" || true)
             if [ -n "$val" ]; then
               echo "$var=$val" >> .env.production
