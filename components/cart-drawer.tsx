@@ -117,16 +117,18 @@ type Suggestion = {
 };
 
 // One sensible default tier per platform-service combo for one-tap add.
+// qty/price/regular must match the matching tier in each _builder.tsx PACKAGES.
 const SUGGESTION_POOL: Suggestion[] = [
-  { platform: "instagram", service: "followers", qty: 1000, price: 12.49, regular: 15.61, href: "/buy-instagram-followers" },
-  { platform: "instagram", service: "likes",     qty: 1000, price: 12.49, regular: 15.61, href: "/buy-instagram-likes" },
-  { platform: "instagram", service: "views",     qty: 2500, price: 6.49,  regular: 8.11,  href: "/buy-instagram-views" },
-  { platform: "tiktok",    service: "followers", qty: 1000, price: 25.99, regular: 32.49, href: "/buy-tiktok-followers" },
-  { platform: "tiktok",    service: "likes",     qty: 1000, price: 11.89, regular: 14.86, href: "/buy-tiktok-likes" },
-  { platform: "tiktok",    service: "views",     qty: 5000, price: 4.49,  regular: 5.61,  href: "/buy-tiktok-views" },
-  { platform: "youtube",   service: "subscribers", qty: 100, price: 22.49, regular: 28.11, href: "/buy-youtube-subscribers" },
-  { platform: "youtube",   service: "views",     qty: 1000, price: 8.39,  regular: 10.49, href: "/buy-youtube-views" },
-  { platform: "facebook",  service: "followers", qty: 500,  price: 14.50, regular: 18.13, href: "/buy-facebook-followers" },
+  { platform: "instagram", service: "followers", qty: 1000, price: 14.99, regular: 18.74, href: "/buy-instagram-followers" },
+  { platform: "instagram", service: "likes",     qty: 1000, price: 14.99, regular: 18.74, href: "/buy-instagram-likes" },
+  { platform: "instagram", service: "views",     qty: 2500, price: 7.99,  regular: 9.99,  href: "/buy-instagram-views" },
+  { platform: "tiktok",    service: "followers", qty: 1000, price: 29.99, regular: 37.49, href: "/buy-tiktok-followers" },
+  { platform: "tiktok",    service: "likes",     qty: 1000, price: 13.99, regular: 17.49, href: "/buy-tiktok-likes" },
+  { platform: "tiktok",    service: "views",     qty: 5000, price: 5.49,  regular: 6.86,  href: "/buy-tiktok-views" },
+  { platform: "youtube",   service: "subscribers", qty: 100, price: 6.99, regular: 8.74, href: "/buy-youtube-subscribers" },
+  { platform: "youtube",   service: "likes",     qty: 250,  price: 4.99,  regular: 6.24,  href: "/buy-youtube-likes" },
+  { platform: "youtube",   service: "views",     qty: 1000, price: 7.99,  regular: 9.99,  href: "/buy-youtube-views" },
+  { platform: "facebook",  service: "followers", qty: 500,  price: 6.89,  regular: 8.61,  href: "/buy-facebook-followers" },
   { platform: "facebook",  service: "likes",     qty: 500,  price: 11.50, regular: 14.38, href: "/buy-facebook-likes" },
   { platform: "facebook",  service: "views",     qty: 2500, price: 6.99,  regular: 8.74,  href: "/buy-facebook-views" },
   { platform: "twitter",   service: "followers", qty: 250,  price: 8.99,  regular: 11.24, href: "/buy-twitter-followers" },
@@ -136,9 +138,9 @@ const SUGGESTION_POOL: Suggestion[] = [
 
 const BROWSE_LINKS: { platform: Platform; href: string; from: string }[] = [
   { platform: "instagram", href: "/buy-instagram-followers", from: "$3.49" },
-  { platform: "tiktok", href: "/buy-tiktok-followers", from: "$4.79" },
-  { platform: "youtube", href: "/buy-youtube-subscribers", from: "$12.49" },
-  { platform: "facebook", href: "/buy-facebook-followers", from: "$6.50" },
+  { platform: "tiktok", href: "/buy-tiktok-followers", from: "$5.99" },
+  { platform: "youtube", href: "/buy-youtube-subscribers", from: "$6.99" },
+  { platform: "facebook", href: "/buy-facebook-followers", from: "$3.49" },
   { platform: "twitter", href: "/buy-twitter-followers", from: "$3.99" },
 ];
 
