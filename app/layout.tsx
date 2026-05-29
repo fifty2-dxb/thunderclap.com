@@ -39,6 +39,24 @@ export const metadata: Metadata = {
   description:
     "Boost your TikTok, Instagram, YouTube, Facebook and Twitter / X accounts with real followers, likes and views from active users. Money-back guaranteed. Trusted by 200K+ creators.",
   icons: { icon: "/logo.webp" },
+  // Default robots for every page (inherited via the root layout). Renders
+  // `index, follow, max-video-preview:-1, max-image-preview:large,
+  // max-snippet:-1` for both the generic robots and googlebot tags. The
+  // /checkout* routes override this with { index: false, follow: false }.
+  robots: {
+    index: true,
+    follow: true,
+    "max-snippet": -1,
+    "max-image-preview": "large",
+    "max-video-preview": -1,
+    googleBot: {
+      index: true,
+      follow: true,
+      "max-snippet": -1,
+      "max-image-preview": "large",
+      "max-video-preview": -1,
+    },
+  },
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {

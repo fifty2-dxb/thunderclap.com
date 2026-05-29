@@ -187,7 +187,7 @@ Pattern:
 
 ## SEO rules (must follow)
 
-1. **Every public route exports `metadata`** with `title`, `description`, `alternates.canonical`, `openGraph`, `twitter`. Exception: all `/checkout*` routes use `robots: { index: false, follow: false }` and skip canonical.
+1. **Every public route exports `metadata`** with `title`, `description`, `alternates.canonical`, `openGraph`, `twitter`. **`robots` is set once in the root `app/layout.tsx`** (`index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1`, mirrored to `googleBot`) and inherited by every page — don't repeat it per-page. Exception: all `/checkout*` routes override with `robots: { index: false, follow: false }` (Next replaces the field per-route, so they emit `noindex, nofollow`) and skip canonical.
 2. **Homepage** injects `Organization` + `WebSite` JSON-LD via a `<script type="application/ld+json">` tag in the page (not layout, to avoid duplication on other routes).
 3. **Service pages** inject `Product` + `AggregateRating` + `FAQPage` + `BreadcrumbList` JSON-LD, all in `page.tsx`.
 4. **`Product.offers`** uses `AggregateOffer` with `lowPrice`/`highPrice` matching the `PACKAGES` array in the matching `_builder.tsx`. Keep these in sync when you change pricing.
