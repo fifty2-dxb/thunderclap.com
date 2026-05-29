@@ -246,15 +246,11 @@ export async function POST(req: Request) {
   returnUrlBase.searchParams.set("premium", first.premium ? "1" : "0");
   returnUrlBase.searchParams.set("target", first.target);
 
-  // Description: up to 3 items listed, then "+ N more"; else "N items".
-  let description: string;
-  if (items.length === 1) {
-    description = describeItem(items[0]);
-  } else if (items.length <= 3) {
-    description = items.map(describeItem).join(" · ");
-  } else {
-    description = `${items.length} items`;
-  }
+  // Generic gateway description on purpose — we don't surface the specific
+  // platform/service (e.g. "YouTube Subscribers") to the payment gateway here.
+  // The itemised breakdown is sent only via summaryItems below (which renders
+  // on the Redlap payment page) and in metadata (needed for fulfilment).
+  const description = "Product Purchase";
 
   // Build metadata payload.
   // - items[]: full per-line array, every entry annotated with its
