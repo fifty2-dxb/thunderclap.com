@@ -3,7 +3,6 @@ import Image from "next/image";
 import Link from "next/link";
 import { Check, ShieldCheck } from "lucide-react";
 import { formatQty } from "@/lib/utils";
-import { PurchaseTracker } from "./_track";
 
 export const metadata: Metadata = {
   title: "Order received · Thunderclap",
@@ -99,12 +98,9 @@ export default async function Page({
 
   return (
     <main className="co-shell">
-      <PurchaseTracker
-        orderId={orderId}
-        total={total}
-        email={email}
-        items={[{ platform, service, qty, price: basePrice, premium }]}
-      />
+      {/* "Checkout Completed" is tracked server-side from the Redlap webhook
+          (app/api/redlap/webhook) so it fires reliably even if the buyer never
+          returns to this page. */}
       <div className="co-top">
         <div className="container" style={{ position: "relative" }}>
           <div className="co-top-inner">

@@ -33,7 +33,7 @@ Social media growth marketing site (Instagram / TikTok / YouTube / Facebook / Tw
 | `/checkout/failed` | **Built** — failure / cancelled / expired / timeout state with a "Try payment again" CTA back to `/checkout` (single-step). |
 | `/api/checkout/session` | POST — accepts `{ items: [{ platform, service, qty, price, premium, target }, ...], email }` (with legacy single-item body still supported for back-compat). Sums totals, builds Redlap metadata with `items[]` + `smmDataItems[]` (and a flat `smmData` when there's exactly one mapped item, for legacy Redlap fulfillment code paths). Returns `{ sessionId, redirectUrl, orderId }`. |
 | `/api/checkout/status` | GET `?sid=…` — returns `{ status: "pending"\|"paid"\|"failed"\|"expired" }`. Reads from the in-process webhook cache, falls back to Redlap's `GET /api/payments/sessions/:id`. |
-| `/api/redlap/webhook` | POST — verifies `X-Webhook-Signature` HMAC-SHA256 and records the outcome in the in-process cache. **No fulfillment** — that lives inside the Redlap environment. |
+| `/api/redlap/webhook` | POST — verifies `X-Webhook-Signature` HMAC-SHA256 and records the outcome in the in-process cache. On the first `payment.completed` for a session it fires the WebEngage **`Checkout Completed`** conversion server-side (reads email/items/total back from the Redlap session metadata; deduped via the status cache; wrapped so it never breaks the 200 ack). **No fulfillment** — that lives inside the Redlap environment. |
 | `/api/webengage/track` | POST — accepts `{ eventName, eventData?, userId?, anonymousId? }` from the client and fire-and-forgets it to the WebEngage REST API via `lib/webengage.ts`. Returns `{ ok: true }` immediately; never blocks the caller on WebEngage. |
 | `/blog` | **Built** — index hub listing every post (featured + grid). |
 | `/{slug}/` (root) | **Built** — `app/[slug]/page.tsx` serves all blog posts at their original root-level slug (NOT under `/blog/`) to preserve legacy WordPress rankings. 544 posts imported from the live WP REST API (`scripts/import-wp-blog.mjs` → `content/blog-imported.json`) + 3 hand-written. `dynamicParams=false` so unknown slugs 404; static routes (`/buy-*`, `/aboutus`, `/blog`, …) take precedence over this segment. |
@@ -419,7 +419,7 @@ Behavioural analytics is wired through WebEngage's REST API. The flow is always 
 | `Checkout Started` | `trackCheckoutStarted` | `app/checkout/_form.tsx` `useEffect` (once, when cart hydrates with items) — wired ✅ |
 | `Order Initiated` | `trackOrderInitiated` | `_form.tsx` `onSubmit` (before creating the Redlap session) — wired ✅ |
 | `NewsLetter Subscribed` | `trackNewsletterSubscribed` | `_form.tsx` `onSubmit` when the promo opt-in box is checked — wired ✅ |
-| `Checkout Completed` | `trackCheckoutCompleted` | `app/checkout/success/_track.tsx` `<PurchaseTracker>` (mounted by `success/page.tsx`, dedups via a `useRef`) — wired ✅ |
+| `Checkout Completed` | server `trackEvent` in `lib/webengage.ts` | Fired **server-side from the Redlap webhook** (`app/api/redlap/webhook`) on the first `payment.completed` — reliable even if the buyer never returns to `/checkout/success`. Reads order details back from the session metadata; deduped via the status cache. The old client-side `<PurchaseTracker>` was removed. The client `trackCheckoutCompleted` helper still exists but is no longer wired — wired ✅ |
 | `Category Selected` | `trackCategorySelected` | helper ready — not yet bound to a UI surface |
 | `Package Selected` | `trackPackageSelected` | helper ready — not yet bound |
 | `Top Menu Clicked` | `trackTopMenuClicked` | helper ready — not yet bound |
@@ -469,4 +469,4 @@ These are the patterns worth lifting wholesale when standing up a similar site:
 
 After every change that introduces a new component, convention, file layout, CSS namespace, data shape, or behaviour rule, **update this CLAUDE.md** in the same commit (or a follow-up `docs:` commit if the original is already large). CLAUDE.md is the portable spec — when it drifts from reality, future sessions waste cycles re-deriving things from code. Add new patterns to the "Portable feature recipes" list when they're worth lifting to another site.
 
-**Don't add fulfillment hooks in the webhook handler.** Fulfillment is the Redlap environment's job. The handler only verifies the signature, records the outcome, and acks 200.
+**Don't add fulfillment hooks in the webhook handler.** Fulfillment is the Redlap environment's job. The handler verifies the signature, records the outcome, fires the WebEngage `Checkout Completed` conversion (analytics only, never blocks the ack), and acks 200.

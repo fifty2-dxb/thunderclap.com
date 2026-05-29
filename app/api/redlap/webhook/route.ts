@@ -1,9 +1,65 @@
 import { NextResponse } from "next/server";
-import { getRedlapEnv, normaliseStatus, verifyWebhookSignature } from "@/lib/redlap";
-import { recordWebhook } from "@/lib/redlap-status-cache";
+import {
+  getRedlapEnv,
+  getSession,
+  normaliseStatus,
+  verifyWebhookSignature,
+  type RedlapEnv,
+} from "@/lib/redlap";
+import { readWebhook, recordWebhook } from "@/lib/redlap-status-cache";
+import { trackEvent, WE_EVENTS } from "@/lib/webengage";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
+
+type MetaItem = {
+  platform?: string;
+  service?: string;
+  qty?: number;
+  price?: number;
+  premium?: boolean;
+};
+
+/**
+ * Fire the WebEngage "Checkout Completed" conversion server-side. This is the
+ * authoritative trigger (the webhook always fires on payment, unlike the
+ * /checkout/success page which only fires if the buyer actually returns). The
+ * order details aren't in the webhook body, so we read them back from the
+ * Redlap session metadata we set at create time. Never throws — analytics must
+ * never break the webhook ack.
+ */
+async function trackCheckoutCompleted(sessionId: string, env: RedlapEnv): Promise<void> {
+  try {
+    const session = await getSession(sessionId, env);
+    const md = (session.metadata ?? {}) as Record<string, unknown>;
+    const email = typeof md.email === "string" ? md.email : "";
+    const orderId = typeof md.tcOrderId === "string" ? md.tcOrderId : sessionId;
+    const currency = typeof md.currency === "string" ? md.currency : "USD";
+    const items: MetaItem[] = Array.isArray(md.items) ? (md.items as MetaItem[]) : [];
+
+    // Prefer the actual charged price; fall back to summing the line items.
+    const total =
+      typeof session.price === "number"
+        ? session.price
+        : Math.round(
+            items.reduce((s, it) => s + (it.price ?? 0) * (it.premium ? 1.35 : 1), 0) * 100,
+          ) / 100;
+
+    await trackEvent({
+      userId: email || undefined,
+      eventName: WE_EVENTS.CHECKOUT_COMPLETED,
+      eventData: {
+        "Order ID": orderId,
+        "Order Total": total,
+        Currency: currency,
+        "Item Count": items.length,
+        Products: items.map((i) => `${i.platform}-${i.service}`).join(","),
+      },
+    });
+  } catch (err) {
+    console.error("[redlap] Checkout Completed tracking failed:", err);
+  }
+}
 
 type WebhookPayload = {
   event?: string;
@@ -62,7 +118,14 @@ export async function POST(req: Request) {
 
   const mapped = TERMINAL_FOR_STATUS[event];
   if (mapped) {
+    // Only fire the conversion the first time this session turns paid — guards
+    // against duplicate WebEngage events if Redlap re-delivers the webhook to
+    // the same warm instance. (Best-effort: the cache is per-process.)
+    const alreadyPaid = readWebhook(sessionId) === "paid";
     recordWebhook(sessionId, mapped);
+    if (mapped === "paid" && !alreadyPaid) {
+      await trackCheckoutCompleted(sessionId, env);
+    }
   } else {
     // Unknown event — log and ack so Redlap doesn't retry forever.
     console.warn(`[redlap] ignoring unknown webhook event: ${event} (session ${sessionId})`);
