@@ -59,12 +59,6 @@ export type CreateSessionInput = {
   description: string;
   expiresIn?: number;
   metadata?: Record<string, unknown>;
-  offerOptions?: {
-    platform: string;
-    quantity: number;
-    type: string;
-    price: number;
-  };
   summaryItems?: SummaryItem[];
 };
 
@@ -103,7 +97,6 @@ export async function createSession(
       ...(input.metadata ?? {}),
       ...(input.summaryItems ? { summaryItems: input.summaryItems } : {}),
     },
-    ...(input.offerOptions ? { offerOptions: input.offerOptions } : {}),
   };
 
   const res = await fetch(`${env.apiBase}/api/payments/sessions`, {

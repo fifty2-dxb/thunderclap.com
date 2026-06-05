@@ -291,12 +291,6 @@ export async function POST(req: Request) {
         returnUrl: returnUrlBase.toString(),
         price: total,
         description,
-        offerOptions: {
-          platform: first.platform,
-          quantity: first.qty,
-          type: first.service,
-          price: total,
-        },
         metadata: {
           tcOrderId: orderId,
           email,
