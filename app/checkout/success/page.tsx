@@ -10,14 +10,21 @@ export const metadata: Metadata = {
   robots: { index: false, follow: false },
 };
 
-type Platform = "instagram" | "tiktok" | "youtube" | "facebook" | "twitter";
+type Platform =
+  | "instagram"
+  | "tiktok"
+  | "youtube"
+  | "facebook"
+  | "twitter"
+  | "linkedin";
 type Service =
   | "followers"
   | "likes"
   | "views"
   | "subscribers"
   | "comments"
-  | "retweets";
+  | "retweets"
+  | "connections";
 
 const PLATFORM_LABEL: Record<Platform, string> = {
   instagram: "Instagram",
@@ -25,6 +32,7 @@ const PLATFORM_LABEL: Record<Platform, string> = {
   youtube: "YouTube",
   facebook: "Facebook",
   twitter: "Twitter / X",
+  linkedin: "LinkedIn",
 };
 const SERVICE_LABEL: Record<Service, string> = {
   followers: "Followers",
@@ -33,6 +41,7 @@ const SERVICE_LABEL: Record<Service, string> = {
   subscribers: "Subscribers",
   comments: "Comments",
   retweets: "Retweets",
+  connections: "Connections",
 };
 
 const isPlatform = (v: string): v is Platform =>
@@ -40,14 +49,16 @@ const isPlatform = (v: string): v is Platform =>
   v === "tiktok" ||
   v === "youtube" ||
   v === "facebook" ||
-  v === "twitter";
+  v === "twitter" ||
+  v === "linkedin";
 const isService = (v: string): v is Service =>
   v === "followers" ||
   v === "likes" ||
   v === "views" ||
   v === "subscribers" ||
   v === "comments" ||
-  v === "retweets";
+  v === "retweets" ||
+  v === "connections";
 
 function pickStr(v: string | string[] | undefined, fallback: string): string {
   if (Array.isArray(v)) return v[0] ?? fallback;

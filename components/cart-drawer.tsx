@@ -62,6 +62,14 @@ const TwitterBrand = (
     />
   </svg>
 );
+const LinkedInBrand = (
+  <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+    <path
+      d="M20.45 20.45h-3.55v-5.56c0-1.33-.02-3.04-1.85-3.04-1.85 0-2.14 1.45-2.14 2.94v5.66H9.36V9h3.41v1.56h.05c.48-.9 1.64-1.85 3.37-1.85 3.6 0 4.27 2.37 4.27 5.46v6.28zM5.34 7.43A2.06 2.06 0 1 1 5.34 3.3a2.06 2.06 0 0 1 0 4.13zM7.12 20.45H3.56V9h3.56v11.45z"
+      fill="#fff"
+    />
+  </svg>
+);
 
 const IG_BG = "linear-gradient(135deg,#feda77 0%,#f58529 35%,#dd2a7b 65%,#8134af 100%)";
 
@@ -71,6 +79,7 @@ const PLATFORM_BRAND: Record<Platform, ReactNode> = {
   youtube: YouTubeBrand,
   facebook: FacebookBrand,
   twitter: TwitterBrand,
+  linkedin: LinkedInBrand,
 };
 
 const PLATFORM_BG: Record<Platform, string> = {
@@ -79,6 +88,7 @@ const PLATFORM_BG: Record<Platform, string> = {
   youtube: "#FF0000",
   facebook: "#1877F2",
   twitter: "#000",
+  linkedin: "#0A66C2",
 };
 
 const PLATFORM_LABEL: Record<Platform, string> = {
@@ -87,6 +97,7 @@ const PLATFORM_LABEL: Record<Platform, string> = {
   youtube: "YouTube",
   facebook: "Facebook",
   twitter: "Twitter / X",
+  linkedin: "LinkedIn",
 };
 
 const SERVICE_LABEL: Record<Service, string> = {
@@ -96,11 +107,13 @@ const SERVICE_LABEL: Record<Service, string> = {
   subscribers: "Subscribers",
   comments: "Comments",
   retweets: "Retweets",
+  connections: "Connections",
 };
 
 const SERVICE_ICON: Record<Service, typeof UserPlus> = {
   followers: UserPlus,
   subscribers: UserPlus,
+  connections: UserPlus,
   likes: Heart,
   views: Play,
   comments: MessageSquare,

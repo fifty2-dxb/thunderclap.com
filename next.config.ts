@@ -47,6 +47,7 @@ const nextConfig: NextConfig = {
       { source: "/youtube", destination: "/buy-youtube-subscribers", permanent: true },
       { source: "/facebook", destination: "/buy-facebook-followers", permanent: true },
       { source: "/twitter", destination: "/buy-twitter-followers", permanent: true },
+      { source: "/linkedin", destination: "/buy-linkedin-followers", permanent: true },
 
       // The 3 hand-written posts moved from /blog/{slug} to the unified
       // root-level /{slug} pattern the 544 imported posts use. Send any

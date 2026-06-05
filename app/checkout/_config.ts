@@ -8,7 +8,8 @@ export type Platform =
   | "tiktok"
   | "youtube"
   | "facebook"
-  | "twitter";
+  | "twitter"
+  | "linkedin";
 
 export type Service =
   | "followers"
@@ -16,7 +17,8 @@ export type Service =
   | "views"
   | "subscribers"
   | "comments"
-  | "retweets";
+  | "retweets"
+  | "connections"; // LinkedIn-specific
 
 export type InputConfig = { label: string; placeholder: string };
 
@@ -26,6 +28,7 @@ export const PLATFORM_LABEL: Record<Platform, string> = {
   youtube: "YouTube",
   facebook: "Facebook",
   twitter: "Twitter / X",
+  linkedin: "LinkedIn",
 };
 
 export const SERVICE_LABEL: Record<Service, string> = {
@@ -35,6 +38,7 @@ export const SERVICE_LABEL: Record<Service, string> = {
   subscribers: "Subscribers",
   comments: "Comments",
   retweets: "Retweets",
+  connections: "Connections",
 };
 
 export const INPUT_CONFIG: Record<string, InputConfig> = {
@@ -93,6 +97,22 @@ export const INPUT_CONFIG: Record<string, InputConfig> = {
   "twitter-retweets": {
     label: "Twitter / X post URL",
     placeholder: "https://x.com/yourhandle/status/123456789",
+  },
+  "linkedin-connections": {
+    label: "LinkedIn profile URL",
+    placeholder: "https://www.linkedin.com/in/yourname",
+  },
+  "linkedin-followers": {
+    label: "LinkedIn profile or company page URL",
+    placeholder: "https://www.linkedin.com/in/yourname",
+  },
+  "linkedin-likes": {
+    label: "LinkedIn post URL",
+    placeholder: "https://www.linkedin.com/posts/yourname_activity-1234567890",
+  },
+  "linkedin-comments": {
+    label: "LinkedIn post URL",
+    placeholder: "https://www.linkedin.com/posts/yourname_activity-1234567890",
   },
 };
 

@@ -10,14 +10,21 @@ import {
 } from "react";
 import { trackAddedToCart } from "@/lib/webengage-client";
 
-export type Platform = "instagram" | "tiktok" | "youtube" | "facebook" | "twitter";
+export type Platform =
+  | "instagram"
+  | "tiktok"
+  | "youtube"
+  | "facebook"
+  | "twitter"
+  | "linkedin";
 export type Service =
   | "followers"
   | "likes"
   | "views"
   | "subscribers"
   | "comments"
-  | "retweets";
+  | "retweets"
+  | "connections"; // LinkedIn-specific
 
 export type CartItem = {
   id: string;

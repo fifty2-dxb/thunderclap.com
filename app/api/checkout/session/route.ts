@@ -90,6 +90,10 @@ const SMM_SERVICE_IDS: Record<string, number> = {
   "twitter-followers": 2594,
   "twitter-likes": 970,
   "twitter-retweets": 3308,
+  "linkedin-connections": 5471,
+  "linkedin-followers": 5467,
+  "linkedin-likes": 5472,
+  "linkedin-comments": 5475,
 };
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;

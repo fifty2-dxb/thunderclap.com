@@ -80,6 +80,7 @@ function PlatformChipIcon({ platform }: { platform: Platform }) {
 const SERVICE_ICON: Record<Service, typeof UserPlus> = {
   followers: UserPlus,
   subscribers: UserPlus,
+  connections: UserPlus,
   likes: Heart,
   views: Play,
   comments: MessageSquare,
