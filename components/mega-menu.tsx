@@ -5,6 +5,7 @@ import {
   ArrowUpRight,
   Eye,
   Heart,
+  MessageSquare,
   Play,
   Repeat2,
   UserPlus,
@@ -32,7 +33,8 @@ export type PlatformId =
   | "tiktok"
   | "youtube"
   | "facebook"
-  | "twitter";
+  | "twitter"
+  | "linkedin";
 
 export const MEGA_PLATFORMS: PlatformDef[] = [
   {
@@ -217,6 +219,50 @@ export const MEGA_PLATFORMS: PlatformDef[] = [
         href: "/buy-twitter-retweets",
         fromPrice: "$2.99",
         Icon: Repeat2,
+      },
+    ],
+  },
+  {
+    id: "linkedin",
+    label: "LinkedIn",
+    brand: () => (
+      <span className="mm-brand mm-brand-linkedin" aria-hidden>
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
+          <path
+            d="M20.45 20.45h-3.55v-5.56c0-1.33-.02-3.04-1.85-3.04-1.85 0-2.14 1.45-2.14 2.94v5.66H9.36V9h3.41v1.56h.05c.48-.9 1.64-1.85 3.37-1.85 3.6 0 4.27 2.37 4.27 5.46v6.28zM5.34 7.43A2.06 2.06 0 1 1 5.34 3.3a2.06 2.06 0 0 1 0 4.13zM7.12 20.45H3.56V9h3.56v11.45z"
+            fill="#fff"
+          />
+        </svg>
+      </span>
+    ),
+    services: [
+      {
+        label: "Buy Connections",
+        description: "Real LinkedIn connections to grow your professional network.",
+        href: "/buy-linkedin-connections",
+        fromPrice: "$8",
+        Icon: UserPlus,
+      },
+      {
+        label: "Buy Followers",
+        description: "Profile or company-page followers from real LinkedIn users.",
+        href: "/buy-linkedin-followers",
+        fromPrice: "$7",
+        Icon: Users,
+      },
+      {
+        label: "Buy Likes",
+        description: "Real reactions on your posts to lift reach in the feed.",
+        href: "/buy-linkedin-likes",
+        fromPrice: "$4.50",
+        Icon: Heart,
+      },
+      {
+        label: "Buy Comments",
+        description: "Custom comments from real profiles — richer post engagement.",
+        href: "/buy-linkedin-comments",
+        fromPrice: "$4",
+        Icon: MessageSquare,
       },
     ],
   },

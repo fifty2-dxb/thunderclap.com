@@ -1,6 +1,6 @@
 # Thunderclap — Project Conventions
 
-Social media growth marketing site (Instagram / TikTok / YouTube / Facebook / Twitter — followers, likes, views, subscribers, retweets). SEO-optimized, conversion-focused, payments routed through Redlap ("Social Empire Pay").
+Social media growth marketing site (Instagram / TikTok / YouTube / Facebook / Twitter / LinkedIn — followers, likes, views, subscribers, retweets, connections, comments). SEO-optimized, conversion-focused, payments routed through Redlap ("Social Empire Pay").
 
 ## Tech stack
 
@@ -25,6 +25,7 @@ Social media growth marketing site (Instagram / TikTok / YouTube / Facebook / Tw
 | `/buy-youtube-{subscribers,likes,views}` | **Fully built** — YouTube-branded with YPP threshold framing. FAQs export `YT_FAQS`. |
 | `/buy-facebook-{followers,likes,views}` | **Fully built** — Facebook-branded copy. FAQs export `FB_FAQS`. |
 | `/buy-twitter-{followers,likes,retweets}` | **Fully built** — labelled "Twitter / X" everywhere user-facing. FAQs export `TW_FAQS`. Adds the `retweets` service type. |
+| `/buy-linkedin-{connections,followers,likes,comments}` | **Fully built** — same 8-section pattern, LinkedIn blue `#0A66C2`. FAQs export `LI_FAQS`. Adds the `connections` service type (LinkedIn-specific) and the first `comments` page on the site. Brand glyph is the LinkedIn "in" SVG (also in `cart-drawer.tsx` as `LinkedInBrand`). |
 | `next.config.ts` redirects | 301s from old `/{platform}/{service}` nested routes AND legacy prod URLs (`/buy-instagram-impressions`, `/free-youtube-subscribers`, `/instagram`, `/tiktok`, `/youtube`, `/facebook`, `/twitter`) → new canonicals. **`trailingSlash: true`** is set so every served URL ends in `/` and non-slash variants 308 to the trailing-slash form — needed to match the legacy WordPress URL pattern Google has already indexed. |
 | `components/cart-drawer.tsx` | **Built** — there is NO `/cart` page anymore. The cart lives in a slide-in drawer (right rail on desktop, bottom sheet on mobile) mounted globally in `app/layout.tsx`. Auto-opens whenever an item is added, with a "MORE FROM {platform}" upsell row whose Add buttons call `addItem` directly (one-tap stacking from the drawer). Header cart icon opens it via `openDrawer()`. |
 | `/checkout` | **Built** — multi-item server shell + `<CheckoutFlow>` client island, `noindex, nofollow`. Reads the cart from context (NOT URL params), renders one `target` input per cart item (per-service placeholder via `INPUT_CONFIG`), plus a single `email` input. On submit POSTs `{ items: [...], email }` to `/api/checkout/session` and `window.location` redirects to the Redlap-hosted payment page. Empty-cart state when no items. No method picker — Redlap owns card/Apple Pay/etc. |
@@ -57,6 +58,7 @@ app/
     buy-youtube-{subscribers,likes,views}/{page.tsx, _builder.tsx, _faqs.ts}
     buy-facebook-{followers,likes,views}/{page.tsx, _builder.tsx, _faqs.ts}
     buy-twitter-{followers,likes,retweets}/{page.tsx, _builder.tsx, _faqs.ts}
+    buy-linkedin-{connections,followers,likes,comments}/{page.tsx, _builder.tsx, _faqs.ts}
   checkout/
     page.tsx                          single-step "Get started" server shell
     _form.tsx                         client form — POSTs /api/checkout/session, redirects to Redlap
@@ -400,7 +402,7 @@ metadata: {
 }
 ```
 
-Currently mapped: `tiktok-followers: 5818`, `tiktok-likes: 1126`, `tiktok-views: 9121`, `instagram-followers: 8072`, `instagram-likes: 2916`, `instagram-views: 7762`, `facebook-followers: 4139`, `facebook-likes: 4704`, `facebook-views: 4715`, `youtube-subscribers: 8125`, `youtube-likes: 9538`, `youtube-views: 1573`, `twitter-followers: 2594`, `twitter-likes: 970`, `twitter-retweets: 3308`. All 5 platforms × their services are now mapped. Add more entries as the user supplies them — unmapped pairs are included in `items[]` without a `smmServiceId` (and contribute nothing to `smmDataItems`), letting Redlap fall back to its default routing for those lines.
+Currently mapped: `tiktok-followers: 5818`, `tiktok-likes: 1126`, `tiktok-views: 9121`, `instagram-followers: 8072`, `instagram-likes: 2916`, `instagram-views: 7762`, `facebook-followers: 4139`, `facebook-likes: 4704`, `facebook-views: 4715`, `youtube-subscribers: 8125`, `youtube-likes: 9538`, `youtube-views: 1573`, `twitter-followers: 2594`, `twitter-likes: 970`, `twitter-retweets: 3308`, `linkedin-connections: 5471`, `linkedin-followers: 5467`, `linkedin-likes: 5472`, `linkedin-comments: 5475`. All 6 platforms × their services are now mapped. Add more entries as the user supplies them — unmapped pairs are included in `items[]` without a `smmServiceId` (and contribute nothing to `smmDataItems`), letting Redlap fall back to its default routing for those lines.
 
 ## WebEngage event tracking
 

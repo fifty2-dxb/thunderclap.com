@@ -45,6 +45,15 @@ const FOOTER_COLS = [
     ],
   },
   {
+    title: "LinkedIn",
+    links: [
+      { label: "Buy LinkedIn Connections", href: "/buy-linkedin-connections" },
+      { label: "Buy LinkedIn Followers", href: "/buy-linkedin-followers" },
+      { label: "Buy LinkedIn Likes", href: "/buy-linkedin-likes" },
+      { label: "Buy LinkedIn Comments", href: "/buy-linkedin-comments" },
+    ],
+  },
+  {
     title: "Company",
     links: [
       { label: "About us", href: "/aboutus" },

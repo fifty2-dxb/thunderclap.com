@@ -63,6 +63,16 @@ const NAV: NavItem[] = [
       { label: "Buy Twitter Retweets", href: "/buy-twitter-retweets" },
     ],
   },
+  {
+    id: "linkedin",
+    label: "LinkedIn",
+    submenu: [
+      { label: "Buy LinkedIn Connections", href: "/buy-linkedin-connections" },
+      { label: "Buy LinkedIn Followers", href: "/buy-linkedin-followers" },
+      { label: "Buy LinkedIn Likes", href: "/buy-linkedin-likes" },
+      { label: "Buy LinkedIn Comments", href: "/buy-linkedin-comments" },
+    ],
+  },
   { id: "blog", label: "Blog", href: "/blog" },
   { id: "support", label: "Support", href: "/contact" },
 ];
@@ -73,6 +83,7 @@ function activeIdForPath(pathname: string): string | null {
   if (pathname.startsWith("/buy-youtube")) return "youtube";
   if (pathname.startsWith("/buy-facebook")) return "facebook";
   if (pathname.startsWith("/buy-twitter")) return "twitter";
+  if (pathname.startsWith("/buy-linkedin")) return "linkedin";
   if (pathname.startsWith("/blog")) return "blog";
   return null;
 }

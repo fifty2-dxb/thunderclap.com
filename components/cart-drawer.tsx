@@ -147,6 +147,10 @@ const SUGGESTION_POOL: Suggestion[] = [
   { platform: "twitter",   service: "followers", qty: 250,  price: 8.99,  regular: 11.24, href: "/buy-twitter-followers" },
   { platform: "twitter",   service: "likes",     qty: 250,  price: 11.49, regular: 14.36, href: "/buy-twitter-likes" },
   { platform: "twitter",   service: "retweets",  qty: 100,  price: 7.99,  regular: 9.99,  href: "/buy-twitter-retweets" },
+  { platform: "linkedin",  service: "connections", qty: 250, price: 18,   regular: 22.5,  href: "/buy-linkedin-connections" },
+  { platform: "linkedin",  service: "followers",   qty: 250, price: 16,   regular: 20,    href: "/buy-linkedin-followers" },
+  { platform: "linkedin",  service: "likes",       qty: 100, price: 9,    regular: 11.25, href: "/buy-linkedin-likes" },
+  { platform: "linkedin",  service: "comments",    qty: 50,  price: 17,   regular: 21.25, href: "/buy-linkedin-comments" },
 ];
 
 const BROWSE_LINKS: { platform: Platform; href: string; from: string }[] = [
@@ -155,6 +159,7 @@ const BROWSE_LINKS: { platform: Platform; href: string; from: string }[] = [
   { platform: "youtube", href: "/buy-youtube-subscribers", from: "$6.99" },
   { platform: "facebook", href: "/buy-facebook-followers", from: "$3.49" },
   { platform: "twitter", href: "/buy-twitter-followers", from: "$3.99" },
+  { platform: "linkedin", href: "/buy-linkedin-followers", from: "$7" },
 ];
 
 function pickSuggestions(

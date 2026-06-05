@@ -3,7 +3,7 @@ import Link from "next/link";
 import { ArrowUpRight } from "lucide-react";
 
 type Service = {
-  platformId: "instagram" | "tiktok" | "youtube" | "facebook" | "twitter";
+  platformId: "instagram" | "tiktok" | "youtube" | "facebook" | "twitter" | "linkedin";
   platformName: string;
   service: string;
   href: string;
@@ -53,6 +53,14 @@ const TwitterBrand = (
     />
   </svg>
 );
+const LinkedInBrand = (
+  <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
+    <path
+      d="M20.45 20.45h-3.55v-5.56c0-1.33-.02-3.04-1.85-3.04-1.85 0-2.14 1.45-2.14 2.94v5.66H9.36V9h3.41v1.56h.05c.48-.9 1.64-1.85 3.37-1.85 3.6 0 4.27 2.37 4.27 5.46v6.28zM5.34 7.43A2.06 2.06 0 1 1 5.34 3.3a2.06 2.06 0 0 1 0 4.13zM7.12 20.45H3.56V9h3.56v11.45z"
+      fill="#fff"
+    />
+  </svg>
+);
 
 const IG_BG = "linear-gradient(135deg,#feda77 0%,#f58529 35%,#dd2a7b 65%,#8134af 100%)";
 
@@ -72,6 +80,10 @@ const SERVICES: Service[] = [
   { platformId: "twitter",   platformName: "Twitter / X", service: "Followers", href: "/buy-twitter-followers", price: "$3.99", brand: TwitterBrand, bg: "#000" },
   { platformId: "twitter",   platformName: "Twitter / X", service: "Likes",     href: "/buy-twitter-likes",     price: "$2.49", brand: TwitterBrand, bg: "#000" },
   { platformId: "twitter",   platformName: "Twitter / X", service: "Retweets",  href: "/buy-twitter-retweets",  price: "$2.99", brand: TwitterBrand, bg: "#000" },
+  { platformId: "linkedin",  platformName: "LinkedIn",  service: "Connections", href: "/buy-linkedin-connections", price: "$8",    brand: LinkedInBrand, bg: "#0A66C2" },
+  { platformId: "linkedin",  platformName: "LinkedIn",  service: "Followers",   href: "/buy-linkedin-followers",   price: "$7",    brand: LinkedInBrand, bg: "#0A66C2" },
+  { platformId: "linkedin",  platformName: "LinkedIn",  service: "Likes",       href: "/buy-linkedin-likes",       price: "$4.50", brand: LinkedInBrand, bg: "#0A66C2" },
+  { platformId: "linkedin",  platformName: "LinkedIn",  service: "Comments",    href: "/buy-linkedin-comments",    price: "$4",    brand: LinkedInBrand, bg: "#0A66C2" },
 ];
 
 export function ServiceTable() {
