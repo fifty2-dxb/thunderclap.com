@@ -4,7 +4,7 @@ import Link from "next/link";
 import { AlertTriangle, ShieldCheck } from "lucide-react";
 
 export const metadata: Metadata = {
-  title: "Payment not completed · Thunderclap",
+  title: "Payment not completed",
   robots: { index: false, follow: false },
 };
 

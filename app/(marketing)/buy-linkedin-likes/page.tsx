@@ -17,7 +17,7 @@ const URL_PATH = "/buy-linkedin-likes/";
 const CANONICAL = `${SITE_URL}${URL_PATH}`;
 
 export const metadata: Metadata = {
-  title: "Buy LinkedIn Likes — Real, Fast, Safe · Thunderclap",
+  title: "Buy LinkedIn Likes — Real, Fast, Safe",
   description:
     "Buy real LinkedIn likes from active professional accounts. Delivery starts in 10 minutes. 30-day refill guarantee. No password required. Trusted by 200,000+ founders, recruiters, and brands.",
   alternates: { canonical: CANONICAL },

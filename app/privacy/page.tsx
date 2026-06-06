@@ -8,7 +8,7 @@ const CANONICAL = `${SITE_URL}${URL_PATH}`;
 const LAST_UPDATED = "2026-05-20";
 
 export const metadata: Metadata = {
-  title: "Privacy policy · Thunderclap",
+  title: "Privacy policy",
   description:
     "How Thunderclap collects, uses and safeguards your information. We never ask for passwords.",
   alternates: { canonical: CANONICAL },

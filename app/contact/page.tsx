@@ -19,7 +19,7 @@ const CANONICAL = `${SITE_URL}${URL_PATH}`;
 const SUPPORT_EMAIL = "support@thunderclap.com";
 
 export const metadata: Metadata = {
-  title: "Contact us · Thunderclap",
+  title: "Contact us",
   description:
     "Get in touch with Thunderclap support — 24/7 help with orders, payments, refills, refunds and security questions.",
   alternates: { canonical: CANONICAL },

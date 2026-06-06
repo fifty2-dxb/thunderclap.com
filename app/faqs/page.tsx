@@ -6,7 +6,7 @@ const URL_PATH = "/faqs/";
 const CANONICAL = `${SITE_URL}${URL_PATH}`;
 
 export const metadata: Metadata = {
-  title: "Frequently asked questions · Thunderclap",
+  title: "Frequently asked questions",
   description:
     "Everything you need to know about Thunderclap — pricing, delivery, account safety, refunds, payments and support.",
   alternates: { canonical: CANONICAL },

@@ -16,7 +16,7 @@ const URL_PATH = "/buy-tiktok-likes/";
 const CANONICAL = `${SITE_URL}${URL_PATH}`;
 
 export const metadata: Metadata = {
-  title: "Buy TikTok Likes — Real, Fast, Safe · Thunderclap",
+  title: "Buy TikTok Likes — Real, Fast, Safe",
   description:
     "Buy real TikTok likes from active users. Delivery starts in 5 minutes. 30-day refill guarantee. No password required. Trusted by 200,000+ creators.",
   alternates: { canonical: CANONICAL },

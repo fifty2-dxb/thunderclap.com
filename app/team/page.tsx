@@ -10,7 +10,7 @@ const DESCRIPTION =
   "Meet the founder and the team behind Thunderclap — the people building authentic social media growth for creators worldwide.";
 
 export const metadata: Metadata = {
-  title: "Our team · Thunderclap",
+  title: "Our team",
   description: DESCRIPTION,
   alternates: { canonical: CANONICAL },
   openGraph: {

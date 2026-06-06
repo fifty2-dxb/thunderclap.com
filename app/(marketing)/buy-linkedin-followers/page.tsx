@@ -17,7 +17,7 @@ const URL_PATH = "/buy-linkedin-followers/";
 const CANONICAL = `${SITE_URL}${URL_PATH}`;
 
 export const metadata: Metadata = {
-  title: "Buy LinkedIn Followers — Real, Fast, Safe · Thunderclap",
+  title: "Buy LinkedIn Followers — Real, Fast, Safe",
   description:
     "Buy real LinkedIn followers from active professional profiles. Delivery starts in 5 minutes. 30-day refill guarantee. No password required. Trusted by 200,000+ founders, consultants, and B2B brands.",
   alternates: { canonical: CANONICAL },

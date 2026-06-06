@@ -25,7 +25,8 @@ const URL_PATH = "/aboutus/";
 const CANONICAL = `${SITE_URL}${URL_PATH}`;
 
 export const metadata: Metadata = {
-  title: "About Thunderclap — Helping Millions Grow Social Media Profiles",
+  // Top-level <title> is short — the layout template adds " · Thunderclap".
+  title: "About us — Real social media growth",
   description:
     "For over a decade, Thunderclap has been the trusted growth partner for 4M+ creators, brands and influencers. Real engagement, no bots, no passwords.",
   alternates: { canonical: CANONICAL },

@@ -17,7 +17,7 @@ const URL_PATH = "/buy-tiktok-views/";
 const CANONICAL = `${SITE_URL}${URL_PATH}`;
 
 export const metadata: Metadata = {
-  title: "Buy TikTok Views — Real, Fast, Safe · Thunderclap",
+  title: "Buy TikTok Views — Real, Fast, Safe",
   description:
     "Buy real TikTok views for any video. Delivery starts in 5 minutes. 30-day refill guarantee. No password required. Trusted by 200,000+ creators.",
   alternates: { canonical: CANONICAL },

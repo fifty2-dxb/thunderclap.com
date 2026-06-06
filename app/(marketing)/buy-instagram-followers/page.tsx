@@ -17,7 +17,7 @@ const URL_PATH = "/buy-instagram-followers/";
 const CANONICAL = `${SITE_URL}${URL_PATH}`;
 
 export const metadata: Metadata = {
-  title: "Buy Instagram Followers — Real, Fast, Safe · Thunderclap",
+  title: "Buy Instagram Followers — Real, Fast, Safe",
   description:
     "Buy real Instagram followers from active accounts. Delivery starts in 5 minutes. 30-day refill guarantee. No password required. Trusted by 200,000+ creators.",
   alternates: { canonical: CANONICAL },

@@ -13,7 +13,7 @@ const URL_PATH = "/refund/";
 const CANONICAL = `${SITE_URL}${URL_PATH}`;
 
 export const metadata: Metadata = {
-  title: "Refund policy · Thunderclap",
+  title: "Refund policy",
   description:
     "30-day money-back guarantee. Clear eligibility, clear timelines, no surprises.",
   alternates: { canonical: CANONICAL },

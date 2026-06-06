@@ -17,7 +17,7 @@ const URL_PATH = "/buy-linkedin-comments/";
 const CANONICAL = `${SITE_URL}${URL_PATH}`;
 
 export const metadata: Metadata = {
-  title: "Buy LinkedIn Comments — Real, Fast, Safe · Thunderclap",
+  title: "Buy LinkedIn Comments — Real, Fast, Safe",
   description:
     "Buy real LinkedIn comments from active professional profiles. Delivery starts in 10 minutes. 30-day refill guarantee. No password required. Trusted by 200,000+ founders, creators, and B2B brands.",
   alternates: { canonical: CANONICAL },

@@ -6,7 +6,7 @@ import { ShieldCheck } from "lucide-react";
 import { ReturnPoll } from "./_poll";
 
 export const metadata: Metadata = {
-  title: "Confirming payment · Thunderclap",
+  title: "Confirming payment",
   robots: { index: false, follow: false },
 };
 

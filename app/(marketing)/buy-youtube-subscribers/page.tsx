@@ -16,7 +16,7 @@ const URL_PATH = "/buy-youtube-subscribers/";
 const CANONICAL = `${SITE_URL}${URL_PATH}`;
 
 export const metadata: Metadata = {
-  title: "Buy YouTube Subscribers — Real, Safe, Monetization-Ready · Thunderclap",
+  title: "Buy YouTube Subscribers — Real, Safe, Monetization-Ready",
   description:
     "Buy real YouTube subscribers from active accounts. 30-day refill guarantee, no password required. Counts toward the 1,000-sub YPP threshold. Trusted by 200,000+ creators.",
   alternates: { canonical: CANONICAL },

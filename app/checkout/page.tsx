@@ -5,7 +5,7 @@ import { ArrowLeft, ShieldCheck } from "lucide-react";
 import { CheckoutFlow } from "./_form";
 
 export const metadata: Metadata = {
-  title: "Secure checkout · Thunderclap",
+  title: "Secure checkout",
   description: "Complete your Thunderclap order — fast, safe, no password required.",
   robots: { index: false, follow: false },
 };

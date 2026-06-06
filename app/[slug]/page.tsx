@@ -25,11 +25,23 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const { slug } = await params;
   const post = getPost(slug);
-  if (!post) return { title: "Not found · Thunderclap" };
+  if (!post) return { title: "Not found" };
 
   const canonical = `${SITE_URL}/${post.slug}/`;
+  // Smart-truncate the SEO <title> so total (incl. the " · Thunderclap" suffix
+  // appended by the root layout title.template) stays ≤ 60 chars. OG and Twitter
+  // titles keep the full post.title since social previews allow more room.
+  const SUFFIX_LEN = " · Thunderclap".length;
+  const MAX_TITLE = 60 - SUFFIX_LEN; // 46
+  let seoTitle = post.title;
+  if (seoTitle.length > MAX_TITLE) {
+    const cut = seoTitle.slice(0, MAX_TITLE);
+    const sp = cut.lastIndexOf(" ");
+    seoTitle =
+      (sp > MAX_TITLE - 18 ? cut.slice(0, sp) : cut).replace(/[\s,;:.–—-]+$/, "") + "…";
+  }
   return {
-    title: `${post.title} · Thunderclap`,
+    title: seoTitle,
     description: post.description,
     alternates: { canonical },
     openGraph: {

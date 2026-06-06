@@ -17,7 +17,7 @@ const URL_PATH = "/buy-facebook-followers/";
 const CANONICAL = `${SITE_URL}${URL_PATH}`;
 
 export const metadata: Metadata = {
-  title: "Buy Facebook Followers — Real, Fast, Safe · Thunderclap",
+  title: "Buy Facebook Followers — Real, Fast, Safe",
   description:
     "Buy real Facebook followers for your Page or profile. Delivery starts in 5 minutes. 30-day refill guarantee. No password required. Trusted by 200,000+ creators and brands.",
   alternates: { canonical: CANONICAL },

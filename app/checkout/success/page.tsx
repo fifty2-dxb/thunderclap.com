@@ -5,7 +5,7 @@ import { Check, ShieldCheck } from "lucide-react";
 import { formatQty } from "@/lib/utils";
 
 export const metadata: Metadata = {
-  title: "Order received · Thunderclap",
+  title: "Order received",
   description: "Your Thunderclap order is confirmed and queued for delivery.",
   robots: { index: false, follow: false },
 };

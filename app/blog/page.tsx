@@ -21,10 +21,12 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const page = pageFromParam((await searchParams).page);
   const canonical = page > 1 ? `${CANONICAL}?page=${page}` : CANONICAL;
+  // No " · Thunderclap" suffix here — the root layout's title.template
+  // (`"%s · Thunderclap"`) appends it once; adding it explicitly doubles up.
   const title =
     page > 1
-      ? `Blog (page ${page}) — Growth playbooks · Thunderclap`
-      : "Blog — Growth playbooks for Instagram, TikTok & YouTube · Thunderclap";
+      ? `Blog (page ${page}) — Growth playbooks`
+      : "Blog — Growth playbooks for every platform";
   const description =
     "Practical, no-fluff growth playbooks for creators and brands building on Instagram, TikTok, YouTube, Facebook and X. Real tactics, no shortcuts that get you banned.";
   return {

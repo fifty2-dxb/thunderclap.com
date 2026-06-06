@@ -17,7 +17,7 @@ const URL_PATH = "/buy-youtube-views/";
 const CANONICAL = `${SITE_URL}${URL_PATH}`;
 
 export const metadata: Metadata = {
-  title: "Buy YouTube Views — Real, Watch-Time Counted · Thunderclap",
+  title: "Buy YouTube Views — Real, Watch-Time Counted",
   description:
     "Buy real YouTube views from active users. 30s+ watch sessions count toward your 4,000-watch-hour YPP threshold. Delivery starts in 15 minutes. No password required.",
   alternates: { canonical: CANONICAL },

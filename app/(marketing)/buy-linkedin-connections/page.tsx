@@ -17,7 +17,7 @@ const URL_PATH = "/buy-linkedin-connections/";
 const CANONICAL = `${SITE_URL}${URL_PATH}`;
 
 export const metadata: Metadata = {
-  title: "Buy LinkedIn Connections — Real, Fast, Safe · Thunderclap",
+  title: "Buy LinkedIn Connections — Real, Fast, Safe",
   description:
     "Buy real LinkedIn connections from active, complete profiles. Delivery starts in 30 minutes. 30-day refill guarantee. No password required. Trusted by 200,000+ professionals, founders, and B2B teams.",
   alternates: { canonical: CANONICAL },

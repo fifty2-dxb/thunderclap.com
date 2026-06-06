@@ -16,7 +16,7 @@ const URL_PATH = "/buy-youtube-likes";
 const CANONICAL = `${SITE_URL}${URL_PATH}`;
 
 export const metadata: Metadata = {
-  title: "Buy YouTube Likes — Real, Engagement-Boosting · Thunderclap",
+  title: "Buy YouTube Likes — Real, Engagement-Boosting",
   description:
     "Buy real YouTube likes from active users. Boost your video's engagement ratio and signal quality to the algorithm. Delivery starts in 5 minutes. No password required.",
   alternates: { canonical: CANONICAL },
