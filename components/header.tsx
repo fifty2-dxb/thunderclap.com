@@ -160,8 +160,14 @@ export function Header() {
         top: 0,
         zIndex: 30,
         background: scrolled ? "rgba(255,255,255,0.92)" : "#fff",
-        backdropFilter: scrolled ? "blur(16px) saturate(180%)" : "none",
-        WebkitBackdropFilter: scrolled ? "blur(16px) saturate(180%)" : "none",
+        // CSS gotcha: backdrop-filter on this <header> creates a containing
+        // block for ALL position:fixed descendants — which means the mobile
+        // sheet (rendered inside <header> as `position: fixed; inset: 0`)
+        // gets clipped to the header's bounds when scrolled, not the viewport.
+        // Turning it off while the sheet is open keeps the sheet full-screen;
+        // it's a transient state so the frosted-glass effect isn't missed.
+        backdropFilter: scrolled && !mobileOpen ? "blur(16px) saturate(180%)" : "none",
+        WebkitBackdropFilter: scrolled && !mobileOpen ? "blur(16px) saturate(180%)" : "none",
         borderBottom: "1px solid var(--uv-line)",
         transition: "background 200ms ease",
       }}
