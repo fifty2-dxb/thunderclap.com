@@ -38,8 +38,7 @@ Social media growth marketing site (Instagram / TikTok / YouTube / Facebook / Tw
 | `/api/checkout/session` | POST — accepts `{ items: [{ platform, service, qty, price, premium, target }, ...], email }` (with legacy single-item body still supported for back-compat). Sums totals, builds Redlap metadata with `items[]` + `smmDataItems[]` (and a flat `smmData` when there's exactly one mapped item, for legacy Redlap fulfillment code paths). The gateway `description` is intentionally the generic string **`"Product Purchase"`** — the platform/service breakdown is sent only via `summaryItems` (rendered on the Redlap payment page) and in metadata (for fulfilment), never in the description. Returns `{ sessionId, redirectUrl, orderId }`. |
 | `/api/checkout/status` | GET `?sid=…` — returns `{ status: "pending"\|"paid"\|"failed"\|"expired" }`. Reads from the in-process webhook cache, falls back to Redlap's `GET /api/payments/sessions/:id`. |
 | `/api/redlap/webhook` | POST — verifies `X-Webhook-Signature` HMAC-SHA256 and records the outcome in the in-process cache. On the first `payment.completed` for a session it fires the WebEngage **`Checkout Completed`** conversion server-side (reads email/items/total back from the Redlap session metadata; deduped via the status cache; wrapped so it never breaks the 200 ack). **No fulfillment** — that lives inside the Redlap environment. |
-| `/api/webengage/track` | POST — accepts `{ eventName, eventData?, userId? }` from the client and fire-and-forgets it to the WebEngage events REST API via `lib/webengage.ts`. Returns `{ ok: true }` immediately; never blocks the caller on WebEngage. |
-| `/api/webengage/user` | POST — accepts a `WebEngageUser` body (`{ userId\|anonymousId, firstName?, lastName?, email?, phone?, attributes?, … }`) and fire-and-forgets it to the WebEngage Users REST API via `lib/webengage.ts` `trackUser`. Requires `userId` or `anonymousId`. Returns `{ ok: true }` immediately. |
+| WebEngage client tracking | **No proxy route** — the browser talks to the WebEngage JS SDK directly (`window.webengage`); the SDK loader is injected in `app/layout.tsx`. The only server-side WebEngage call is `Checkout Completed` from the Redlap webhook. |
 | `/blog` | **Built** — index hub listing every post (featured + grid). |
 | `/{slug}/` (root) | **Built** — `app/[slug]/page.tsx` serves all blog posts at their original root-level slug (NOT under `/blog/`) to preserve legacy WordPress rankings. 544 posts imported from the live WP REST API (`scripts/import-wp-blog.mjs` → `content/blog-imported.json`) + 3 hand-written. `dynamicParams=false` so unknown slugs 404; static routes (`/buy-*`, `/aboutus`, `/blog`, …) take precedence over this segment. |
 | `/aboutus/`, `/team/`, `/faqs/`, `/contact/`, `/refund/`, `/privacy/` | **Built** — ported from the legacy thunderclap.com WordPress site (DR-72) to preserve their indexed URLs. All carry a trailing slash to match the legacy URLs exactly (Google has them indexed that way). |
@@ -77,9 +76,7 @@ app/
     contact/route.ts                  contact form → nodemailer + Zoho SMTP
     checkout/session/route.ts         create Redlap session
     checkout/status/route.ts          poll status
-    redlap/webhook/route.ts           inbound Redlap webhook (HMAC verified)
-    webengage/track/route.ts          forwards client events → WebEngage REST API
-    webengage/user/route.ts           forwards client identify calls → WebEngage Users API
+    redlap/webhook/route.ts           inbound Redlap webhook (HMAC verified) — also fires the server-side WebEngage Checkout Completed
 components/
   header.tsx                          desktop platform tabs + mega-menu trigger + full-screen mobile sheet
   mega-menu.tsx                       (client) desktop dropdown panel: sidebar + 2-col service cards
@@ -94,8 +91,8 @@ lib/
   utils.ts                            cn() + formatQty()
   redlap.ts                           Redlap API client + HMAC verifier
   redlap-status-cache.ts              in-process Map of session → outcome
-  webengage.ts                        server-side WebEngage REST client (trackEvent / trackUser) + WE_EVENTS names
-  webengage-client.ts                 client-side track* helpers → POST /api/webengage/track
+  webengage.ts                        server-side WebEngage REST client (trackEvent for the webhook's Checkout Completed) + WE_EVENTS names
+  webengage-client.ts                 client-side track* helpers → WebEngage JS SDK (window.webengage)
 content/
   packages.ts                         EMPTY STUB — see Build status note
   faqs.ts                             global FAQ content (homepage)
@@ -431,13 +428,15 @@ Currently mapped: `tiktok-followers: 5818`, `tiktok-likes: 1126`, `tiktok-views:
 
 ## WebEngage event tracking
 
-Behavioural analytics is wired through WebEngage's REST API. The flow is always **client helper → `POST /api/webengage/{track,user}` → WebEngage REST API** — the browser never calls WebEngage directly (keeps the API key server-side, dodges CORS). Events go through `/api/webengage/track`; user-profile creates/updates go through `/api/webengage/user`.
+Behavioural analytics runs through **two separate channels**:
+1. **Client-side → WebEngage JS SDK** (the primary path). The SDK loader (the official `_webengage_script_tag` snippet) is injected in `app/layout.tsx` via a `next/script` (`afterInteractive`), gated on `NEXT_PUBLIC_WEBENGAGE_LICENSE_CODE`. It exposes a queue-backed `window.webengage` **synchronously**, so calls made before the SDK finishes downloading are buffered, not dropped. All client `track*` helpers call `webengage.track(...)` directly in the browser; identity uses `webengage.user.login(...)` + `webengage.user.setAttribute(...)`. We moved off the REST proxy on the client because the REST events/users API wasn't attributing correctly — the old `/api/webengage/{track,user}` proxy routes and the browser `localStorage` userId scheme were removed.
+2. **Server-side → WebEngage REST events API** (one event only). The Redlap webhook (`app/api/redlap/webhook`) fires `Checkout Completed` server-side via `lib/webengage.ts` `trackEvent` (keyed by `userId: email`) so the conversion lands even if the buyer never returns to the site. This is the only server-side WebEngage call.
 
-**Identity model — everything is keyed by `userId` (NOT `anonymousId`).** Each browser gets a stable id in `localStorage` under `tc:we_user_id` (migrated from the older `tc:we_anon_id` key if present, format `anon_<ts>_<rand>`). That id is sent as the **`userId`** on every event. The moment a visitor identifies (gives their email — newsletter, AI waitlist), `identifyUser({ email, … })` **promotes** the stored id to their email so all subsequent events stay under one user, and POSTs their profile to the Users API. WebEngage's events API rejects/ignores `anonymousId` for us, so we never send it — the previous `anonymousId` wiring was removed.
+**Identity model.** The SDK manages identity. Before a visitor is known, the SDK uses its own anonymous CUID. The moment they identify (email captured — newsletter, AI waitlist), `identifyUser({ email, … })` calls `webengage.user.login(email)` and writes the reserved profile attributes, so all subsequent events tie to one user. (Note: events fired before `login` sit under the SDK's anonymous CUID; the SDK merges that anonymous history into the logged-in user automatically — this is the main reason we use the SDK over the REST API.)
 
 **Two modules:**
-- `lib/webengage.ts` — server-only. `trackEvent({ userId?, anonymousId?, eventName, eventTime?, eventData? })` POSTs to `${WEBENGAGE_API_HOST}/v1/accounts/${WEBENGAGE_LICENSE_CODE}/events` with a `Bearer ${WEBENGAGE_API_KEY}` header. `trackUser(user: WebEngageUser)` POSTs to the `/users` endpoint — it puts the reserved **system attributes** (`firstName`, `lastName`, `email`, `phone`, `birthDate`, `gender`, `company`, `emailOptIn`, `smsOptIn`, `whatsappOptIn`, `hashedEmail`, `hashedPhone`) at the top level and nests everything else under an `attributes` object (per the Users API contract — custom attributes must NOT be flattened to the top level). Requires `userId` **or** `anonymousId` (userId wins); supports an optional `requestId` → `x-request-id` idempotency header (WebEngage dedupes within 4h). Both `trackEvent`/`trackUser` **return `false` instead of throwing** when credentials are missing or the call fails — analytics must never break a request. Exports `WE_EVENTS` (canonical event-name constants) and the `WebEngageUser` type.
-- `lib/webengage-client.ts` — `"use client"` helpers. Each `track*` function builds the right `eventData` shape and fire-and-forgets a `fetch` to `/api/webengage/track`, keyed by the stable browser `userId` (or an explicit `userId: email` override). `identifyUser({ email, firstName?, lastName?, phone?, attributes? })` promotes the stored id to the email and POSTs to `/api/webengage/user`. It's called automatically inside `trackNewsletterSubscribed` and `trackAiWaitlistJoined` so the user profile is created right when those events fire.
+- `lib/webengage.ts` — **server-only**, used solely by the Redlap webhook for the `Checkout Completed` conversion. `trackEvent({ userId?, anonymousId?, eventName, eventTime?, eventData? })` POSTs to `${WEBENGAGE_API_HOST}/v1/accounts/${WEBENGAGE_LICENSE_CODE}/events` with a `Bearer ${WEBENGAGE_API_KEY}` header. Returns `false` instead of throwing when credentials are missing or the call fails — analytics must never break a request. Exports `WE_EVENTS` (canonical event-name constants).
+- `lib/webengage-client.ts` — `"use client"` helpers calling the JS SDK. `trackEvent({ eventName, eventData? })` → `window.webengage.track(eventName, eventData)` (no-op if the SDK is absent). `identifyUser({ email, firstName?, lastName?, phone?, attributes? })` → `webengage.user.login(email)` then `webengage.user.setAttribute(key, value)` **one pair at a time** (the SDK does NOT accept an attributes object) using the reserved keys `we_email` / `we_first_name` / `we_last_name` / `we_phone` (custom attrs passed straight through). It's called automatically inside `trackNewsletterSubscribed` and `trackAiWaitlistJoined`.
 
 **Event catalogue** (names must match the WebEngage dashboard exactly — note the capital-N `NewsLetter`):
 
@@ -459,9 +458,10 @@ Behavioural analytics is wired through WebEngage's REST API. The flow is always 
 The last five helpers exist with the correct `eventData` contract but aren't called from any component yet — wire them to the relevant click/view handlers when those surfaces get tracked.
 
 **Env vars** (in `.env.example`, must be baked into `.env.production` via `amplify.yml` like the Redlap ones — Amplify console env vars don't reach the SSR runtime):
-- `WEBENGAGE_API_HOST` — defaults to `https://api.webengage.com`
-- `WEBENGAGE_LICENSE_CODE` — account license code (part of the events URL)
-- `WEBENGAGE_API_KEY` — REST API bearer token
+- `WEBENGAGE_API_HOST` — defaults to `https://api.webengage.com` (server REST, webhook only)
+- `WEBENGAGE_LICENSE_CODE` — account license code (server REST events URL)
+- `WEBENGAGE_API_KEY` — REST API bearer token (server only)
+- `NEXT_PUBLIC_WEBENGAGE_LICENSE_CODE` — **client** JS SDK license code; injected into the SDK loader in `app/layout.tsx`. Must be set (and baked via `amplify.yml`) or the SDK won't load and no client events fire.
 
 When credentials are absent the server client silently no-ops (logs a skip line in dev), so the site runs fine locally without WebEngage configured.
 
@@ -512,7 +512,7 @@ These are the patterns worth lifting wholesale when standing up a similar site:
 12. **SSH-only git remote** for agent sessions — HTTPS push fails silently. `git remote set-url origin git@github.com:org/repo.git` once.
 13. **Service-tab strip as navigation** — `<Link href>` not `<button onClick>`. Local tab-state without page navigation is a UX trap: prices don't change, copy doesn't change, only the highlight does, and users get confused.
 14. **Three sources of truth for service pricing** (PACKAGES in `_builder.tsx`, mega-menu `fromPrice` in `mega-menu.tsx`, and the cart drawer's `SUGGESTION_POOL`/`BROWSE_LINKS` in `cart-drawer.tsx`) must stay in sync. The lowest tier of PACKAGES is the `fromPrice`/`from`; the cart `SUGGESTION_POOL` mirrors a specific tier per service. Until you centralise into `content/packages.ts`, every price change touches three files. (A 4th — the homepage `service-table.tsx` — was removed 2026-06.)
-15. **WebEngage event tracking** (`lib/webengage.ts` server client + `lib/webengage-client.ts` browser helpers + `/api/webengage/track` proxy). Client never calls WebEngage directly — key stays server-side. Anonymous id in `localStorage`, fire-and-forget fetches, server client no-ops without credentials. Drop-in: swap the `eventData` shapes in `webengage-client.ts` for the new site's event schema.
+15. **WebEngage event tracking** — client-side via the **JS SDK** (`window.webengage.track` / `webengage.user.login` in `lib/webengage-client.ts`; SDK loader injected in `app/layout.tsx`, gated on `NEXT_PUBLIC_WEBENGAGE_LICENSE_CODE`) plus a server-side REST fallback (`lib/webengage.ts`) for the one conversion that must fire even if the buyer leaves (the Redlap webhook's `Checkout Completed`). Drop-in: swap the `eventData` shapes in `webengage-client.ts` for the new site's event schema. (Earlier we tried a pure-REST proxy approach — `/api/webengage/{track,user}` — but the REST API didn't attribute anonymous→identified history correctly, so the SDK is the client path.)
 
 ## Workflow rule: keep CLAUDE.md in sync
 

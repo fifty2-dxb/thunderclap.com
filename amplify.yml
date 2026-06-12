@@ -25,6 +25,7 @@ frontend:
             WEBENGAGE_API_HOST \
             WEBENGAGE_LICENSE_CODE \
             WEBENGAGE_API_KEY \
+            NEXT_PUBLIC_WEBENGAGE_LICENSE_CODE \
             ZOHO_EMAIL \
             ZOHO_PASSWORD \
             CONTACT_TO \

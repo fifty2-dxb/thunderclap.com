@@ -1,67 +1,46 @@
 /**
- * Client-side WebEngage event tracking utilities.
- * Events are sent to /api/webengage/track which forwards to WebEngage REST API.
+ * Client-side WebEngage tracking via the in-browser JS SDK.
+ * The SDK is loaded in app/layout.tsx (the `_webengage_script_tag` snippet),
+ * which exposes a queue-backed `window.webengage` synchronously — so calls
+ * made before the SDK finishes downloading are buffered, not dropped.
  */
 
 import type { Platform, Service } from "@/components/cart-context";
 
+type WebEngageUserApi = {
+  login: (userId: string) => void;
+  logout: () => void;
+  // The SDK's setAttribute takes one key/value pair at a time, not an object.
+  setAttribute: (key: string, value: unknown) => void;
+};
+
+type WebEngageSDK = {
+  track: (eventName: string, eventData?: Record<string, unknown>) => void;
+  user: WebEngageUserApi;
+};
+
+declare global {
+  interface Window {
+    webengage?: WebEngageSDK;
+  }
+}
+
 export type TrackEventPayload = {
   eventName: string;
   eventData?: Record<string, string | number | boolean | null | undefined>;
-  userId?: string;
 };
 
-const USER_ID_KEY = "tc:we_user_id";
-
-/**
- * Get the stable WebEngage userId for this browser. Once a visitor identifies
- * (email captured), that id is promoted to their email via `setUserId` so all
- * subsequent events stay under one user. Until then it's a stable random id.
- * WebEngage's events API is keyed by `userId` (not `anonymousId`) for us.
- */
-function getUserId(): string {
-  if (typeof window === "undefined") return "";
-  let id = localStorage.getItem(USER_ID_KEY);
-  if (!id) {
-    // Migrate any pre-existing anonymous id so we don't fork the profile.
-    id = localStorage.getItem("tc:we_anon_id");
-    if (!id) id = `anon_${Date.now()}_${Math.random().toString(36).slice(2, 11)}`;
-    localStorage.setItem(USER_ID_KEY, id);
-  }
-  return id;
-}
-
-/** Promote this browser to a known userId (the email) once they identify. */
-function setUserId(userId: string): void {
-  if (typeof window === "undefined" || !userId) return;
-  localStorage.setItem(USER_ID_KEY, userId);
-}
-
-/**
- * Track an event client-side by posting to our API route.
- * Fire-and-forget — doesn't block UI. Always keyed by `userId`.
- */
+/** Track an event through the WebEngage JS SDK. No-ops if the SDK is absent. */
 export function trackEvent(payload: TrackEventPayload): void {
-  const userId = payload.userId || getUserId();
-
-  console.log("[WebEngage]", payload.eventName, payload.eventData ?? {});
-
-  fetch("/api/webengage/track", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({
-      ...payload,
-      userId,
-    }),
-  }).catch(() => {
-    // Silent fail — analytics shouldn't break the app
-  });
+  if (typeof window === "undefined" || !window.webengage) return;
+  window.webengage.track(payload.eventName, payload.eventData ?? {});
 }
 
 /**
- * Create/update the WebEngage user profile (Users API) and promote this
- * browser's userId to the supplied email so future events tie to the same
- * user. Call this the moment a visitor gives their details.
+ * Identify the current visitor: log them in under their email (so every
+ * subsequent event ties to one user) and write the reserved WebEngage profile
+ * attributes (`we_first_name` / `we_last_name` / `we_email` / `we_phone`).
+ * Call this the moment a visitor gives their details.
  */
 export function identifyUser(data: {
   email: string;
@@ -70,16 +49,19 @@ export function identifyUser(data: {
   phone?: string;
   attributes?: Record<string, string | number | boolean | null>;
 }): void {
-  const userId = data.email || getUserId();
-  setUserId(userId);
+  if (typeof window === "undefined" || !window.webengage) return;
+  const we = window.webengage;
+  we.user.login(data.email);
 
-  fetch("/api/webengage/user", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ userId, ...data }),
-  }).catch(() => {
-    // Silent fail — analytics shouldn't break the app
-  });
+  we.user.setAttribute("we_email", data.email);
+  if (data.firstName) we.user.setAttribute("we_first_name", data.firstName);
+  if (data.lastName) we.user.setAttribute("we_last_name", data.lastName);
+  if (data.phone) we.user.setAttribute("we_phone", data.phone);
+  if (data.attributes) {
+    for (const [key, value] of Object.entries(data.attributes)) {
+      we.user.setAttribute(key, value);
+    }
+  }
 }
 
 // Event tracking functions matching WebEngage dashboard events
@@ -187,7 +169,6 @@ export function trackNewsletterSubscribed(email: string): void {
     eventData: {
       Email: email,
     },
-    userId: email,
   });
 }
 
@@ -240,7 +221,6 @@ export function trackAiWaitlistJoined(data: {
       "Last Name": data.lastName,
       Email: data.email,
     },
-    userId: data.email,
   });
 }
 
@@ -275,6 +255,5 @@ export function trackCheckoutCompleted(data: {
       "Item Count": data.items.length,
       Products: data.items.map((i) => `${i.platform}-${i.service}`).join(","),
     },
-    userId: data.email,
   });
 }
