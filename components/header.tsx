@@ -45,6 +45,7 @@ const NAV: NavItem[] = [
     label: "YouTube",
     submenu: [
       { label: "Buy YouTube Subscribers", href: "/buy-youtube-subscribers" },
+      { label: "Buy YouTube Likes", href: "/buy-youtube-likes" },
       { label: "Buy YouTube Views", href: "/buy-youtube-views" },
     ],
   },
