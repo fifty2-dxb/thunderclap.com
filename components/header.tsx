@@ -215,7 +215,7 @@ export function Header() {
           />
         </Link>
         <nav className="hdr-desktop-nav">
-          {NAV.map((it) => {
+          {NAV.filter((it) => it.id !== "ai").map((it) => {
             const isActive = active === it.id;
             const isPlatform = isPlatformId(it.id);
             const labelStyle = {
@@ -230,22 +230,6 @@ export function Header() {
               textDecoration: "none" as const,
               fontSize: 14,
             };
-            if (it.id === "ai") {
-              return (
-                <button
-                  key={it.id}
-                  type="button"
-                  onClick={() => {
-                    gaTopMenuClick(it.label);
-                    openWaitlist("header-nav");
-                  }}
-                  style={{ ...labelStyle, gap: 5, background: "transparent", border: "none" }}
-                >
-                  <Sparkles size={14} color="var(--uv-pink)" />
-                  <span>{it.label}</span>
-                </button>
-              );
-            }
             if (isPlatform) {
               const platformDef = MEGA_PLATFORMS.find((p) => p.id === it.id)!;
               return (
