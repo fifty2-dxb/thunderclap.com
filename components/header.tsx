@@ -153,13 +153,26 @@ export function Header() {
   const toggleMobileSection = (id: string) =>
     setExpandedMobileId((cur) => (cur === id ? null : id));
 
+  // Soft Bolt glow gradient — copied from `.soft-hero` so the header reads as an
+  // extension of the hero glow. The radials' bright top edge washes the bar in
+  // soft blue from the top corners; the linear base carries the pale-blue tint.
+  const glowTop =
+    "radial-gradient(900px 500px at 12% -10%, #e4ecfc 0%, transparent 55%)," +
+    "radial-gradient(820px 540px at 100% 0%, #dfe9fc 0%, transparent 58%)," +
+    "linear-gradient(180deg, #f3f7fd 0%, #eef3fb 100%)";
+  // Scrolled: same glow but over translucent white so it frosts over page content.
+  const glowScrolled =
+    "radial-gradient(900px 500px at 12% -10%, rgba(228,236,252,0.92) 0%, transparent 55%)," +
+    "radial-gradient(820px 540px at 100% 0%, rgba(223,233,252,0.92) 0%, transparent 58%)," +
+    "rgba(247,250,255,0.82)";
+
   return (
     <header
       style={{
         position: "sticky",
         top: 0,
         zIndex: 30,
-        background: scrolled ? "rgba(255,255,255,0.92)" : "#fff",
+        background: scrolled ? glowScrolled : glowTop,
         // CSS gotcha: backdrop-filter on this <header> creates a containing
         // block for ALL position:fixed descendants — which means the mobile
         // sheet (rendered inside <header> as `position: fixed; inset: 0`)
@@ -168,8 +181,9 @@ export function Header() {
         // it's a transient state so the frosted-glass effect isn't missed.
         backdropFilter: scrolled && !mobileOpen ? "blur(16px) saturate(180%)" : "none",
         WebkitBackdropFilter: scrolled && !mobileOpen ? "blur(16px) saturate(180%)" : "none",
-        borderBottom: "1px solid var(--uv-line)",
-        transition: "background 200ms ease",
+        borderBottom: "1px solid rgba(59,118,246,0.10)",
+        boxShadow: scrolled ? "0 8px 28px rgba(59,118,246,0.10)" : "none",
+        transition: "background 200ms ease, box-shadow 200ms ease",
       }}
     >
       <div

@@ -145,6 +145,8 @@ When adding new sections, target ≤ 640px viewport — that's where the bugs hi
 - `.hdr-desktop-cta` — "Track order" + "Get Started" buttons — same behavior
 - `.hdr-mobile-toggle` — hamburger button — `display: none` default, `display: inline-flex` at ≤980
 
+**Header background is the Soft Bolt glow gradient** (inline on the `<header>` via the `glowTop` / `glowScrolled` consts in `header.tsx`) — copied from `.soft-hero` (two radial blue glows `#e4ecfc`/`#dfe9fc` over a `linear-gradient(180deg, #f3f7fd → #eef3fb)`) so the bar reads as an extension of the hero glow site-wide, NOT flat white. Scrolled state swaps to the same glow over translucent white (`rgba(247,250,255,0.82)`) + `backdrop-filter: blur(16px)` so it frosts over page content, plus a soft blue drop shadow. Border-bottom is a faint blue `rgba(59,118,246,0.10)` (not the grey `--uv-line`) so it doesn't break the glow. Keep these three (top bg, scrolled bg, border) in sync with the `.soft-hero` gradient if that ever changes.
+
 **Inline `style={{ display: ... }}` on these elements is a bug** — it'll beat the `@media display: none` override and the chrome won't hide. Layout props live in the CSS class, not the JSX.
 
 **Active state**: `activeIdForPath(pathname)` returns one of `instagram | tiktok | youtube | facebook | twitter | blog | null`; the matching top tab gets `color: var(--uv-pink)` and `font-weight: 700`.
