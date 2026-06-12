@@ -66,8 +66,8 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <svg width="0" height="0" style={{ position: "absolute" }} aria-hidden="true">
           <defs>
             <linearGradient id="uv-icon-grad" x1="0" y1="0" x2="1" y2="1">
-              <stop offset="0%" stopColor="#ef4655" />
-              <stop offset="100%" stopColor="#d8344a" />
+              <stop offset="0%" stopColor="#3b76f6" />
+              <stop offset="100%" stopColor="#2257d8" />
             </linearGradient>
           </defs>
         </svg>

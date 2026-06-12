@@ -5,37 +5,42 @@
    Ported from the Claude Design handoff (styles.css)
    ============================================================ */
 @theme {
-  --color-uv-pink:        #ef4655;
-  --color-uv-pink-deep:   #d8344a;
-  --color-uv-pink-hot:    #f25665;
-  --color-uv-pink-soft:   #fff1ef;
-  --color-uv-pink-bg:     #fde6e3;
-  --color-uv-pink-chip:   #fcdfdc;
-  --color-uv-blue:        #4a86c9;
-  --color-uv-cyan:        #6db4e8;
-  --color-uv-magenta:     #c83a55;
+  /* Brand theme refreshed 2026-06 — coral → blue palette. Variable NAMES are
+     preserved (--color-uv-pink etc. now hold blue hexes) so every component
+     style picks up the new colour without touching .tsx files. */
+  --color-uv-pink:        #3b76f6;
+  --color-uv-pink-deep:   #2257d8;
+  --color-uv-pink-hot:    #6ea0ff;
+  --color-uv-pink-soft:   #eef4ff;
+  --color-uv-pink-bg:     #dbe8ff;
+  --color-uv-pink-chip:   #c9dcff;
+  --color-uv-blue:        #3d7bf7;
+  --color-uv-cyan:        #56b6f5;
+  --color-uv-magenta:     #5e96f5;
+  --color-uv-violet:      #3b76f6;
+  --color-uv-violet-deep: #2257d8;
 
   --color-uv-bg:          #ffffff;
-  --color-uv-bg-lavender: #f5f3ee;
-  --color-uv-bg-alt:      #f7f8fb;
-  --color-uv-bg-tint:     #f1f3f9;
+  --color-uv-bg-lavender: #f3f6fd;
+  --color-uv-bg-alt:      #f6f8fc;
+  --color-uv-bg-tint:     #eef2fb;
   --color-uv-card:        #ffffff;
-  --color-uv-line:        #ebedf2;
-  --color-uv-line-soft:   #f1f3f7;
-  --color-uv-line-strong: #d8dbe3;
-  --color-uv-faq-bg:      #f0f1f4;
-  --color-uv-faq-active:  #1a1f2b;
+  --color-uv-line:        #e7ecf5;
+  --color-uv-line-soft:   #f0f3fa;
+  --color-uv-line-strong: #d7deec;
+  --color-uv-faq-bg:      #eef2fa;
+  --color-uv-faq-active:  #1a2238;
 
-  --color-uv-ink:         #181d28;
-  --color-uv-ink-2:       #20263a;
-  --color-uv-ink-3:       #2b3247;
+  --color-uv-ink:         #1a2238;
+  --color-uv-ink-2:       #232c45;
+  --color-uv-ink-3:       #303a57;
 
-  --color-uv-fg-1:        #181d28;
-  --color-uv-fg-2:        #4a5163;
-  --color-uv-fg-3:        #6f7686;
-  --color-uv-fg-4:        #a0a6b6;
+  --color-uv-fg-1:        #1a2238;
+  --color-uv-fg-2:        #565f72;
+  --color-uv-fg-3:        #8b94a3;
+  --color-uv-fg-4:        #b3bccb;
 
-  --color-uv-success:     #16a36a;
+  --color-uv-success:     #0fa968;
   --color-uv-success-text:#0ec377;
   --color-uv-warning:     #f5a524;
   --color-uv-danger:      #e0264c;
@@ -47,63 +52,67 @@
 }
 
 :root {
-  /* ---------- gradients ---------- */
-  --uv-pink:        #ef4655;
-  --uv-pink-deep:   #d8344a;
-  --uv-pink-hot:    #f25665;
-  --uv-pink-soft:   #fff1ef;
-  --uv-pink-bg:     #fde6e3;
-  --uv-pink-chip:   #fcdfdc;
-  --uv-blue:        #4a86c9;
-  --uv-cyan:        #6db4e8;
-  --uv-magenta:     #c83a55;
+  /* ---------- brand colours (blue theme, 2026-06) ---------- */
+  --uv-pink:        #3b76f6;
+  --uv-pink-deep:   #2257d8;
+  --uv-pink-hot:    #6ea0ff;
+  --uv-pink-soft:   #eef4ff;
+  --uv-pink-bg:     #dbe8ff;
+  --uv-pink-chip:   #c9dcff;
+  --uv-blue:        #3d7bf7;
+  --uv-cyan:        #56b6f5;
+  --uv-magenta:     #5e96f5;
+  --uv-violet:      #3b76f6;
+  --uv-violet-deep: #2257d8;
 
-  --uv-gradient:           linear-gradient(135deg, #ef4655 0%, #f47286 50%, #d8344a 100%);
-  --uv-gradient-soft:      linear-gradient(135deg, rgba(239,70,85,0.10) 0%, rgba(216,52,74,0.10) 100%);
-  --uv-gradient-button:    linear-gradient(92deg, #ef4655 0%, #d8344a 100%);
-  --uv-gradient-text:      linear-gradient(92deg, #ef4655 0%, #d8344a 100%);
-  --uv-gradient-button-hover: linear-gradient(92deg, #d8344a 0%, #c0263d 100%);
+  --uv-gradient:           linear-gradient(120deg, #3f7bf6 0%, #2f66ec 100%);
+  --uv-gradient-soft:      linear-gradient(135deg, rgba(59,118,246,0.07) 0%, rgba(59,118,246,0.07) 100%);
+  --uv-gradient-button:    #3b76f6;
+  --uv-gradient-text:      linear-gradient(95deg, #2f66ec 0%, #3b76f6 100%);
+  --uv-gradient-button-hover: #2f66ec;
 
   --uv-bg:           #ffffff;
-  --uv-bg-lavender:  #f5f3ee;
-  --uv-bg-alt:       #f7f8fb;
-  --uv-bg-tint:      #f1f3f9;
+  --uv-bg-lavender:  #f3f6fd;
+  --uv-bg-alt:       #f6f8fc;
+  --uv-bg-tint:      #eef2fb;
   --uv-card:         #ffffff;
-  --uv-line:         #ebedf2;
-  --uv-line-soft:    #f1f3f7;
-  --uv-line-strong:  #d8dbe3;
-  --uv-faq-bg:       #f0f1f4;
-  --uv-faq-active:   #1a1f2b;
+  --uv-line:         #e7ecf5;
+  --uv-line-soft:    #f0f3fa;
+  --uv-line-strong:  #d7deec;
+  --uv-faq-bg:       #eef2fa;
+  --uv-faq-active:   #1a2238;
 
-  --uv-ink:        #181d28;
-  --uv-ink-2:      #20263a;
-  --uv-ink-3:      #2b3247;
+  --uv-ink:        #1a2238;
+  --uv-ink-2:      #232c45;
+  --uv-ink-3:      #303a57;
   --uv-ink-line:   rgba(255,255,255,0.08);
 
-  --uv-fg-1:       #181d28;
-  --uv-fg-2:       #4a5163;
-  --uv-fg-3:       #6f7686;
-  --uv-fg-4:       #a0a6b6;
+  --uv-fg-1:       #1a2238;
+  --uv-fg-2:       #565f72;
+  --uv-fg-3:       #8b94a3;
+  --uv-fg-4:       #b3bccb;
   --uv-fg-on-grad: #ffffff;
   --uv-fg-on-dark: #ffffff;
   --uv-fg-on-dark-2: rgba(255,255,255,0.72);
 
-  --uv-success:     #16a36a;
+  --uv-success:     #0fa968;
   --uv-success-text:#0ec377;
   --uv-warning:     #f5a524;
   --uv-danger:      #e0264c;
-  --uv-info:        var(--uv-blue);
+  --uv-info:        var(--uv-violet);
   --uv-star:        #00b67a;
 
-  --uv-glow-pink:   0 14px 40px -10px rgba(239,70,85,0.50);
-  --uv-glow-grad:   0 18px 50px -14px rgba(239,70,85,0.45);
-  --uv-shadow-sm:   0 1px 2px rgba(11,16,32,0.06);
-  --uv-shadow-md:   0 6px 18px -6px rgba(11,16,32,0.08),
-                    0 2px 6px -2px rgba(11,16,32,0.04);
-  --uv-shadow-lg:   0 24px 48px -16px rgba(11,16,32,0.16),
-                    0 10px 20px -10px rgba(11,16,32,0.08);
-  --uv-shadow-card: 0 4px 14px -6px rgba(11,16,32,0.08),
-                    0 1px 2px rgba(11,16,32,0.04);
+  /* Glows removed in the new theme — kept as `none` so any rule still
+     referencing them gets a no-op instead of an undefined variable. */
+  --uv-glow-pink:   none;
+  --uv-glow-grad:   none;
+  --uv-shadow-sm:   0 1px 2px rgba(40,60,120,0.06);
+  --uv-shadow-md:   0 14px 34px -14px rgba(40,60,120,0.14),
+                    0 3px 10px -4px rgba(40,60,120,0.08);
+  --uv-shadow-lg:   0 34px 64px -22px rgba(40,60,120,0.18),
+                    0 12px 26px -14px rgba(40,60,120,0.10);
+  --uv-shadow-card: 0 8px 22px -10px rgba(40,60,120,0.12),
+                    0 1px 3px rgba(40,60,120,0.05);
 
   --uv-r-xs: 6px;   --uv-r-sm: 10px;  --uv-r-md: 14px;
   --uv-r-lg: 20px;  --uv-r-xl: 28px;  --uv-r-pill: 999px;
@@ -115,6 +124,16 @@
   --uv-container: 1200px;
   --uv-container-narrow: 960px;
   --uv-header-h: 72px;
+
+  /* ---------- tart accent palette + ticker mask (new theme — for illustration accents / future use) ---------- */
+  --tart-ink:       #6a5a7e;
+  --tart-lilac:     #bdd6f8;
+  --tart-mint:      #bfe8d2;
+  --tart-peach:     #bcd0f6;
+  --tart-sky:       #bcd9f7;
+  --tart-yellow:    #ffd874;
+  --tart-yellow-d:  #ffc94a;
+  --tick-mask:      linear-gradient(90deg, transparent, #000 6%, #000 94%, transparent);
 }
 
 * { box-sizing: border-box; }

@@ -122,7 +122,7 @@ export function HowItWorks() {
                       width: 22,
                       height: 22,
                       borderRadius: 999,
-                      background: "linear-gradient(135deg,#f5a524,#ef4655)",
+                      background: "linear-gradient(135deg,#f5a524,#3b76f6)",
                       border: "2px solid #fff",
                     }}
                   />
@@ -156,7 +156,7 @@ export function HowItWorks() {
                 height: 132,
                 borderRadius: 999,
                 background:
-                  "conic-gradient(from -90deg, var(--uv-pink) 0deg, #f47286 260deg, #f2eaea 260deg)",
+                  "conic-gradient(from -90deg, var(--uv-pink) 0deg, #6ea0ff 260deg, #eaf0fb 260deg)",
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "center",

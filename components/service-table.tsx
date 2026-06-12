@@ -120,7 +120,7 @@ export function ServiceTable() {
                       letterSpacing: "0.06em",
                       color: "var(--uv-pink)",
                       padding: "3px 7px",
-                      background: "rgba(239,70,85,0.10)",
+                      background: "rgba(59,118,246,0.10)",
                       borderRadius: 4,
                       marginLeft: 6,
                     }}

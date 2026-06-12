@@ -49,7 +49,7 @@ const FOUNDER: Member = {
   role: "Founder & CEO",
   bio: "Lucas founded Thunderclap after completing his MBA in marketing at the University of Pennsylvania. With 20+ years in brand marketing, he now leads the SMM industry through Thunderclap — building the platform he wished existed when he started.",
   initials: "LZ",
-  gradient: "linear-gradient(135deg, #ef4655 0%, #f59e0b 100%)",
+  gradient: "linear-gradient(135deg, #3b76f6 0%, #f59e0b 100%)",
 };
 
 const TEAM: Member[] = [
@@ -65,7 +65,7 @@ const TEAM: Member[] = [
     role: "TikTok & YouTube Expert",
     bio: "Owns delivery quality for our highest-volume TikTok and YouTube services. FYP whisperer.",
     initials: "JG",
-    gradient: "linear-gradient(135deg, #0ea5e9 0%, #ef4655 100%)",
+    gradient: "linear-gradient(135deg, #0ea5e9 0%, #3b76f6 100%)",
   },
   {
     name: "Elizabeth Ray",
@@ -103,7 +103,7 @@ const EDITORIAL: Member[] = [
     role: "Author",
     bio: "Tech expertise paired with sharp narratives about growth in the digital age.",
     initials: "SG",
-    gradient: "linear-gradient(135deg, #f59e0b 0%, #ef4655 100%)",
+    gradient: "linear-gradient(135deg, #f59e0b 0%, #3b76f6 100%)",
   },
   {
     name: "Rebecca Adley",

@@ -106,8 +106,9 @@ public/                               logo.webp at root, images in /images/ (blo
 
 The visual language was locked in via a Claude Design handoff. **All design tokens live in `app/globals.css`** under `:root` and `@theme`. Use the `--uv-*` CSS variables, not arbitrary Tailwind colors.
 
-- **Brand color**: coral red `--uv-pink` `#ef4655` (NOT navy or electric blue — earlier briefs mentioned those, but the final design is coral on warm cream)
-- **Surface**: white `--uv-bg` + warm cream `--uv-bg-lavender` `#f5f3ee` for hero/footer
+- **Brand color**: blue `--uv-pink` `#3b76f6` (the variable name is historical — originally coral `#ef4655`; rebranded to blue 2026-06). Deep variant `--uv-pink-deep` `#2257d8`. The variable NAMES were preserved across the rebrand so every component picked up the new colour without touching `.tsx` files; don't rename them unless you also sweep every reference.
+- **Surface**: white `--uv-bg` + cool blue-grey `--uv-bg-lavender` `#f3f6fd` for hero/footer (was warm cream `#f5f3ee` pre-rebrand).
+- **Tart accent palette** (new 2026-06): `--tart-lilac` `#bdd6f8`, `--tart-mint` `#bfe8d2`, `--tart-peach` `#bcd0f6`, `--tart-sky` `#bcd9f7`, `--tart-yellow` `#ffd874`, `--tart-yellow-d` `#ffc94a`, `--tart-ink` `#6a5a7e`. Defined but not yet used by any component — available for future illustration/accent work.
 - **Type**: Plus Jakarta Sans (display) + Manrope (body) + JetBrains Mono — all loaded via `next/font` (self-hosted, no Google Fonts requests at runtime)
 - **Component classes** ported from the handoff and added over time: `.btn`, `.btn-primary`, `.btn-outline`, `.tier`, `.tier-featured`, `.faq-chip`, `.coral-band`, `.pkg-card`, `.svc-layout`, `.svc-side`, `.compare-card`, `.persona-row`, `.related-grid`, `.testi-grid`, `.why-grid-3`, `.nav-menu*`, `.co-*` (checkout), etc. **Prefer these to re-inventing Tailwind utility soup** — they encode the design.
 - **Platform side icons** (used in the service-page order summary AND in checkout's order summary): `.side-ig-icon` (IG gradient), `.side-tt-icon` (TikTok black + cyan/red glow), `.side-yt-icon` (YouTube red), `.side-fb-icon` (Facebook blue), `.side-tw-icon` (Twitter black). Each expects a small white-stroke SVG inside.
