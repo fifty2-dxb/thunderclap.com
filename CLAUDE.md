@@ -83,7 +83,7 @@ components/
   ticker.tsx                          right-to-left marquee of trust signals (below the header)
   footer.tsx                          6-col service grid (link equity), socials, payment badges
   hero.tsx (client — "Soft Bolt" HeroSoft + interactive HomeBuyBox), faq.tsx, pricing-table.tsx, trust-bar.tsx, testimonials.tsx
-  cta-section.tsx (SoftCta — bolt-row + sparks), service-table.tsx (one row per platform → /buy-*), how-it-works.tsx, announcement.tsx
+  cta-section.tsx (SoftCta — bolt-row + sparks), how-it-works.tsx, announcement.tsx
   dashboard-strip.tsx (dark "Live Platform Metrics" stat strip), two-ways.tsx (Growth packages vs Thunderclap AI), bolt-art.tsx (shared Bolt/Spark SVG art)
 lib/
   seo.ts                              SITE_URL, SITE_NAME, default metadata
@@ -100,14 +100,15 @@ content/
   blog-imported.json                  544 posts imported from legacy WP (generated)
 scripts/
   import-wp-blog.mjs                  one-time WP→Next blog importer (run while old WP is live)
-public/                               logo.webp at root, images in /images/ (blog imgs in /images/blog/)
+public/                               logo.webp (blue mark + black wordmark) + favicon.png (512² blue mark) at root, images in /images/ (blog imgs in /images/blog/)
 ```
 
 ## Design system
 
 The visual language was locked in via a Claude Design handoff. **All design tokens live in `app/globals.css`** under `:root` and `@theme`. Use the `--uv-*` CSS variables, not arbitrary Tailwind colors.
 
-- **Brand color**: blue `--uv-pink` `#3b76f6` (the variable name is historical — originally coral `#ef4655`; rebranded to blue 2026-06). Deep variant `--uv-pink-deep` `#2257d8`. The variable NAMES were preserved across the rebrand so every component picked up the new colour without touching `.tsx` files; don't rename them unless you also sweep every reference.
+- **Brand color**: blue `--uv-pink` `#3b76f6` (the variable name is historical — originally coral `#ef4655`; rebranded to blue 2026-06). Deep variant `--uv-pink-deep` `#2257d8`. The variable NAMES were preserved across the rebrand so every component picked up the new colour without touching `.tsx` files; don't rename them unless you also sweep every reference. The old coral hex `#ef4655` (`rgb(239,70,85)`) was ALSO hardcoded into ~18 `box-shadow`/glow/focus-ring `rgba()` values in `globals.css` (not via a var), which kept emitting an orange glow after the rebrand — these were swept to `rgba(59,118,246,…)` 2026-06. The TikTok-icon glow `rgba(254,44,85,…)` is intentionally left (brand-correct for that icon).
+- **Logo + favicon**: `public/logo.webp` is the blue mark + black "thunderclap" wordmark (recoloured from the original coral mark via `sharp`, wordmark untouched). `public/favicon.png` is the 512² blue mark alone, wired in `app/layout.tsx` as `icons: { icon: "/favicon.png", apple: "/favicon.png" }`.
 - **Surface**: white `--uv-bg` + cool blue-grey `--uv-bg-lavender` `#f3f6fd` for hero/footer (was warm cream `#f5f3ee` pre-rebrand).
 - **Tart accent palette** (new 2026-06): `--tart-lilac` `#bdd6f8`, `--tart-mint` `#bfe8d2`, `--tart-peach` `#bcd0f6`, `--tart-sky` `#bcd9f7`, `--tart-yellow` `#ffd874`, `--tart-yellow-d` `#ffc94a`, `--tart-ink` `#6a5a7e`. Defined but not yet used by any component — available for future illustration/accent work.
 - **Type**: Plus Jakarta Sans (display) + Manrope (body) + JetBrains Mono — all loaded via `next/font` (self-hosted, no Google Fonts requests at runtime)
@@ -162,7 +163,7 @@ When adding new sections, target ≤ 640px viewport — that's where the bugs hi
 
 **Hover handoff**: parent `Header` owns the `openMenu` state. On platform-tab `mouseEnter` → `open(it.id)` cancels close-timer + sets state. On `mouseLeave` → `scheduleClose()` sets a 120ms timer that nulls the state. The mega-menu fires the same handlers from its own `mouseEnter`/`mouseLeave`, so moving the pointer from tab to menu keeps it open. The sidebar items inside the menu fire `onMouseEnter={() => onPlatformHover(p.id)}` to switch the active platform without closing.
 
-**From-price anchors** — `MEGA_PLATFORMS[i].services[j].fromPrice` is hardcoded per service. Keep in sync with the lowest tier of each builder's `PACKAGES` array AND with the homepage `service-table.tsx` prices.
+**From-price anchors** — `MEGA_PLATFORMS[i].services[j].fromPrice` is hardcoded per service. Keep in sync with the lowest tier of each builder's `PACKAGES` array.
 
 **Smaller brand chips in top tabs**: `.hdr-platform-tab .mm-brand` overrides the default 22px chip to 18px and scales the inner SVG to 0.78. The mega-menu sidebar keeps the default 22px chip.
 
@@ -261,7 +262,7 @@ All required component classes already exist in `app/globals.css`. Use them — 
 1. Copy the array shape and fill in `qty`/`price`/`regular` from the CSV row for the matching qty
 2. Mark exactly one tier `popular: true` (the value-anchor — middle-of-curve)
 3. Re-sync `Product.offers` `lowPrice` / `highPrice` / `offerCount` in `page.tsx`
-4. Re-sync the mega-menu `fromPrice` and homepage `service-table.tsx` price for that service
+4. Re-sync the mega-menu `fromPrice` for that service
 5. The "Save up to N%" header pill is hardcoded to 20% across all builders (the CSV's standard discount). Bump it if a service's max actual discount is meaningfully higher.
 
 **Service tabs (`.svc-tabs` strip above the package grid) are real navigation, NOT local state.** Each entry in `SERVICE_TABS` carries an `href` pointing to the matching `/buy-{platform}-{service}` page; the markup uses `<Link href={t.href}>` not `<button onClick={setTab}>`. Clicking a tab loads the new page with its real PACKAGES, prices, H1, and CTA — there's no shared tab-state model. The `tab` useState stays as a read-only constant for the per-tier sub-label and side-summary title (it always equals the current page's service id). Active-tab styling still works via `tab === t.id`. **Don't reintroduce the local-state tab pattern** — the user explicitly rejected it because the prices didn't change when toggling. SERVICE_TABS must list only services that exist on that platform (don't include `Comments` or `Likes` on YouTube etc.).
@@ -286,11 +287,9 @@ const checkoutHref = `/checkout?platform=instagram&service=likes&qty=${pkg.qty}&
 
 The `price` query param is the **base** tier price (not premium-adjusted). The checkout page re-applies the +35% based on the `premium` flag so the math stays consistent.
 
-## Homepage service-table (single source of "what we sell")
+## Service pricing — sources of truth
 
-`components/service-table.tsx` is now **one row per platform** (6 rows: Instagram, TikTok, YouTube, Facebook, Twitter/X, LinkedIn) to match the "Soft Bolt" homepage design — NOT one row per platform+service. Each row is a `<Link>` (`.st-row-link` extends `.st-row` with `text-decoration: none; color: inherit; cursor: pointer`) wrapping the whole row, pointing at that platform's **lowest-priced** service page (e.g. Instagram → `/buy-instagram-likes`), with the "starting from" column showing that lowest price. The full per-service link grid still lives in the footer for SEO link equity. Hover state shifts the Get Started chip to pink-fill.
-
-When you change a service price in a `_builder.tsx` `PACKAGES` array, the homepage `SERVICES` array, `MEGA_PLATFORMS[i].services[j].fromPrice`, AND the cart drawer's `SUGGESTION_POOL`/`BROWSE_LINKS` (`components/cart-drawer.tsx`) all need the matching value. **These four sources of truth aren't centralised yet** — `content/packages.ts` is still an empty stub. If you centralise them, rewrite all four call sites or it'll drift.
+When you change a service price in a `_builder.tsx` `PACKAGES` array, `MEGA_PLATFORMS[i].services[j].fromPrice` (`components/mega-menu.tsx`) AND the cart drawer's `SUGGESTION_POOL`/`BROWSE_LINKS` (`components/cart-drawer.tsx`) all need the matching value. **These three sources of truth aren't centralised yet** — `content/packages.ts` is still an empty stub. If you centralise them, rewrite all three call sites or it'll drift. (There used to be a 4th — the homepage `service-table.tsx` — but that component was removed from the homepage 2026-06; the footer service grid carries the SEO link equity instead.)
 
 ## Homepage design ("Soft Bolt" — blue, no orange glow)
 
@@ -300,7 +299,7 @@ The homepage was rebuilt to the playful "Soft Bolt" design. The brand moved from
 - **`components/dashboard-strip.tsx`** — dark (`#0e1117`) "LIVE PLATFORM METRICS" stat strip ("Real numbers. Real growth.", 6 stat cards incl. **4.9★** Trustpilot). The "View full ops dashboard" link points to `/` (no ops page yet).
 - **`components/two-ways.tsx`** — "Two ways to grow" — a "Growth packages" card (→ `/buy-instagram-followers/`) next to a featured "Thunderclap AI" card (→ `/`, AI funnel not built yet).
 - **`components/bolt-art.tsx`** — shared `Bolt` + `Spark` cartoon SVGs, imported by both `hero.tsx` and `cta-section.tsx` (`SoftCta`). Pure SVG, no `"use client"`.
-- Homepage section order (`app/page.tsx`): Hero → ServiceTable → DashboardStrip → TwoWays → WhyThunderclap → HowItWorks → PricingTable → Testimonials → FaqSection → CtaSection. (ServiceTable is intentionally kept even though the design omits it — it's a real-link SEO/conversion surface.)
+- Homepage section order (`app/page.tsx`): Hero → DashboardStrip → TwoWays → WhyThunderclap → HowItWorks → PricingTable → Testimonials → FaqSection → CtaSection. (The old ServiceTable section was removed 2026-06 per the Soft Bolt design — the footer service grid + mega-menu carry the SEO link equity.)
 - **Rating is 4.9 everywhere** (the design HTML showed 4.7 in spots — 4.9 wins, it's unified site-wide).
 
 ## Blog system
@@ -479,7 +478,7 @@ These are the patterns worth lifting wholesale when standing up a similar site:
 11. **`amplify.yml` env-baking** — inlines selected env vars into `.env.production` at build time so Next.js SSR Lambda actually sees them. Amplify's console env vars don't reach the runtime by default.
 12. **SSH-only git remote** for agent sessions — HTTPS push fails silently. `git remote set-url origin git@github.com:org/repo.git` once.
 13. **Service-tab strip as navigation** — `<Link href>` not `<button onClick>`. Local tab-state without page navigation is a UX trap: prices don't change, copy doesn't change, only the highlight does, and users get confused.
-14. **Four sources of truth for service pricing** (PACKAGES in `_builder.tsx`, mega-menu `fromPrice` in `mega-menu.tsx`, SERVICES in `service-table.tsx`, and the cart drawer's `SUGGESTION_POOL`/`BROWSE_LINKS` in `cart-drawer.tsx`) must stay in sync. The lowest tier of PACKAGES is the `fromPrice`/`from`; the cart `SUGGESTION_POOL` mirrors a specific tier per service. Until you centralise into `content/packages.ts`, every price change touches four files.
+14. **Three sources of truth for service pricing** (PACKAGES in `_builder.tsx`, mega-menu `fromPrice` in `mega-menu.tsx`, and the cart drawer's `SUGGESTION_POOL`/`BROWSE_LINKS` in `cart-drawer.tsx`) must stay in sync. The lowest tier of PACKAGES is the `fromPrice`/`from`; the cart `SUGGESTION_POOL` mirrors a specific tier per service. Until you centralise into `content/packages.ts`, every price change touches three files. (A 4th — the homepage `service-table.tsx` — was removed 2026-06.)
 15. **WebEngage event tracking** (`lib/webengage.ts` server client + `lib/webengage-client.ts` browser helpers + `/api/webengage/track` proxy). Client never calls WebEngage directly — key stays server-side. Anonymous id in `localStorage`, fire-and-forget fetches, server client no-ops without credentials. Drop-in: swap the `eventData` shapes in `webengage-client.ts` for the new site's event schema.
 
 ## Workflow rule: keep CLAUDE.md in sync

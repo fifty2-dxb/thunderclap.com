@@ -5,7 +5,6 @@ import { FaqSection } from "@/components/faq";
 import { Hero } from "@/components/hero";
 import { HowItWorks } from "@/components/how-it-works";
 import { PricingTable } from "@/components/pricing-table";
-import { ServiceTable } from "@/components/service-table";
 import { Testimonials } from "@/components/testimonials";
 import { TwoWays } from "@/components/two-ways";
 import { WhyThunderclap } from "@/components/trust-bar";
@@ -89,7 +88,6 @@ export default function HomePage() {
         dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }}
       />
       <Hero />
-      <ServiceTable />
       <DashboardStrip />
       <TwoWays />
       <WhyThunderclap />

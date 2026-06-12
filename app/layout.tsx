@@ -38,7 +38,7 @@ export const metadata: Metadata = {
   },
   description:
     "Boost your TikTok, Instagram, YouTube, Facebook and Twitter / X accounts with real followers, likes and views from active users. Money-back guaranteed. Trusted by 200K+ creators.",
-  icons: { icon: "/logo.webp" },
+  icons: { icon: "/favicon.png", apple: "/favicon.png" },
   // Default robots for every page (inherited via the root layout). Renders
   // `index, follow, max-video-preview:-1, max-image-preview:large,
   // max-snippet:-1` for both the generic robots and googlebot tags. The
