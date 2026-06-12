@@ -1568,8 +1568,13 @@ img { display: block; max-width: 100%; }
   .prem-row { padding: 12px 14px; }
   .prem-title { font-size: 14px; }
   .prem-sub { font-size: 12px; }
-  .svc-tabs { gap: 4px; flex-wrap: wrap; padding: 3px; }
-  .svc-tab { padding: 8px 12px; font-size: 13px; }
+  .svc-tabs {
+    gap: 3px; flex-wrap: nowrap; padding: 3px;
+    max-width: 100%; overflow-x: auto;
+    scrollbar-width: none; -webkit-overflow-scrolling: touch;
+  }
+  .svc-tabs::-webkit-scrollbar { display: none; }
+  .svc-tab { padding: 8px 13px; font-size: 13px; white-space: nowrap; flex: 0 0 auto; }
 
   .coral-band { padding: 44px 18px; border-radius: 22px; }
   .coral-band h2 { font-size: 28px; line-height: 1.1; }
