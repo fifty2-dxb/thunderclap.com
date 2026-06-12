@@ -12,6 +12,7 @@ Social media growth marketing site (Instagram / TikTok / YouTube / Facebook / Tw
 - **shadcn/ui** primitives (Radix under the hood) for accessible components when needed
 - **next-sitemap** for build-time sitemap, **`app/robots.ts`** for robots
 - **@vercel/analytics**, **@vercel/speed-insights**, **Partytown** for GTM
+- **Google Analytics 4** (`G-0T6JZ3J82L`) wired via two `next/script` tags (`afterInteractive`) in the `<head>` of `app/layout.tsx` — the gtag loader + the inline `gtag('config', …)` init
 - Path alias: `@/*` → repo root
 - Repo: `github.com/fifty2-dxb/thunderclap.com`, single branch `main`
 
