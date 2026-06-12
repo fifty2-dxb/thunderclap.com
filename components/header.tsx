@@ -4,9 +4,10 @@ import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
-import { ShoppingCart } from "lucide-react";
+import { ShoppingCart, Sparkles } from "lucide-react";
 import { MegaMenu, MEGA_PLATFORMS, type PlatformId } from "./mega-menu";
 import { useCart } from "./cart-context";
+import { useAiWaitlist } from "./ai-waitlist";
 
 const PLATFORM_IDS = new Set<string>(MEGA_PLATFORMS.map((p) => p.id));
 const isPlatformId = (v: string): v is PlatformId => PLATFORM_IDS.has(v);
@@ -74,6 +75,7 @@ const NAV: NavItem[] = [
       { label: "Buy LinkedIn Comments", href: "/buy-linkedin-comments" },
     ],
   },
+  { id: "ai", label: "AI Growth" },
   { id: "blog", label: "Blog", href: "/blog" },
   { id: "support", label: "Support", href: "/contact" },
 ];
@@ -93,6 +95,7 @@ export function Header() {
   const pathname = usePathname();
   const active = activeIdForPath(pathname);
   const { count: cartCount, openDrawer } = useCart();
+  const { open: openWaitlist } = useAiWaitlist();
   const [scrolled, setScrolled] = useState(false);
   const [openMenu, setOpenMenu] = useState<string | null>(null);
   const [isMobile, setIsMobile] = useState(false);
@@ -226,6 +229,19 @@ export function Header() {
               textDecoration: "none" as const,
               fontSize: 14,
             };
+            if (it.id === "ai") {
+              return (
+                <button
+                  key={it.id}
+                  type="button"
+                  onClick={() => openWaitlist("header-nav")}
+                  style={{ ...labelStyle, gap: 5, background: "transparent", border: "none" }}
+                >
+                  <Sparkles size={14} color="var(--uv-pink)" />
+                  <span>{it.label}</span>
+                </button>
+              );
+            }
             if (isPlatform) {
               const platformDef = MEGA_PLATFORMS.find((p) => p.id === it.id)!;
               return (
@@ -393,6 +409,36 @@ export function Header() {
                 const isActive = active === it.id;
                 const hasMenu = !!it.submenu;
                 const expanded = expandedMobileId === it.id;
+                if (it.id === "ai") {
+                  return (
+                    <button
+                      key={it.id}
+                      type="button"
+                      onClick={() => {
+                        closeMobile();
+                        openWaitlist("mobile-nav");
+                      }}
+                      style={{
+                        width: "100%",
+                        display: "flex",
+                        alignItems: "center",
+                        gap: 8,
+                        padding: "16px 20px",
+                        background: "transparent",
+                        border: "none",
+                        cursor: "pointer",
+                        fontFamily: "var(--font-display)",
+                        fontSize: 14,
+                        fontWeight: 800,
+                        color: "var(--uv-fg-1)",
+                        textAlign: "left",
+                      }}
+                    >
+                      <Sparkles size={15} color="var(--uv-pink)" />
+                      <span>{it.label}</span>
+                    </button>
+                  );
+                }
                 if (!hasMenu) {
                   return (
                     <Link
