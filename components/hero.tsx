@@ -422,7 +422,6 @@ function HomeBuyBox() {
           <label className="pkg-url-wrap">
             <Link2 size={16} color="var(--uv-fg-3)" />
             <div style={{ flex: 1 }}>
-              <div className="pkg-url-label">USERNAME OR POST LINK</div>
               <input
                 className="pkg-url-input"
                 value={url}
