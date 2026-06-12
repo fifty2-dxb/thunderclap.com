@@ -32,10 +32,20 @@ async function trackCheckoutCompleted(sessionId: string, env: RedlapEnv): Promis
   try {
     const session = await getSession(sessionId, env);
     const md = (session.metadata ?? {}) as Record<string, unknown>;
-    const email = typeof md.email === "string" ? md.email : "";
+    const email = typeof md.email === "string" ? md.email.trim() : "";
     const orderId = typeof md.tcOrderId === "string" ? md.tcOrderId : sessionId;
     const currency = typeof md.currency === "string" ? md.currency : "USD";
     const items: MetaItem[] = Array.isArray(md.items) ? (md.items as MetaItem[]) : [];
+
+    // WebEngage rejects an event with neither userId nor anonymousId, so the
+    // email (which we set the userId to) is mandatory here. If it's missing the
+    // event would silently never land — log loudly instead of firing a no-op.
+    if (!email) {
+      console.error(
+        `[redlap] Checkout Completed NOT fired — no email in session metadata (session ${sessionId}). WebEngage needs a userId.`,
+      );
+      return;
+    }
 
     // Prefer the actual charged price; fall back to summing the line items.
     const total =
@@ -46,14 +56,14 @@ async function trackCheckoutCompleted(sessionId: string, env: RedlapEnv): Promis
           ) / 100;
 
     await trackEvent({
-      userId: email || undefined,
+      userId: email,
       eventName: WE_EVENTS.CHECKOUT_COMPLETED,
       eventData: {
-        "Order ID": orderId,
-        "Order Total": total,
-        Currency: currency,
-        "Item Count": items.length,
-        Products: items.map((i) => `${i.platform}-${i.service}`).join(","),
+        orderId,
+        amount: total,
+        currency,
+        itemCount: items.length,
+        products: items.map((i) => `${i.platform}-${i.service}`).join(","),
       },
     });
   } catch (err) {
