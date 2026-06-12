@@ -20,6 +20,7 @@ import {
   Zap,
 } from "lucide-react";
 import { Bolt, Spark } from "@/components/bolt-art";
+import { useAiWaitlist } from "@/components/ai-waitlist";
 
 const IgGlyph = () => (
   <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
@@ -91,6 +92,7 @@ function HomeBuyBox() {
   const [url, setUrl] = useState("");
   const [billing, setBilling] = useState<"m" | "a">("m");
   const [aiPlan, setAiPlan] = useState(1);
+  const { open: openWaitlist } = useAiWaitlist();
 
   const aiMode = platId === "ai";
   const plat = HOME_PLATFORMS.find((p) => p.id === platId) ?? HOME_PLATFORMS[0];
@@ -243,9 +245,19 @@ function HomeBuyBox() {
               ? billing === "a" && <div className="pkg-save-line">You save ${(plan.m - plan.a) * 12}/yr</div>
               : offFor(pkg) >= 1 && <div className="pkg-save-line">You save ${offFor(pkg)}</div>}
           </div>
-          <Link className="btn btn-primary btn-lg pkg-cta" href={ctaHref}>
-            {aiMode ? "Start free trial" : "Get Started"} <ArrowRight size={16} />
-          </Link>
+          {aiMode ? (
+            <button
+              type="button"
+              className="btn btn-primary btn-lg pkg-cta"
+              onClick={() => openWaitlist("home-buybox")}
+            >
+              Be the first <ArrowRight size={16} />
+            </button>
+          ) : (
+            <Link className="btn btn-primary btn-lg pkg-cta" href={ctaHref}>
+              Get Started <ArrowRight size={16} />
+            </Link>
+          )}
         </div>
 
         <div className="pkg-trust">
@@ -277,15 +289,15 @@ function HomeBuyBox() {
         </div>
 
         {!aiMode && (
-          <Link className="pkg-ai-strip" href="/">
+          <button type="button" className="pkg-ai-strip" onClick={() => openWaitlist("home-ai-strip")}>
             <Sparkles size={14} color="var(--uv-pink)" />
             <span className="pkg-ai-text">
               <strong>New — Thunderclap AI.</strong> Organic growth on autopilot.
             </span>
             <span className="pkg-ai-cta">
-              Try free <ArrowRight size={12} />
+              Be the first <ArrowRight size={12} />
             </span>
-          </Link>
+          </button>
         )}
       </div>
     </div>

@@ -1337,17 +1337,126 @@ img { display: block; max-width: 100%; }
 /* --- AI Growth cross-sell strip --- */
 .pkg-ai-strip {
   display: flex; align-items: center; gap: 8px;
+  width: 100%;
   margin-top: 14px;
   padding: 11px 14px;
   background: var(--uv-pink-soft);
   border: 1px solid var(--uv-pink-bg);
   border-radius: 12px;
+  font-family: inherit;
   font-size: 13px; color: var(--uv-fg-2);
+  text-align: left;
   text-decoration: none;
+  cursor: pointer;
   transition: border-color 150ms, background 150ms;
 }
 .pkg-ai-strip:hover { border-color: var(--uv-pink); }
 .pkg-ai-strip strong { color: var(--uv-fg-1); }
+
+/* AI Growth waitlist modal */
+.aiw-overlay {
+  position: fixed; inset: 0; z-index: 90;
+  display: flex; align-items: center; justify-content: center;
+  padding: 20px;
+}
+.aiw-backdrop {
+  position: absolute; inset: 0;
+  background: rgba(15, 17, 23, 0.55);
+  backdrop-filter: blur(4px);
+  animation: aiw-fade 180ms ease;
+}
+.aiw-modal {
+  position: relative;
+  width: 100%; max-width: 460px;
+  background: #fff;
+  border-radius: 22px;
+  padding: 34px 30px 26px;
+  box-shadow: 0 30px 80px rgba(15, 17, 23, 0.32);
+  animation: aiw-pop 220ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+.aiw-close {
+  position: absolute; top: 14px; right: 14px;
+  width: 34px; height: 34px;
+  display: inline-flex; align-items: center; justify-content: center;
+  border: none; border-radius: 999px;
+  background: var(--uv-bg-lavender); color: var(--uv-fg-2);
+  cursor: pointer;
+  transition: background 150ms, color 150ms;
+}
+.aiw-close:hover { background: var(--uv-pink-soft); color: var(--uv-pink); }
+.aiw-badge {
+  display: inline-flex; align-items: center; gap: 5px;
+  background: linear-gradient(90deg, #f5a623 0%, #ff7a3d 24%, #ffce5a 50%, #ff7a3d 76%, #f5a623 100%);
+  background-size: 200% 100%;
+  animation: pill-grad-shift 3s linear infinite;
+  color: #fff;
+  font-size: 10px; font-weight: 800; letter-spacing: 0.08em;
+  padding: 4px 11px; border-radius: 999px;
+  box-shadow: 0 5px 14px rgba(245, 140, 35, 0.36);
+}
+.aiw-title {
+  font-family: var(--uv-font-display);
+  font-size: 24px; font-weight: 800; letter-spacing: -0.02em;
+  color: var(--uv-fg-1);
+  margin: 14px 0 6px;
+}
+.aiw-sub {
+  font-size: 14px; line-height: 1.55; color: var(--uv-fg-2);
+  margin: 0 0 20px;
+}
+.aiw-form { display: flex; flex-direction: column; gap: 12px; }
+.aiw-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.aiw-field { display: flex; flex-direction: column; gap: 5px; }
+.aiw-label {
+  font-size: 12px; font-weight: 700; letter-spacing: 0.02em;
+  color: var(--uv-fg-2);
+}
+.aiw-input {
+  width: 100%;
+  font-family: inherit; font-size: 15px;
+  padding: 11px 13px;
+  border: 1.5px solid var(--uv-line);
+  border-radius: 11px;
+  background: #fff; color: var(--uv-fg-1);
+  transition: border-color 150ms, box-shadow 150ms;
+}
+.aiw-input:focus {
+  outline: none;
+  border-color: var(--uv-pink);
+  box-shadow: 0 0 0 3px rgba(59, 118, 246, 0.12);
+}
+.aiw-err {
+  font-size: 13px; color: var(--uv-danger-text, #c0392b);
+  background: rgba(192, 57, 43, 0.07);
+  padding: 8px 11px; border-radius: 9px;
+}
+.aiw-submit { width: 100%; justify-content: center; margin-top: 4px; }
+.aiw-fine {
+  font-size: 11.5px; color: var(--uv-fg-3);
+  text-align: center; margin: 8px 0 0;
+}
+.aiw-done { text-align: center; padding: 6px 0; }
+.aiw-done-icon {
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 60px; height: 60px; border-radius: 999px;
+  background: var(--uv-success-bg, #e7f6ec);
+  color: var(--uv-success-text, #1c8a4a);
+  margin-bottom: 6px;
+}
+@keyframes aiw-fade { from { opacity: 0; } to { opacity: 1; } }
+@keyframes aiw-pop {
+  from { opacity: 0; transform: translateY(12px) scale(0.97); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+@media (max-width: 640px) {
+  .aiw-row { grid-template-columns: 1fr; }
+  .aiw-modal { padding: 30px 22px 22px; }
+  /* iOS: 16px inputs prevent focus auto-zoom */
+  .aiw-input { font-size: 16px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .aiw-backdrop, .aiw-modal { animation: none; }
+}
 .pkg-ai-text { flex: 1; min-width: 0; }
 .pkg-ai-cta {
   display: inline-flex; align-items: center; gap: 4px;

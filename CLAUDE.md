@@ -450,6 +450,7 @@ Behavioural analytics is wired through WebEngage's REST API. The flow is always 
 | `Top Menu Clicked` | `trackTopMenuClicked` | helper ready — not yet bound |
 | `Cart Viewed` | `trackCartViewed` | helper ready — not yet bound |
 | `Homepage CTA Clicked` | `trackHomepageCTAClicked` | helper ready — not yet bound |
+| `AI Growth Waitlist` | `trackAiWaitlistJoined` | `components/ai-waitlist.tsx` `onSubmit` on a successful waitlist join — `eventData` carries `First Name`/`Last Name`/`Email`, `userId: email`. See the AI Growth waitlist section — wired ✅ |
 
 The last five helpers exist with the correct `eventData` contract but aren't called from any component yet — wire them to the relevant click/view handlers when those surfaces get tracked.
 
@@ -459,6 +460,25 @@ The last five helpers exist with the correct `eventData` contract but aren't cal
 - `WEBENGAGE_API_KEY` — REST API bearer token
 
 When credentials are absent the server client silently no-ops (logs a skip line in dev), so the site runs fine locally without WebEngage configured.
+
+## AI Growth waitlist (FOMO email capture)
+
+Thunderclap AI is an unbuilt subscription product. Instead of linking its CTAs to a non-existent funnel page, every "AI Growth" surface opens a **FOMO email-capture modal** ("Be the first on Thunderclap AI") that collects first/last name + email, emails support, and tracks the signup. This is the conversion path until the real AI funnel exists.
+
+**`components/ai-waitlist.tsx`** (`"use client"`) exports three things:
+- `AiWaitlistProvider` — context provider mounted in `app/layout.tsx` **inside `CartProvider`, wrapping everything** (so any client component below it can open the modal). Holds `firstName/lastName/email/status/error` state, body scroll-lock + Escape-to-close `useEffect`, and renders the modal globally (`.aiw-overlay`/`.aiw-backdrop`/`.aiw-modal`). `onSubmit` validates (first name required, `EMAIL_RE`), POSTs to `/api/ai-waitlist`, then fires `trackAiWaitlistJoined` and flips to a success state on a 2xx `{ ok: true }`.
+- `useAiWaitlist()` — hook returning `{ open(source?), close() }`. `source` is analytics-only.
+- `AiWaitlistButton({ className, style, source, children })` — a `<button onClick={() => open(source)}>` wrapper so **server components** (e.g. `two-ways.tsx`) can mount a trigger without becoming client components. Pass `className` to style it like any `.btn`.
+
+**Trigger sites** (all open the same modal — don't link AI CTAs to `/` anymore):
+- `components/hero.tsx` `HomeBuyBox` — when the "AI Growth" chip is active, the CTA is `<button onClick={() => openWaitlist("home-buybox")}>Be the first</button>`; the `.pkg-ai-strip` is also a `<button>` (source `home-ai-strip`, label "Be the first").
+- `components/two-ways.tsx` — the featured "Thunderclap AI" card uses `<AiWaitlistButton source="two-ways">Be the first</AiWaitlistButton>`.
+
+**`/api/ai-waitlist`** (`app/api/ai-waitlist/route.ts`, `runtime = "nodejs"`) — mirrors `/api/contact`: accepts `{ firstName, lastName, email }`, validates, sends via **nodemailer + Zoho SMTP** to `CONTACT_TO` (default `support@thunderclap.com`) with subject `[AI Growth Waitlist] {fullName}` and `replyTo` = the visitor's email. Recipient is fixed server-side (NOT a relay). CR/LF stripped from header fields (`oneLine`) + `escapeHtml` on the body. No-ops with a friendly 503 when `ZOHO_EMAIL`/`ZOHO_PASSWORD` are unset.
+
+**Tracking**: `trackAiWaitlistJoined({ firstName, lastName, email })` in `lib/webengage-client.ts` fires the `AI Growth Waitlist` event (`eventData`: `First Name`/`Last Name`/`Email`, `userId: email`).
+
+**CSS**: all `.aiw-*` classes live in `app/globals.css`. The modal reuses the amber `pill-grad-shift` animated gradient on its "EARLY ACCESS" badge. `@media (max-width: 640px)` collapses `.aiw-row` to one column and forces 16px inputs (iOS no-zoom); `prefers-reduced-motion` kills the entrance animations.
 
 ## Ahrefs SEO grounding (don't change these without re-checking)
 

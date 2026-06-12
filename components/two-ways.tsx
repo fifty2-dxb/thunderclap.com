@@ -1,6 +1,7 @@
 import type { CSSProperties } from "react";
 import Link from "next/link";
 import { ArrowRight, Check, Sparkles, Zap } from "lucide-react";
+import { AiWaitlistButton } from "@/components/ai-waitlist";
 
 const card: CSSProperties = {
   background: "#fff",
@@ -150,9 +151,13 @@ export function TwoWays() {
                 <Check size={15} color="var(--uv-success-text)" /> 3-day free trial · cancel anytime
               </span>
             </div>
-            <Link className="btn btn-primary btn-md" href="/" style={{ marginTop: "auto" }}>
-              Explore Thunderclap AI <ArrowRight size={15} />
-            </Link>
+            <AiWaitlistButton
+              className="btn btn-primary btn-md"
+              style={{ marginTop: "auto" }}
+              source="two-ways"
+            >
+              Be the first <ArrowRight size={15} />
+            </AiWaitlistButton>
           </div>
         </div>
       </div>

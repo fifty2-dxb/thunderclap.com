@@ -5,6 +5,7 @@ import { Plus_Jakarta_Sans, Manrope, JetBrains_Mono } from "next/font/google";
 import { Announcement } from "@/components/announcement";
 import { CartProvider } from "@/components/cart-context";
 import { CartDrawer } from "@/components/cart-drawer";
+import { AiWaitlistProvider } from "@/components/ai-waitlist";
 import { Header } from "@/components/header";
 import { Ticker } from "@/components/ticker";
 import { Footer } from "@/components/footer";
@@ -87,15 +88,17 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           </defs>
         </svg>
         <CartProvider>
-          <Suspense fallback={null}>
-            <PageViewTracker />
-          </Suspense>
-          <Announcement />
-          <Header />
-          <Ticker />
-          {children}
-          <Footer />
-          <CartDrawer />
+          <AiWaitlistProvider>
+            <Suspense fallback={null}>
+              <PageViewTracker />
+            </Suspense>
+            <Announcement />
+            <Header />
+            <Ticker />
+            {children}
+            <Footer />
+            <CartDrawer />
+          </AiWaitlistProvider>
         </CartProvider>
       </body>
     </html>

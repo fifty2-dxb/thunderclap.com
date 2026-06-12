@@ -189,6 +189,22 @@ export function trackCheckoutStarted(items: Array<{
   });
 }
 
+export function trackAiWaitlistJoined(data: {
+  firstName: string;
+  lastName: string;
+  email: string;
+}): void {
+  trackEvent({
+    eventName: "AI Growth Waitlist",
+    eventData: {
+      "First Name": data.firstName,
+      "Last Name": data.lastName,
+      Email: data.email,
+    },
+    userId: data.email,
+  });
+}
+
 export function trackHomepageCTAClicked(ctaText: string, destination?: string): void {
   trackEvent({
     eventName: "Homepage CTA Clicked",
