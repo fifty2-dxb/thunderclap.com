@@ -465,6 +465,33 @@ The last five helpers exist with the correct `eventData` contract but aren't cal
 
 When credentials are absent the server client silently no-ops (logs a skip line in dev), so the site runs fine locally without WebEngage configured.
 
+## GA4 event tracking (`lib/ga4.ts`)
+
+A second analytics channel runs **in parallel with WebEngage** — Google Analytics 4 ecommerce events via `gtag`. The gtag loader + `gtag('config', 'G-0T6JZ3J82L')` init are already in `app/layout.tsx` (two `next/script` tags), so `window.gtag` / `window.dataLayer` exist synchronously; events fired before the lib finishes downloading are buffered, not dropped. **`lib/ga4.ts` is the single client-side helper module** — every helper no-ops when `gtag` is absent (SSR, ad-block), so it never breaks a render.
+
+- **Item shape** (`toGaItem`): `{ item_id: "${platform}-${service}[-premium]", item_name: "${platform} ${service}", item_category: platform, item_variant: "premium"|"standard", price, quantity: 1, item_qty }`. `quantity` is fixed at **1** (one cart line = one purchasable package); the follower/like **count** rides along as the custom `item_qty` param so GA4 doesn't mistake it for unit quantity. `price` is the effective per-line price — `linePrice` re-applies the **+35% premium** multiplier (`price * (premium ? 1.35 : 1)`), same convention as the cart/checkout.
+- **`LineLike`** is the common input: `{ platform, service, qty, price, premium }`. A `CartItem` is structurally assignable, so cart lines pass straight through.
+
+**Event → helper → fire site** (mirrors the requested table):
+
+| GA4 event | Helper | Fires from |
+| --- | --- | --- |
+| `add_to_cart` | `gaAddToCart(line)` | `cart-context.tsx` `addItem()` (next to `trackAddedToCart`) |
+| `remove_from_cart` | `gaRemoveFromCart(line)` | `cart-context.tsx` `removeItem()` — reads the removed line from an `itemsRef` mirror (NOT inside the state updater, to avoid StrictMode double-fire) |
+| `view_cart` | `gaViewCart(items, subtotal)` | `cart-drawer.tsx` `useEffect` keyed on `[isDrawerOpen]` only (so it counts once per open, not per item change) |
+| `begin_checkout` | `gaBeginCheckout(items, subtotal)` | `app/checkout/_form.tsx` Checkout-Started `useEffect` (once, on cart hydrate) |
+| `checkout_progress` | `gaCheckoutProgress(items, 2, subtotal)` | `_form.tsx` `onSubmit` — custom event; `checkout_step: 2` |
+| `add_payment_info` | `gaAddPaymentInfo(items, subtotal)` | `_form.tsx` `onSubmit` (Redlap owns the real payment UI, so we fire it at handoff; `payment_type: "redlap"`) |
+| `sign_up` | `gaSignUp("newsletter")` | `_form.tsx` `onSubmit` when the promo opt-in box is checked |
+| `select_item` | `gaSelectItem(line)` | `hero.tsx` HomeBuyBox tier-select `onClick` (`item_list_name: "build_your_order"`) |
+| `top_menu_click` | `gaTopMenuClick(label, platform?)` | `header.tsx` — desktop platform tabs / AI button / href links, and mobile-sheet equivalents incl. submenu service links. Custom event |
+| `cta_click` | `gaCtaClick("Get Started", location)` | `header.tsx` desktop + mobile "Get Started" CTAs. Custom event |
+| `purchase` | `gaPurchase({ transactionId, value, items })` | `app/checkout/success/_purchase.tsx` `<PurchaseTracker>` client island, mounted by `success/page.tsx`. **Deduped per `transaction_id` via `localStorage` key `ga4:purchase:${id}`** so a refresh can't double-count |
+
+**Why `purchase` is client-side** (unlike WebEngage's server-side `Checkout Completed`): `gtag` needs the browser, so it can only fire when the buyer lands on `/checkout/success`. The two conversions are complementary — WebEngage fires from the Redlap webhook (reliable even if the buyer never returns), GA4 fires from the success page (deduped). `<PurchaseTracker>` takes the **base** tier price as `price` (so `toGaItem` re-applies premium) and the already-charged order `total` as `value`; it bails when `transactionId` is empty or `value <= 0`.
+
+There are **no GA4 env vars** — the measurement ID `G-0T6JZ3J82L` is hardcoded in `app/layout.tsx`. No server-side GA4 (no Measurement Protocol); everything is client `gtag`.
+
 ## AI Growth waitlist (FOMO email capture)
 
 Thunderclap AI is an unbuilt subscription product. Instead of linking its CTAs to a non-existent funnel page, every "AI Growth" surface opens a **FOMO email-capture modal** ("Be the first on Thunderclap AI") that collects first/last name + email, emails support, and tracks the signup. This is the conversion path until the real AI funnel exists.
@@ -513,6 +540,7 @@ These are the patterns worth lifting wholesale when standing up a similar site:
 13. **Service-tab strip as navigation** — `<Link href>` not `<button onClick>`. Local tab-state without page navigation is a UX trap: prices don't change, copy doesn't change, only the highlight does, and users get confused.
 14. **Four sources of truth for service pricing** (PACKAGES in `_builder.tsx`, mega-menu `fromPrice` in `mega-menu.tsx`, the cart drawer's `SUGGESTION_POOL`/`BROWSE_LINKS` in `cart-drawer.tsx`, and the homepage box's `HOME_PRICING` map in `hero.tsx`) must stay in sync. The lowest tier of PACKAGES is the `fromPrice`/`from`; the cart `SUGGESTION_POOL` mirrors a specific tier per service; `HOME_PRICING` mirrors the full tier list. Until you centralise into `content/packages.ts`, every price change touches four files.
 15. **WebEngage event tracking** — client-side via the **JS SDK** (`window.webengage.track` / `webengage.user.login` in `lib/webengage-client.ts`; SDK loader injected in `app/layout.tsx`, gated on `NEXT_PUBLIC_WEBENGAGE_LICENSE_CODE`) plus a server-side REST fallback (`lib/webengage.ts`) for the one conversion that must fire even if the buyer leaves (the Redlap webhook's `Checkout Completed`). Drop-in: swap the `eventData` shapes in `webengage-client.ts` for the new site's event schema. (Earlier we tried a pure-REST proxy approach — `/api/webengage/{track,user}` — but the REST API didn't attribute anonymous→identified history correctly, so the SDK is the client path.)
+16. **GA4 ecommerce tracking** (`lib/ga4.ts`) — one client-side `gtag` helper module covering the full GA4 funnel (`add_to_cart`/`remove_from_cart`/`view_cart`/`begin_checkout`/`add_payment_info`/`select_item`/`sign_up`/`purchase` + custom `checkout_progress`/`top_menu_click`/`cta_click`), wired alongside the WebEngage calls at the same fire sites. Key conventions: GA4 `quantity` is fixed at 1 per cart line with the real count in a custom `item_qty` param; `purchase` is deduped per `transaction_id` via `localStorage` and fires client-side from `success/page.tsx` (gtag needs the browser) to complement the server-side WebEngage conversion. Drop-in: change the measurement ID in `app/layout.tsx` and the item-mapping in `toGaItem`.
 
 ## Workflow rule: keep CLAUDE.md in sync
 

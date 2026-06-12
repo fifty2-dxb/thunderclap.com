@@ -20,6 +20,7 @@ import {
 import { Bolt, Spark } from "@/components/bolt-art";
 import { useAiWaitlist } from "@/components/ai-waitlist";
 import { useCart, type Platform, type Service } from "@/components/cart-context";
+import { gaSelectItem } from "@/lib/ga4";
 
 const IgGlyph = () => (
   <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
@@ -406,7 +407,16 @@ function HomeBuyBox() {
                   key={t.qty}
                   type="button"
                   className={`pkg-tier ${safeIdx === i ? "selected" : ""} ${t.popular ? "best" : ""} ${t.bestDeal || t.bulkPrice ? "bulk" : ""}`}
-                  onClick={() => setSelected(i)}
+                  onClick={() => {
+                    setSelected(i);
+                    gaSelectItem({
+                      platform: platId as Platform,
+                      service: activeService.toLowerCase() as Service,
+                      qty: t.qty,
+                      price: t.price,
+                      premium: false,
+                    });
+                  }}
                 >
                   {t.popular && (
                     <span className="pkg-tier-tag best">

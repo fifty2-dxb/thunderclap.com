@@ -14,6 +14,7 @@ import {
   X,
 } from "lucide-react";
 import { formatQty } from "@/lib/utils";
+import { gaViewCart } from "@/lib/ga4";
 import {
   lineItemTotal,
   useCart,
@@ -246,6 +247,15 @@ export function CartDrawer() {
       bodyRef.current.scrollTop = 0;
     }
   }, [count]);
+
+  // Fire GA4 view_cart once each time the drawer opens with items in it.
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  useEffect(() => {
+    if (isDrawerOpen && items.length > 0) gaViewCart(items, subtotal);
+    // Intentionally keyed on open transitions only — refiring on every item
+    // change while open would double-count the cart view.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isDrawerOpen]);
 
   const grouped = useMemo(() => {
     const map = new Map<Platform, CartItem[]>();

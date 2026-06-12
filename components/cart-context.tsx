@@ -6,9 +6,11 @@ import {
   useContext,
   useEffect,
   useMemo,
+  useRef,
   useState,
 } from "react";
 import { trackAddedToCart } from "@/lib/webengage-client";
+import { gaAddToCart, gaRemoveFromCart } from "@/lib/ga4";
 
 export type Platform =
   | "instagram"
@@ -94,6 +96,13 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
     }
   }, [items, hydrated]);
 
+  // Mirror of `items` so removeItem can read the line being removed without a
+  // stale closure (and without firing analytics inside a state updater).
+  const itemsRef = useRef<CartItem[]>(items);
+  useEffect(() => {
+    itemsRef.current = items;
+  }, [items]);
+
   const openDrawer = useCallback(() => setIsDrawerOpen(true), []);
   const closeDrawer = useCallback(() => setIsDrawerOpen(false), []);
 
@@ -107,10 +116,13 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
     setLastAddedPlatform(input.platform);
     setIsDrawerOpen(true);
     trackAddedToCart(input);
+    gaAddToCart(input);
   }, []);
 
   const removeItem = useCallback<CartContextValue["removeItem"]>((id) => {
+    const removed = itemsRef.current.find((it) => it.id === id);
     setItems((curr) => curr.filter((it) => it.id !== id));
+    if (removed) gaRemoveFromCart(removed);
   }, []);
 
   const updateTarget = useCallback<CartContextValue["updateTarget"]>((id, target) => {

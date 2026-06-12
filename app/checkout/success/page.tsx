@@ -3,6 +3,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { Check, ShieldCheck } from "lucide-react";
 import { formatQty } from "@/lib/utils";
+import { PurchaseTracker } from "./_purchase";
 
 export const metadata: Metadata = {
   title: "Order received",
@@ -109,9 +110,19 @@ export default async function Page({
 
   return (
     <main className="co-shell">
-      {/* "Checkout Completed" is tracked server-side from the Redlap webhook
-          (app/api/redlap/webhook) so it fires reliably even if the buyer never
-          returns to this page. */}
+      {/* "Checkout Completed" (WebEngage) is tracked server-side from the Redlap
+          webhook so it fires even if the buyer never returns here. The GA4
+          `purchase` conversion, however, needs the browser, so it fires from
+          this page — deduped per order id. */}
+      <PurchaseTracker
+        transactionId={orderId}
+        value={total}
+        platform={platform}
+        service={service}
+        qty={qty}
+        price={basePrice}
+        premium={premium}
+      />
       <div className="co-top">
         <div className="container" style={{ position: "relative" }}>
           <div className="co-top-inner">

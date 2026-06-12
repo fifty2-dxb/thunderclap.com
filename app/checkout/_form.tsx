@@ -21,6 +21,12 @@ import {
   trackNewsletterSubscribed,
 } from "@/lib/webengage-client";
 import {
+  gaBeginCheckout,
+  gaCheckoutProgress,
+  gaAddPaymentInfo,
+  gaSignUp,
+} from "@/lib/ga4";
+import {
   PLATFORM_LABEL,
   SERVICE_LABEL,
   inputConfigFor,
@@ -103,6 +109,7 @@ export function CheckoutFlow({ initialEmail }: { initialEmail?: string }) {
   useEffect(() => {
     if (hydrated && items.length > 0 && !trackedCheckout) {
       trackCheckoutStarted(items, subtotal);
+      gaBeginCheckout(items, subtotal);
       setTrackedCheckout(true);
     }
   }, [hydrated, items, subtotal, trackedCheckout]);
@@ -205,12 +212,18 @@ export function CheckoutFlow({ initialEmail }: { initialEmail?: string }) {
 
     setSubmitting(true);
 
-    // Track Order Initiated
+    // Track Order Initiated + GA4 funnel: advancing past the form into the
+    // hosted payment page is the "progress" step and the payment-info step
+    // (Redlap owns the card/Apple Pay UI, so this is as close to add_payment_info
+    // as we can fire on-site).
     trackOrderInitiated(items, subtotal);
+    gaCheckoutProgress(items, 2, subtotal);
+    gaAddPaymentInfo(items, subtotal);
 
     // Track newsletter subscription if opted in
     if (promo && email.trim()) {
       trackNewsletterSubscribed(email.trim());
+      gaSignUp("newsletter");
     }
 
     try {

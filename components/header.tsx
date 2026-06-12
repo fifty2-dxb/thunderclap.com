@@ -8,6 +8,7 @@ import { ShoppingCart, Sparkles } from "lucide-react";
 import { MegaMenu, MEGA_PLATFORMS, type PlatformId } from "./mega-menu";
 import { useCart } from "./cart-context";
 import { useAiWaitlist } from "./ai-waitlist";
+import { gaTopMenuClick, gaCtaClick } from "@/lib/ga4";
 
 const PLATFORM_IDS = new Set<string>(MEGA_PLATFORMS.map((p) => p.id));
 const isPlatformId = (v: string): v is PlatformId => PLATFORM_IDS.has(v);
@@ -234,7 +235,10 @@ export function Header() {
                 <button
                   key={it.id}
                   type="button"
-                  onClick={() => openWaitlist("header-nav")}
+                  onClick={() => {
+                    gaTopMenuClick(it.label);
+                    openWaitlist("header-nav");
+                  }}
                   style={{ ...labelStyle, gap: 5, background: "transparent", border: "none" }}
                 >
                   <Sparkles size={14} color="var(--uv-pink)" />
@@ -252,6 +256,7 @@ export function Header() {
                   onMouseEnter={() => open(it.id)}
                   onFocus={() => open(it.id)}
                   onMouseLeave={scheduleClose}
+                  onClick={() => gaTopMenuClick(it.label, it.id)}
                   style={{
                     ...labelStyle,
                     background: "transparent",
@@ -286,7 +291,12 @@ export function Header() {
               );
             }
             return it.href ? (
-              <Link key={it.id} href={it.href} style={labelStyle}>
+              <Link
+                key={it.id}
+                href={it.href}
+                style={labelStyle}
+                onClick={() => gaTopMenuClick(it.label)}
+              >
                 {it.label}
               </Link>
             ) : (
@@ -307,6 +317,7 @@ export function Header() {
               display: "inline-flex",
               alignItems: "center",
             }}
+            onClick={() => gaCtaClick("Get Started", "header")}
           >
             Get Started
           </Link>
@@ -415,6 +426,7 @@ export function Header() {
                       key={it.id}
                       type="button"
                       onClick={() => {
+                        gaTopMenuClick(it.label);
                         closeMobile();
                         openWaitlist("mobile-nav");
                       }}
@@ -444,7 +456,10 @@ export function Header() {
                     <Link
                       key={it.id}
                       href={it.href ?? "#"}
-                      onClick={closeMobile}
+                      onClick={() => {
+                        gaTopMenuClick(it.label);
+                        closeMobile();
+                      }}
                       style={{
                         display: "block",
                         padding: "16px 20px",
@@ -515,7 +530,10 @@ export function Header() {
                             <Link
                               key={s.label}
                               href={s.href}
-                              onClick={closeMobile}
+                              onClick={() => {
+                                gaTopMenuClick(s.label, it.id);
+                                closeMobile();
+                              }}
                               aria-current={isCurrent ? "page" : undefined}
                               className={isCurrent ? "is-active" : undefined}
                               style={{
@@ -554,7 +572,10 @@ export function Header() {
               <div style={{ padding: "16px 20px 32px" }}>
                 <Link
                   href="/#services"
-                  onClick={closeMobile}
+                  onClick={() => {
+                    gaCtaClick("Get Started", "mobile-menu");
+                    closeMobile();
+                  }}
                   className="btn btn-primary"
                   style={{
                     width: "100%",
