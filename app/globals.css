@@ -1323,13 +1323,8 @@ img { display: block; max-width: 100%; }
 }
 .pkg-tier.best {
   border-color: var(--uv-pink);
-  background: var(--uv-gradient);
 }
 .pkg-tier.best:hover { transform: translateY(-1px); }
-.pkg-tier.best .pkg-qty,
-.pkg-tier.best .pkg-price,
-.pkg-tier.best .pkg-off,
-.pkg-tier.best .pkg-qty-sub { color: #fff !important; }
 .pkg-tier.bulk .pkg-off { color: #ff5e3a; }
 .pkg-tier-tag.best { background: var(--uv-pink-deep); }
 .pkg-tier-tag.bulk { background: #ff5e3a; }
