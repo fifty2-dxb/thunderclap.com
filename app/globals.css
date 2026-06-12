@@ -667,7 +667,7 @@ img { display: block; max-width: 100%; }
 .prem-badge {
   position: absolute;
   top: -10px; left: 20px;
-  background: linear-gradient(90deg, var(--uv-pink) 0%, var(--uv-pink-deep) 22%, #6f9bff 48%, var(--uv-pink-deep) 74%, var(--uv-pink) 100%);
+  background: linear-gradient(90deg, #f5a623 0%, #ff7a3d 24%, #ffce5a 50%, #ff7a3d 76%, #f5a623 100%);
   background-size: 200% 100%;
   animation: pill-grad-shift 3s linear infinite;
   color: #fff;
@@ -678,7 +678,7 @@ img { display: block; max-width: 100%; }
   padding: 3px 11px;
   border-radius: 999px;
   display: inline-flex; align-items: center; gap: 4px;
-  box-shadow: 0 5px 14px rgba(59,118,246,0.32);
+  box-shadow: 0 5px 14px rgba(245,140,35,0.36);
   z-index: 1;
 }
 @media (prefers-reduced-motion: reduce) {
