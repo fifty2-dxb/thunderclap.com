@@ -35,9 +35,9 @@ const PACKAGES = [
   { qty: 10000, price: 42.99, regular: 53.74 },
   { qty: 25000, price: 74.99, regular: 93.74 },
   { qty: 50000, price: 124.99, regular: 156.24 },
-  { qty: 100000, price: 199.99, regular: 249.99 },
+  { qty: 100000, price: 199.99, regular: 249.99, bestDeal: true },
   { qty: 250000, price: 399.99, regular: 499.99 },
-  { qty: 500000, price: 699.99, regular: 874.99 },
+  { qty: 500000, price: 699.99, regular: 874.99, bulkPrice: true },
 ] as const;
 
 const SIDE_BENEFITS = [
@@ -128,6 +128,7 @@ export function YouTubeViewsHero() {
         <div className="svc-layout">
           <div className="svc-builder">
             <div className={`prem-row ${premium ? "on" : ""}`}>
+              <span className="prem-badge"><Sparkles size={10} /> Recommended</span>
               <div style={{ display: "flex", alignItems: "center", gap: 14 }}>
                 <span className="prem-icon">
                   <Sparkles size={18} />
@@ -183,7 +184,17 @@ export function YouTubeViewsHero() {
                   >
                     {"popular" in p && p.popular && (
                       <span className="pkg-tier-tag">
-                        <Star size={9} fill="currentColor" /> POPULAR
+                        <Star size={9} fill="currentColor" /> MOST POPULAR
+                      </span>
+                    )}
+                    {(p as { bestDeal?: boolean }).bestDeal && (
+                      <span className="pkg-tier-tag best-deal">
+                        <Zap size={9} fill="currentColor" /> BEST DEAL
+                      </span>
+                    )}
+                    {(p as { bulkPrice?: boolean }).bulkPrice && (
+                      <span className="pkg-tier-tag bulk-price">
+                        <Zap size={9} fill="currentColor" /> BULK PRICE
                       </span>
                     )}
                     <span className="pkg-qty">{formatQty(p.qty)}</span>

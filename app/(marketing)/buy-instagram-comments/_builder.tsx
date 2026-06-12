@@ -27,10 +27,10 @@ const SERVICE_TABS = [
 
 const PACKAGES = [
   { qty: 10, price: 12.49, regular: 15.61 },
-  { qty: 25, price: 26.99, regular: 33.74 },
-  { qty: 50, price: 49.99, regular: 62.49, popular: true },
+  { qty: 25, price: 26.99, regular: 33.74, popular: true },
+  { qty: 50, price: 49.99, regular: 62.49 },
   { qty: 75, price: 69.99, regular: 87.49 },
-  { qty: 100, price: 94.99, regular: 118.74 },
+  { qty: 100, price: 94.99, regular: 118.74, bestDeal: true },
 ] as const;
 
 const SIDE_BENEFITS = [
@@ -121,6 +121,7 @@ export function CommentsHero() {
         <div className="svc-layout">
           <div className="svc-builder">
             <div className={`prem-row ${premium ? "on" : ""}`}>
+              <span className="prem-badge"><Sparkles size={10} /> Recommended</span>
               <div style={{ display: "flex", alignItems: "center", gap: 14 }}>
                 <span className="prem-icon">
                   <Sparkles size={18} />
@@ -176,7 +177,17 @@ export function CommentsHero() {
                   >
                     {"popular" in p && p.popular && (
                       <span className="pkg-tier-tag">
-                        <Star size={9} fill="currentColor" /> POPULAR
+                        <Star size={9} fill="currentColor" /> MOST POPULAR
+                      </span>
+                    )}
+                    {(p as { bestDeal?: boolean }).bestDeal && (
+                      <span className="pkg-tier-tag best-deal">
+                        <Zap size={9} fill="currentColor" /> BEST DEAL
+                      </span>
+                    )}
+                    {(p as { bulkPrice?: boolean }).bulkPrice && (
+                      <span className="pkg-tier-tag bulk-price">
+                        <Zap size={9} fill="currentColor" /> BULK PRICE
                       </span>
                     )}
                     <span className="pkg-qty">{formatQty(p.qty)}</span>

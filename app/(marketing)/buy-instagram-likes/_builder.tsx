@@ -30,11 +30,11 @@ const PACKAGES = [
   { qty: 100, price: 3.49, regular: 4.36 },
   { qty: 250, price: 5.99, regular: 7.49 },
   { qty: 500, price: 7.99, regular: 9.99 },
-  { qty: 1000, price: 14.99, regular: 18.74, popular: true },
-  { qty: 2500, price: 26.99, regular: 33.74 },
+  { qty: 1000, price: 14.99, regular: 18.74 },
+  { qty: 2500, price: 26.99, regular: 33.74, popular: true },
   { qty: 5000, price: 49.99, regular: 62.49 },
   { qty: 10000, price: 99.99, regular: 124.99 },
-  { qty: 20000, price: 189.99, regular: 237.49 },
+  { qty: 20000, price: 189.99, regular: 237.49, bulkPrice: true },
 ] as const;
 
 const SIDE_BENEFITS = [
@@ -125,6 +125,7 @@ export function LikesHero() {
         <div className="svc-layout">
           <div className="svc-builder">
             <div className={`prem-row ${premium ? "on" : ""}`}>
+              <span className="prem-badge"><Sparkles size={10} /> Recommended</span>
               <div style={{ display: "flex", alignItems: "center", gap: 14 }}>
                 <span className="prem-icon">
                   <Sparkles size={18} />
@@ -180,7 +181,17 @@ export function LikesHero() {
                   >
                     {"popular" in p && p.popular && (
                       <span className="pkg-tier-tag">
-                        <Star size={9} fill="currentColor" /> POPULAR
+                        <Star size={9} fill="currentColor" /> MOST POPULAR
+                      </span>
+                    )}
+                    {(p as { bestDeal?: boolean }).bestDeal && (
+                      <span className="pkg-tier-tag best-deal">
+                        <Zap size={9} fill="currentColor" /> BEST DEAL
+                      </span>
+                    )}
+                    {(p as { bulkPrice?: boolean }).bulkPrice && (
+                      <span className="pkg-tier-tag bulk-price">
+                        <Zap size={9} fill="currentColor" /> BULK PRICE
                       </span>
                     )}
                     <span className="pkg-qty">{formatQty(p.qty)}</span>

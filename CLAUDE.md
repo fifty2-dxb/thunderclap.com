@@ -267,6 +267,12 @@ All required component classes already exist in `app/globals.css`. Use them — 
 4. Re-sync the mega-menu `fromPrice` for that service
 5. The "Save up to N%" header pill is hardcoded to 20% across all builders (the CSV's standard discount). Bump it if a service's max actual discount is meaningfully higher.
 
+**Tier badge pills** — every `_builder.tsx` renders three optional per-tier badge pills, each driven by a boolean flag on the `PACKAGES` entry. All three are **animated gradient pills** (`@keyframes pill-grad-shift` slides a `200%`-wide gradient; `prefers-reduced-motion` disables it):
+- `popular?: true` → `.pkg-tier-tag` (blue gradient, Star icon) labelled **MOST POPULAR** (was "POPULAR" — renamed 2026-06).
+- `bestDeal?: true` → `.pkg-tier-tag.best-deal` (amber/orange gradient, Zap icon) labelled **BEST DEAL**.
+- `bulkPrice?: true` → `.pkg-tier-tag.bulk-price` (green gradient, Zap icon) labelled **BULK PRICE**.
+All 20 builders carry **all three render branches** (so any tier can opt in by adding a flag); the `bestDeal`/`bulkPrice` branches use a cast guard `{(p as { bestDeal?: boolean }).bestDeal && …}` (not `"x" in p`) so they typecheck even on pages where no tier sets the flag. There's no enforced "exactly one" rule for best-deal/bulk-price — set them per the user's per-page instruction (typically MOST POPULAR on a mid tier, BEST DEAL or BULK PRICE on the top tier). The premium row also carries a static-position **animated "Recommended" gradient pill** (`.prem-badge`, top-left, Sparkles icon) calling out the +35% premium upsell.
+
 **Service tabs (`.svc-tabs` strip above the package grid) are real navigation, NOT local state.** Each entry in `SERVICE_TABS` carries an `href` pointing to the matching `/buy-{platform}-{service}` page; the markup uses `<Link href={t.href}>` not `<button onClick={setTab}>`. Clicking a tab loads the new page with its real PACKAGES, prices, H1, and CTA — there's no shared tab-state model. The `tab` useState stays as a read-only constant for the per-tier sub-label and side-summary title (it always equals the current page's service id). Active-tab styling still works via `tab === t.id`. **Don't reintroduce the local-state tab pattern** — the user explicitly rejected it because the prices didn't change when toggling. SERVICE_TABS must list only services that exist on that platform (don't include `Comments` or `Likes` on YouTube etc.).
 
 **Premium toggle** (`+35%`):

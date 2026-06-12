@@ -125,6 +125,7 @@ export function LinkedInConnectionsHero() {
         <div className="svc-layout">
           <div className="svc-builder">
             <div className={`prem-row ${premium ? "on" : ""}`}>
+              <span className="prem-badge"><Sparkles size={10} /> Recommended</span>
               <div style={{ display: "flex", alignItems: "center", gap: 14 }}>
                 <span className="prem-icon">
                   <Sparkles size={18} />
@@ -180,7 +181,17 @@ export function LinkedInConnectionsHero() {
                   >
                     {"popular" in p && p.popular && (
                       <span className="pkg-tier-tag">
-                        <Star size={9} fill="currentColor" /> POPULAR
+                        <Star size={9} fill="currentColor" /> MOST POPULAR
+                      </span>
+                    )}
+                    {(p as { bestDeal?: boolean }).bestDeal && (
+                      <span className="pkg-tier-tag best-deal">
+                        <Zap size={9} fill="currentColor" /> BEST DEAL
+                      </span>
+                    )}
+                    {(p as { bulkPrice?: boolean }).bulkPrice && (
+                      <span className="pkg-tier-tag bulk-price">
+                        <Zap size={9} fill="currentColor" /> BULK PRICE
                       </span>
                     )}
                     <span className="pkg-qty">{formatQty(p.qty)}</span>

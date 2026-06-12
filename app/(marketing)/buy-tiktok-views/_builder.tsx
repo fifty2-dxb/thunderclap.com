@@ -29,7 +29,7 @@ const PACKAGES = [
   { qty: 2000, price: 2.99, regular: 3.74 },
   { qty: 5000, price: 5.49, regular: 6.86 },
   { qty: 10000, price: 9.99, regular: 12.49, popular: true },
-  { qty: 50000, price: 34.99, regular: 43.74 },
+  { qty: 50000, price: 34.99, regular: 43.74, bestDeal: true },
 ] as const;
 
 const SIDE_BENEFITS = [
@@ -120,6 +120,7 @@ export function TikTokViewsHero() {
         <div className="svc-layout">
           <div className="svc-builder">
             <div className={`prem-row ${premium ? "on" : ""}`}>
+              <span className="prem-badge"><Sparkles size={10} /> Recommended</span>
               <div style={{ display: "flex", alignItems: "center", gap: 14 }}>
                 <span className="prem-icon">
                   <Sparkles size={18} />
@@ -175,7 +176,17 @@ export function TikTokViewsHero() {
                   >
                     {"popular" in p && p.popular && (
                       <span className="pkg-tier-tag">
-                        <Star size={9} fill="currentColor" /> POPULAR
+                        <Star size={9} fill="currentColor" /> MOST POPULAR
+                      </span>
+                    )}
+                    {(p as { bestDeal?: boolean }).bestDeal && (
+                      <span className="pkg-tier-tag best-deal">
+                        <Zap size={9} fill="currentColor" /> BEST DEAL
+                      </span>
+                    )}
+                    {(p as { bulkPrice?: boolean }).bulkPrice && (
+                      <span className="pkg-tier-tag bulk-price">
+                        <Zap size={9} fill="currentColor" /> BULK PRICE
                       </span>
                     )}
                     <span className="pkg-qty">{formatQty(p.qty)}</span>

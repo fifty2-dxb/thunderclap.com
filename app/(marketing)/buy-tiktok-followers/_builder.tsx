@@ -27,10 +27,10 @@ const SERVICE_TABS = [
 const PACKAGES = [
   { qty: 100, price: 5.99, regular: 7.49 },
   { qty: 200, price: 8.99, regular: 11.24 },
-  { qty: 500, price: 18.99, regular: 23.74 },
-  { qty: 1000, price: 29.99, regular: 37.49, popular: true },
+  { qty: 500, price: 18.99, regular: 23.74, popular: true },
+  { qty: 1000, price: 29.99, regular: 37.49 },
   { qty: 2000, price: 39.99, regular: 49.99 },
-  { qty: 5000, price: 69.99, regular: 87.49 },
+  { qty: 5000, price: 69.99, regular: 87.49, bestDeal: true },
 ] as const;
 
 const SIDE_BENEFITS = [
@@ -121,6 +121,7 @@ export function TikTokFollowersHero() {
         <div className="svc-layout">
           <div className="svc-builder">
             <div className={`prem-row ${premium ? "on" : ""}`}>
+              <span className="prem-badge"><Sparkles size={10} /> Recommended</span>
               <div style={{ display: "flex", alignItems: "center", gap: 14 }}>
                 <span className="prem-icon">
                   <Sparkles size={18} />
@@ -176,7 +177,17 @@ export function TikTokFollowersHero() {
                   >
                     {"popular" in p && p.popular && (
                       <span className="pkg-tier-tag">
-                        <Star size={9} fill="currentColor" /> POPULAR
+                        <Star size={9} fill="currentColor" /> MOST POPULAR
+                      </span>
+                    )}
+                    {(p as { bestDeal?: boolean }).bestDeal && (
+                      <span className="pkg-tier-tag best-deal">
+                        <Zap size={9} fill="currentColor" /> BEST DEAL
+                      </span>
+                    )}
+                    {(p as { bulkPrice?: boolean }).bulkPrice && (
+                      <span className="pkg-tier-tag bulk-price">
+                        <Zap size={9} fill="currentColor" /> BULK PRICE
                       </span>
                     )}
                     <span className="pkg-qty">{formatQty(p.qty)}</span>
