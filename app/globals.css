@@ -1159,6 +1159,173 @@ img { display: block; max-width: 100%; }
 }
 
 /* ============================================================
+   Homepage redesign ("Soft Bolt") — soft hero, interactive
+   buy-box platform pills, savings tiles, AI cross-sell strip,
+   cartoon thunder art. Ported from the new design handoff.
+   ============================================================ */
+
+/* --- Soft hero --- */
+.soft-hero {
+  position: relative;
+  overflow: hidden;
+  background:
+    radial-gradient(900px 500px at 12% -10%, #e4ecfc 0%, transparent 55%),
+    radial-gradient(820px 540px at 100% 0%, #dfe9fc 0%, transparent 58%),
+    linear-gradient(180deg, #f3f7fd 0%, #eef3fb 100%);
+  padding: 44px 0 84px;
+}
+.soft-hero .container { position: relative; z-index: 2; }
+.soft-hero-grid {
+  display: grid;
+  grid-template-columns: 1.02fr 0.98fr;
+  gap: 52px;
+  align-items: center;
+}
+.soft-pill {
+  display: inline-flex; align-items: center; gap: 10px;
+  padding: 8px 16px 8px 10px;
+  background: #fff;
+  border: 1.5px solid var(--uv-pink-bg);
+  border-radius: 999px;
+  font-size: 13px; font-weight: 700;
+  color: var(--uv-fg-2);
+  box-shadow: var(--uv-shadow-card);
+  margin-bottom: 22px;
+}
+.soft-pill .bolt-mini {
+  width: 26px; height: 26px; border-radius: 999px;
+  background: var(--tart-yellow);
+  display: inline-flex; align-items: center; justify-content: center;
+}
+.soft-h1 {
+  font-family: var(--uv-font-display);
+  font-weight: 800;
+  font-size: clamp(40px, 5.6vw, 62px);
+  line-height: 1.02;
+  letter-spacing: -0.035em;
+  color: var(--uv-fg-1);
+  margin: 0;
+  text-wrap: balance;
+}
+.soft-h1 .wordwrap { position: relative; display: inline-block; }
+.soft-h1 .underliner {
+  position: absolute; left: 0; right: 0; bottom: -6px; height: 12px;
+  background: var(--tart-yellow);
+  border-radius: 999px; opacity: 0.55; z-index: -1;
+}
+.soft-sub {
+  font-size: 18px; line-height: 1.6;
+  color: var(--uv-fg-2);
+  max-width: 500px;
+  margin: 22px 0 26px;
+  text-wrap: pretty;
+}
+.soft-chips { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 28px; }
+.soft-chip {
+  display: inline-flex; align-items: center; gap: 8px;
+  padding: 9px 15px; border-radius: 999px;
+  background: #fff; border: 1.5px solid var(--uv-line);
+  font-size: 13.5px; font-weight: 700; color: var(--uv-fg-2);
+  box-shadow: var(--uv-shadow-sm);
+}
+.soft-chip .dot { width: 8px; height: 8px; border-radius: 999px; }
+.soft-stats {
+  display: flex; gap: 30px; flex-wrap: wrap;
+  padding-top: 26px; border-top: 1.5px dashed var(--uv-line-strong);
+}
+.soft-stat-n {
+  font-family: var(--uv-font-display); font-weight: 800; font-size: 28px;
+  letter-spacing: -0.03em; color: var(--uv-pink-deep); line-height: 1;
+}
+.soft-stat-l { font-size: 12.5px; color: var(--uv-fg-3); font-weight: 600; margin-top: 6px; }
+.soft-buybox { position: relative; }
+.soft-buybox::before {
+  content: ""; position: absolute; inset: -14px;
+  background: var(--uv-gradient); filter: blur(38px); opacity: 0.30;
+  border-radius: 44px; z-index: 0;
+}
+.soft-buybox > * { position: relative; z-index: 1; }
+
+/* --- Interactive buy-box: platform pill row --- */
+.buybox-frame { position: relative; }
+.buybox-frame > * { position: relative; z-index: 1; }
+.buybox-frame .pkg-qty-sub {
+  display: block; font-size: 9px; font-weight: 800; letter-spacing: 0.04em;
+  color: var(--uv-fg-3); margin-top: 3px; text-align: center;
+}
+.plat-row { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 16px; }
+.plat-chip {
+  display: inline-flex; align-items: center; gap: 8px;
+  padding: 8px 14px 8px 10px;
+  background: #fff;
+  border: 1.5px solid var(--uv-line);
+  border-radius: 999px;
+  font-size: 13.5px; font-weight: 700;
+  color: var(--uv-fg-2);
+  cursor: pointer;
+  transition: all 150ms cubic-bezier(.2,.8,.2,1);
+}
+.plat-chip:hover { border-color: var(--uv-line-strong); }
+.plat-chip.active { border-color: var(--uv-pink); color: var(--uv-fg-1); }
+.plat-glyph {
+  width: 24px; height: 24px; border-radius: 7px;
+  display: inline-flex; align-items: center; justify-content: center;
+  color: #fff; flex-shrink: 0;
+}
+
+/* --- Buy-box savings tiles: best-selling + bulk --- */
+.pkg-off {
+  font-family: var(--uv-font-display);
+  font-size: 11.5px; font-weight: 800;
+  color: #0a9c64;
+  margin-top: 4px; letter-spacing: -0.01em;
+  white-space: nowrap;
+}
+.pkg-tier.best {
+  border-color: var(--uv-pink);
+  background: var(--uv-gradient);
+}
+.pkg-tier.best:hover { transform: translateY(-1px); }
+.pkg-tier.best .pkg-qty,
+.pkg-tier.best .pkg-price,
+.pkg-tier.best .pkg-off,
+.pkg-tier.best .pkg-qty-sub { color: #fff !important; }
+.pkg-tier.bulk .pkg-off { color: #ff5e3a; }
+.pkg-tier-tag.best { background: var(--uv-pink-deep); }
+.pkg-tier-tag.bulk { background: #ff5e3a; }
+
+/* --- AI Growth cross-sell strip --- */
+.pkg-ai-strip {
+  display: flex; align-items: center; gap: 8px;
+  margin-top: 14px;
+  padding: 11px 14px;
+  background: var(--uv-pink-soft);
+  border: 1px solid var(--uv-pink-bg);
+  border-radius: 12px;
+  font-size: 13px; color: var(--uv-fg-2);
+  text-decoration: none;
+  transition: border-color 150ms, background 150ms;
+}
+.pkg-ai-strip:hover { border-color: var(--uv-pink); }
+.pkg-ai-strip strong { color: var(--uv-fg-1); }
+.pkg-ai-text { flex: 1; min-width: 0; }
+.pkg-ai-cta {
+  display: inline-flex; align-items: center; gap: 4px;
+  font-weight: 800; color: var(--uv-pink);
+  white-space: nowrap; flex-shrink: 0;
+}
+
+/* --- Cartoon thunder art (floating decorations) --- */
+.tart { position: absolute; pointer-events: none; z-index: 1; }
+.tart-float { animation: tart-float 6s ease-in-out infinite; }
+.tart-float-2 { animation: tart-float 7.5s ease-in-out infinite; }
+.tart-wiggle { animation: tart-wiggle 5s ease-in-out infinite; transform-origin: 50% 0; }
+@keyframes tart-float { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-16px); } }
+@keyframes tart-wiggle { 0%,100% { transform: rotate(-7deg); } 50% { transform: rotate(7deg); } }
+@media (prefers-reduced-motion: reduce) { .tart-float, .tart-float-2, .tart-wiggle { animation: none; } }
+.bolt-row { display: flex; justify-content: center; gap: 18px; margin-bottom: -6px; }
+
+/* ============================================================
    Responsive
    Breakpoint cascade: 1080 → 980 → 720 → 640 → 480
    ============================================================ */
@@ -1188,6 +1355,7 @@ img { display: block; max-width: 100%; }
   .hdr-desktop-cta { display: none; }
   .hdr-mobile-toggle { display: inline-flex; }
 
+  .soft-hero-grid { grid-template-columns: 1fr; gap: 40px; }
   .why-grid-3 { grid-template-columns: 1fr; }
   .pricing-grid { grid-template-columns: 1fr; }
   .tier-featured { transform: none; }
@@ -1224,6 +1392,11 @@ img { display: block; max-width: 100%; }
 @media (max-width: 640px) {
   .container { padding-left: 16px; padding-right: 16px; }
   .container-narrow { padding-left: 16px; padding-right: 16px; }
+
+  /* Soft hero: single column, hide floating decorations */
+  .soft-hero-grid { grid-template-columns: 1fr; gap: 36px; }
+  .soft-stats { gap: 22px; }
+  .tart-hide-sm { display: none; }
 
   /* Pricing tiles: THREE columns at phone widths — proper rectangles with
      real breathing room, not chips. All 14 tiles still fit in an overview. */

@@ -1,11 +1,13 @@
 import type { Metadata } from "next";
 import { CtaSection } from "@/components/cta-section";
+import { DashboardStrip } from "@/components/dashboard-strip";
 import { FaqSection } from "@/components/faq";
 import { Hero } from "@/components/hero";
 import { HowItWorks } from "@/components/how-it-works";
 import { PricingTable } from "@/components/pricing-table";
 import { ServiceTable } from "@/components/service-table";
 import { Testimonials } from "@/components/testimonials";
+import { TwoWays } from "@/components/two-ways";
 import { WhyThunderclap } from "@/components/trust-bar";
 import { HOMEPAGE_FAQS } from "@/content/faqs";
 import { SITE_URL } from "@/lib/seo";
@@ -88,6 +90,8 @@ export default function HomePage() {
       />
       <Hero />
       <ServiceTable />
+      <DashboardStrip />
+      <TwoWays />
       <WhyThunderclap />
       <HowItWorks />
       <PricingTable />

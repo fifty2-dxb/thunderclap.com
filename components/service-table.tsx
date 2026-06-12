@@ -5,7 +5,6 @@ import { ArrowUpRight } from "lucide-react";
 type Service = {
   platformId: "instagram" | "tiktok" | "youtube" | "facebook" | "twitter" | "linkedin";
   platformName: string;
-  service: string;
   href: string;
   price: string;
   popular?: boolean;
@@ -64,26 +63,16 @@ const LinkedInBrand = (
 
 const IG_BG = "linear-gradient(135deg,#feda77 0%,#f58529 35%,#dd2a7b 65%,#8134af 100%)";
 
+// One row per platform — "starting from" is the platform's lowest service price,
+// and the row links to that lowest-priced service page. Keep prices in sync with
+// each builder's PACKAGES lowest tier.
 const SERVICES: Service[] = [
-  { platformId: "instagram", platformName: "Instagram", service: "Followers", href: "/buy-instagram-followers", price: "$3.49", popular: true, brand: InstagramBrand, bg: IG_BG },
-  { platformId: "instagram", platformName: "Instagram", service: "Likes",     href: "/buy-instagram-likes",     price: "$1.99", brand: InstagramBrand, bg: IG_BG },
-  { platformId: "instagram", platformName: "Instagram", service: "Views",     href: "/buy-instagram-views",     price: "$2.49", brand: InstagramBrand, bg: IG_BG },
-  { platformId: "tiktok",    platformName: "TikTok",    service: "Followers", href: "/buy-tiktok-followers",    price: "$5.99", popular: true, brand: TikTokBrand, bg: "#000" },
-  { platformId: "tiktok",    platformName: "TikTok",    service: "Likes",     href: "/buy-tiktok-likes",        price: "$2.99", brand: TikTokBrand, bg: "#000" },
-  { platformId: "tiktok",    platformName: "TikTok",    service: "Views",     href: "/buy-tiktok-views",        price: "$1.99", brand: TikTokBrand, bg: "#000" },
-  { platformId: "youtube",   platformName: "YouTube",   service: "Subscribers", href: "/buy-youtube-subscribers", price: "$6.99", brand: YouTubeBrand, bg: "#FF0000" },
-  { platformId: "youtube",   platformName: "YouTube",   service: "Likes",     href: "/buy-youtube-likes",       price: "$2.99", brand: YouTubeBrand, bg: "#FF0000" },
-  { platformId: "youtube",   platformName: "YouTube",   service: "Views",     href: "/buy-youtube-views",       price: "$2.49", brand: YouTubeBrand, bg: "#FF0000" },
-  { platformId: "facebook",  platformName: "Facebook",  service: "Followers", href: "/buy-facebook-followers",  price: "$3.49", brand: FacebookBrand, bg: "#1877F2" },
-  { platformId: "facebook",  platformName: "Facebook",  service: "Likes",     href: "/buy-facebook-likes",      price: "$3.50", brand: FacebookBrand, bg: "#1877F2" },
-  { platformId: "facebook",  platformName: "Facebook",  service: "Views",     href: "/buy-facebook-views",      price: "$2.99", brand: FacebookBrand, bg: "#1877F2" },
-  { platformId: "twitter",   platformName: "Twitter / X", service: "Followers", href: "/buy-twitter-followers", price: "$3.99", brand: TwitterBrand, bg: "#000" },
-  { platformId: "twitter",   platformName: "Twitter / X", service: "Likes",     href: "/buy-twitter-likes",     price: "$2.49", brand: TwitterBrand, bg: "#000" },
-  { platformId: "twitter",   platformName: "Twitter / X", service: "Retweets",  href: "/buy-twitter-retweets",  price: "$2.99", brand: TwitterBrand, bg: "#000" },
-  { platformId: "linkedin",  platformName: "LinkedIn",  service: "Connections", href: "/buy-linkedin-connections", price: "$8",    brand: LinkedInBrand, bg: "#0A66C2" },
-  { platformId: "linkedin",  platformName: "LinkedIn",  service: "Followers",   href: "/buy-linkedin-followers",   price: "$7",    brand: LinkedInBrand, bg: "#0A66C2" },
-  { platformId: "linkedin",  platformName: "LinkedIn",  service: "Likes",       href: "/buy-linkedin-likes",       price: "$4.50", brand: LinkedInBrand, bg: "#0A66C2" },
-  { platformId: "linkedin",  platformName: "LinkedIn",  service: "Comments",    href: "/buy-linkedin-comments",    price: "$4",    brand: LinkedInBrand, bg: "#0A66C2" },
+  { platformId: "instagram", platformName: "Instagram",   href: "/buy-instagram-likes", price: "$1.99", popular: true, brand: InstagramBrand, bg: IG_BG },
+  { platformId: "tiktok",    platformName: "TikTok",      href: "/buy-tiktok-views",    price: "$1.99", popular: true, brand: TikTokBrand, bg: "#000" },
+  { platformId: "youtube",   platformName: "YouTube",     href: "/buy-youtube-views",   price: "$2.49", brand: YouTubeBrand, bg: "#FF0000" },
+  { platformId: "facebook",  platformName: "Facebook",    href: "/buy-facebook-views",  price: "$2.99", brand: FacebookBrand, bg: "#1877F2" },
+  { platformId: "twitter",   platformName: "Twitter / X", href: "/buy-twitter-likes",   price: "$2.49", brand: TwitterBrand, bg: "#000" },
+  { platformId: "linkedin",  platformName: "LinkedIn",    href: "/buy-linkedin-comments", price: "$4", brand: LinkedInBrand, bg: "#0A66C2" },
 ];
 
 export function ServiceTable() {
@@ -92,7 +81,7 @@ export function ServiceTable() {
       <div className="container">
         <div className="service-table">
           <div className="st-head">
-            <span>Service</span>
+            <span>Platform</span>
             <span>Starting from</span>
             <span>Delivery</span>
             <span />
@@ -102,14 +91,14 @@ export function ServiceTable() {
               key={s.href}
               href={s.href}
               className="st-row st-row-link"
-              aria-label={`Buy ${s.platformName} ${s.service}`}
+              aria-label={`Buy ${s.platformName}`}
             >
               <div className="st-name">
                 <span className="st-dot" style={{ background: s.bg, color: "#fff" }}>
                   {s.brand}
                 </span>
                 <span style={{ fontWeight: 700, fontSize: 15, color: "var(--uv-fg-1)" }}>
-                  Buy {s.platformName} {s.service}
+                  {s.platformName}
                 </span>
                 {s.popular && (
                   <span

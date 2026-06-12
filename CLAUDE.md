@@ -82,8 +82,9 @@ components/
   mega-menu.tsx                       (client) desktop dropdown panel: sidebar + 2-col service cards
   ticker.tsx                          right-to-left marquee of trust signals (below the header)
   footer.tsx                          6-col service grid (link equity), socials, payment badges
-  hero.tsx, faq.tsx, pricing-table.tsx, trust-bar.tsx, testimonials.tsx
-  cta-section.tsx, service-table.tsx (clickable rows → /buy-*), how-it-works.tsx, announcement.tsx
+  hero.tsx (client — "Soft Bolt" HeroSoft + interactive HomeBuyBox), faq.tsx, pricing-table.tsx, trust-bar.tsx, testimonials.tsx
+  cta-section.tsx (SoftCta — bolt-row + sparks), service-table.tsx (one row per platform → /buy-*), how-it-works.tsx, announcement.tsx
+  dashboard-strip.tsx (dark "Live Platform Metrics" stat strip), two-ways.tsx (Growth packages vs Thunderclap AI), bolt-art.tsx (shared Bolt/Spark SVG art)
 lib/
   seo.ts                              SITE_URL, SITE_NAME, default metadata
   schema.ts                           JSON-LD generators
@@ -287,9 +288,20 @@ The `price` query param is the **base** tier price (not premium-adjusted). The c
 
 ## Homepage service-table (single source of "what we sell")
 
-`components/service-table.tsx` lists every buyable service the site offers — 14 rows that mirror the header mega-menu exactly. Each row is a `<Link>` (`.st-row-link` extends `.st-row` with `text-decoration: none; color: inherit; cursor: pointer`) that wraps the whole row, so any click goes to `/buy-{platform}-{service}`. Hover state shifts the Get Started chip to pink-fill so it reads as the active CTA.
+`components/service-table.tsx` is now **one row per platform** (6 rows: Instagram, TikTok, YouTube, Facebook, Twitter/X, LinkedIn) to match the "Soft Bolt" homepage design — NOT one row per platform+service. Each row is a `<Link>` (`.st-row-link` extends `.st-row` with `text-decoration: none; color: inherit; cursor: pointer`) wrapping the whole row, pointing at that platform's **lowest-priced** service page (e.g. Instagram → `/buy-instagram-likes`), with the "starting from" column showing that lowest price. The full per-service link grid still lives in the footer for SEO link equity. Hover state shifts the Get Started chip to pink-fill.
 
 When you change a service price in a `_builder.tsx` `PACKAGES` array, the homepage `SERVICES` array, `MEGA_PLATFORMS[i].services[j].fromPrice`, AND the cart drawer's `SUGGESTION_POOL`/`BROWSE_LINKS` (`components/cart-drawer.tsx`) all need the matching value. **These four sources of truth aren't centralised yet** — `content/packages.ts` is still an empty stub. If you centralise them, rewrite all four call sites or it'll drift.
+
+## Homepage design ("Soft Bolt" — blue, no orange glow)
+
+The homepage was rebuilt to the playful "Soft Bolt" design. The brand moved from coral to **blue** (the `--uv-pink-*` CSS vars now hold blue hexes; `--uv-glow-pink`/`--uv-glow-grad` are `none` — there is NO orange glow anymore). The cartoon-art palette lives in the `--tart-*` vars. All the new homepage CSS lives in the "Homepage redesign (Soft Bolt)" block in `globals.css` just before the Responsive section (`.soft-hero`, `.soft-buybox`, `.buybox-frame`, `.plat-row`/`.plat-chip`, `.pkg-ai-strip`, `.tart`/`.tart-float`/`.tart-wiggle`, `.bolt-row`).
+
+- **`components/hero.tsx`** (`"use client"`) — `HeroSoft` layout (rating pill "4.9 · Loved by 200,000+ creators", H1 "Grow any account, real engagement, in minutes.", chips, stats) + the interactive **`HomeBuyBox`**. The buy-box has a platform-chip row (the 6 real platforms + an "AI Growth" chip), service tabs, an 8-tier package grid (`HOME_PACKAGES`, synthetic display prices), a URL input, and a live total. **Default `platId` is `"instagram"`** (NOT `"ai"`) so the box opens on the primary conversion path; its CTA links to the real `/buy-{platform}-{service}/` page. When the "AI Growth" chip is active (`aiMode`), it swaps to a Monthly/Annual subscription view (`HOME_AI_PLANS`) whose CTA links to `/` (the AI funnel page doesn't exist yet — keep it pointing home until it does).
+- **`components/dashboard-strip.tsx`** — dark (`#0e1117`) "LIVE PLATFORM METRICS" stat strip ("Real numbers. Real growth.", 6 stat cards incl. **4.9★** Trustpilot). The "View full ops dashboard" link points to `/` (no ops page yet).
+- **`components/two-ways.tsx`** — "Two ways to grow" — a "Growth packages" card (→ `/buy-instagram-followers/`) next to a featured "Thunderclap AI" card (→ `/`, AI funnel not built yet).
+- **`components/bolt-art.tsx`** — shared `Bolt` + `Spark` cartoon SVGs, imported by both `hero.tsx` and `cta-section.tsx` (`SoftCta`). Pure SVG, no `"use client"`.
+- Homepage section order (`app/page.tsx`): Hero → ServiceTable → DashboardStrip → TwoWays → WhyThunderclap → HowItWorks → PricingTable → Testimonials → FaqSection → CtaSection. (ServiceTable is intentionally kept even though the design omits it — it's a real-link SEO/conversion surface.)
+- **Rating is 4.9 everywhere** (the design HTML showed 4.7 in spots — 4.9 wins, it's unified site-wide).
 
 ## Blog system
 
