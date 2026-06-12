@@ -7,7 +7,6 @@ import {
   Facebook,
   Flame,
   Linkedin,
-  Link2,
   Lock,
   Music2,
   Play,
@@ -270,7 +269,6 @@ function HomeBuyBox() {
   const [platId, setPlatId] = useState<HomePlatform["id"] | "ai">("instagram");
   const [service, setService] = useState("Followers");
   const [selected, setSelected] = useState(3);
-  const [url, setUrl] = useState("");
   const [billing, setBilling] = useState<"m" | "a">("m");
   const [aiPlan, setAiPlan] = useState(1);
   const { open: openWaitlist } = useAiWaitlist();
@@ -306,7 +304,6 @@ function HomeBuyBox() {
       price: pkg.price,
       regular: pkg.regular,
       premium: false,
-      target: url.trim() || undefined,
     });
   }
 
@@ -416,23 +413,6 @@ function HomeBuyBox() {
               );
             })}
           </div>
-        )}
-
-        {!aiMode && (
-          <label className="pkg-url-wrap">
-            <Link2 size={16} color="var(--uv-fg-3)" />
-            <div style={{ flex: 1 }}>
-              <input
-                className="pkg-url-input"
-                value={url}
-                onChange={(e) => setUrl(e.target.value)}
-                placeholder="You'll paste this at checkout — no password needed."
-              />
-            </div>
-            <span className="pkg-safe">
-              <Lock size={11} /> Safe
-            </span>
-          </label>
         )}
 
         <div className="pkg-cta-row">
