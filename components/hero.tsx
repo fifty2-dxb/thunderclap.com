@@ -44,12 +44,12 @@ type HomePlatform = {
 };
 
 const HOME_PLATFORMS: HomePlatform[] = [
-  { id: "instagram", label: "Instagram", bg: "linear-gradient(135deg,#feda77 0%,#f58529 35%,#dd2a7b 65%,#8134af 100%)", glyph: <IgGlyph />, services: ["Followers", "Likes", "Views"] },
+  { id: "instagram", label: "Instagram", bg: "linear-gradient(135deg,#feda77 0%,#f58529 35%,#dd2a7b 65%,#8134af 100%)", glyph: <IgGlyph />, services: ["Followers", "Likes", "Views", "Comments"] },
   { id: "tiktok", label: "TikTok", bg: "#000", icon: <Music2 size={13} color="#fff" />, services: ["Followers", "Likes", "Views"] },
   { id: "youtube", label: "YouTube", bg: "#FF0000", icon: <Play size={13} color="#fff" />, services: ["Subscribers", "Views", "Likes"] },
   { id: "twitter", label: "X", bg: "#000", glyph: <XGlyph />, services: ["Followers", "Likes", "Retweets"] },
   { id: "facebook", label: "Facebook", bg: "#1877F2", icon: <Facebook size={13} color="#fff" />, services: ["Followers", "Likes", "Views"] },
-  { id: "linkedin", label: "LinkedIn", bg: "#0A66C2", icon: <Linkedin size={13} color="#fff" />, services: ["Followers", "Likes", "Comments"] },
+  { id: "linkedin", label: "LinkedIn", bg: "#0A66C2", icon: <Linkedin size={13} color="#fff" />, services: ["Connections", "Followers", "Likes", "Comments"] },
 ];
 
 type HomeTier = {
@@ -95,6 +95,13 @@ const HOME_PRICING: Record<string, HomeTier[]> = {
     { qty: 10000, price: 26.99, regular: 33.74 },
     { qty: 25000, price: 54.99, regular: 68.74 },
     { qty: 50000, price: 79.99, regular: 99.99, bestDeal: true },
+  ],
+  "instagram-comments": [
+    { qty: 10, price: 12.49, regular: 15.61 },
+    { qty: 25, price: 26.99, regular: 33.74, popular: true },
+    { qty: 50, price: 49.99, regular: 62.49 },
+    { qty: 75, price: 69.99, regular: 87.49 },
+    { qty: 100, price: 94.99, regular: 118.74, bestDeal: true },
   ],
   "tiktok-followers": [
     { qty: 100, price: 5.99, regular: 7.49 },
@@ -213,6 +220,16 @@ const HOME_PRICING: Record<string, HomeTier[]> = {
     { qty: 10000, price: 24.99, regular: 31.24, popular: true },
     { qty: 25000, price: 49.99, regular: 62.49 },
     { qty: 50000, price: 74.99, regular: 93.74 },
+  ],
+  "linkedin-connections": [
+    { qty: 100, price: 8, regular: 10 },
+    { qty: 250, price: 18, regular: 22.5 },
+    { qty: 500, price: 36, regular: 45 },
+    { qty: 750, price: 54, regular: 67.5 },
+    { qty: 1000, price: 69, regular: 86.25, popular: true },
+    { qty: 1500, price: 109, regular: 136.25 },
+    { qty: 2000, price: 139, regular: 173.75 },
+    { qty: 2500, price: 175, regular: 218.75 },
   ],
   "linkedin-followers": [
     { qty: 100, price: 7, regular: 8.75 },

@@ -297,7 +297,7 @@ The `price` query param is the **base** tier price (not premium-adjusted). The c
 
 ## Service pricing — sources of truth
 
-When you change a service price in a `_builder.tsx` `PACKAGES` array, `MEGA_PLATFORMS[i].services[j].fromPrice` (`components/mega-menu.tsx`), the cart drawer's `SUGGESTION_POOL`/`BROWSE_LINKS` (`components/cart-drawer.tsx`), AND the homepage box's `HOME_PRICING` map (`components/hero.tsx`) all need the matching value. **These four sources of truth aren't centralised yet** — `content/packages.ts` is still an empty stub. `HOME_PRICING` mirrors the **full** `PACKAGES` array (every tier) for each of the 18 platform-service combos, so it's the broadest mirror; the mega-menu only needs the lowest tier and `SUGGESTION_POOL` only one mid tier. If you centralise, rewrite all four call sites or it'll drift.
+When you change a service price in a `_builder.tsx` `PACKAGES` array, `MEGA_PLATFORMS[i].services[j].fromPrice` (`components/mega-menu.tsx`), the cart drawer's `SUGGESTION_POOL`/`BROWSE_LINKS` (`components/cart-drawer.tsx`), AND the homepage box's `HOME_PRICING` map (`components/hero.tsx`) all need the matching value. **These four sources of truth aren't centralised yet** — `content/packages.ts` is still an empty stub. `HOME_PRICING` mirrors the **full** `PACKAGES` array (every tier) for all 20 platform-service combos (every service the buy pages offer, incl. Instagram Comments + LinkedIn Connections), so it's the broadest mirror; the mega-menu only needs the lowest tier and `SUGGESTION_POOL` only one mid tier. If you centralise, rewrite all four call sites or it'll drift.
 
 ## Homepage design ("Soft Bolt" — blue, no orange glow)
 
