@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useState, type ReactNode } from "react";
-import Link from "next/link";
 import {
   ArrowRight,
   Bot,
@@ -21,6 +20,7 @@ import {
 } from "lucide-react";
 import { Bolt, Spark } from "@/components/bolt-art";
 import { useAiWaitlist } from "@/components/ai-waitlist";
+import { useCart, type Platform, type Service } from "@/components/cart-context";
 
 const IgGlyph = () => (
   <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
@@ -53,25 +53,206 @@ const HOME_PLATFORMS: HomePlatform[] = [
   { id: "linkedin", label: "LinkedIn", bg: "#0A66C2", icon: <Linkedin size={13} color="#fff" />, services: ["Followers", "Likes", "Comments"] },
 ];
 
-const HOME_PACKAGES = [
-  { qty: 250, base: 2.99 },
-  { qty: 500, base: 4.99 },
-  { qty: 1000, base: 8.99 },
-  { qty: 2500, base: 19.99, popular: true },
-  { qty: 5000, base: 34.99 },
-  { qty: 10000, base: 69.99 },
-  { qty: 25000, base: 149.99 },
-  { qty: 50000, base: 269.99 },
-];
-
-const SERVICE_MULT: Record<string, number> = {
-  Followers: 1,
-  Subscribers: 1.4,
-  Likes: 0.55,
-  Views: 0.32,
-  Retweets: 0.7,
-  Comments: 1.6,
+type HomeTier = {
+  qty: number;
+  price: number;
+  regular: number;
+  popular?: boolean;
+  bestDeal?: boolean;
+  bulkPrice?: boolean;
 };
+
+// Mirrors the PACKAGES arrays in each app/(marketing)/buy-<platform>-<service>/_builder.tsx.
+// Keep these in sync with the buy pages (see the pricing sources-of-truth note in CLAUDE.md).
+const HOME_PRICING: Record<string, HomeTier[]> = {
+  "instagram-followers": [
+    { qty: 100, price: 3.49, regular: 4.36 },
+    { qty: 250, price: 5.99, regular: 7.49 },
+    { qty: 500, price: 7.99, regular: 9.99 },
+    { qty: 1000, price: 14.99, regular: 18.74 },
+    { qty: 2000, price: 25.99, regular: 32.49 },
+    { qty: 5000, price: 39.99, regular: 49.99, popular: true },
+    { qty: 10000, price: 59.99, regular: 74.99 },
+    { qty: 20000, price: 99.99, regular: 124.99 },
+    { qty: 50000, price: 219.99, regular: 274.99 },
+    { qty: 100000, price: 379.99, regular: 474.99 },
+    { qty: 200000, price: 649.99, regular: 812.49, bulkPrice: true },
+  ],
+  "instagram-likes": [
+    { qty: 50, price: 1.99, regular: 2.49 },
+    { qty: 100, price: 3.49, regular: 4.36 },
+    { qty: 250, price: 5.99, regular: 7.49 },
+    { qty: 500, price: 7.99, regular: 9.99 },
+    { qty: 1000, price: 14.99, regular: 18.74 },
+    { qty: 2500, price: 26.99, regular: 33.74, popular: true },
+    { qty: 5000, price: 49.99, regular: 62.49 },
+    { qty: 10000, price: 99.99, regular: 124.99 },
+    { qty: 20000, price: 189.99, regular: 237.49, bulkPrice: true },
+  ],
+  "instagram-views": [
+    { qty: 500, price: 2.49, regular: 3.11 },
+    { qty: 2500, price: 7.99, regular: 9.99 },
+    { qty: 5000, price: 16.99, regular: 21.24, popular: true },
+    { qty: 10000, price: 26.99, regular: 33.74 },
+    { qty: 25000, price: 54.99, regular: 68.74 },
+    { qty: 50000, price: 79.99, regular: 99.99, bestDeal: true },
+  ],
+  "tiktok-followers": [
+    { qty: 100, price: 5.99, regular: 7.49 },
+    { qty: 200, price: 8.99, regular: 11.24 },
+    { qty: 500, price: 18.99, regular: 23.74, popular: true },
+    { qty: 1000, price: 29.99, regular: 37.49 },
+    { qty: 2000, price: 39.99, regular: 49.99 },
+    { qty: 5000, price: 69.99, regular: 87.49, bestDeal: true },
+  ],
+  "tiktok-likes": [
+    { qty: 100, price: 2.99, regular: 3.74 },
+    { qty: 200, price: 4.49, regular: 5.61 },
+    { qty: 500, price: 8.99, regular: 11.24, popular: true },
+    { qty: 1000, price: 13.99, regular: 17.49 },
+    { qty: 2000, price: 22.99, regular: 28.74 },
+    { qty: 5000, price: 44.99, regular: 56.24, bestDeal: true },
+  ],
+  "tiktok-views": [
+    { qty: 1000, price: 1.99, regular: 2.49 },
+    { qty: 2000, price: 2.99, regular: 3.74 },
+    { qty: 5000, price: 5.49, regular: 6.86 },
+    { qty: 10000, price: 9.99, regular: 12.49, popular: true },
+    { qty: 50000, price: 34.99, regular: 43.74, bestDeal: true },
+  ],
+  "youtube-subscribers": [
+    { qty: 100, price: 6.99, regular: 8.74 },
+    { qty: 250, price: 13.99, regular: 17.49 },
+    { qty: 500, price: 24.99, regular: 31.24, popular: true },
+    { qty: 1000, price: 44.99, regular: 56.24 },
+    { qty: 2500, price: 99.99, regular: 124.99 },
+    { qty: 5000, price: 174.99, regular: 218.74 },
+    { qty: 7500, price: 239.99, regular: 299.99 },
+    { qty: 10000, price: 299.99, regular: 374.99, bulkPrice: true },
+  ],
+  "youtube-views": [
+    { qty: 100, price: 2.49, regular: 3.11 },
+    { qty: 250, price: 3.99, regular: 4.99 },
+    { qty: 500, price: 6.49, regular: 8.11 },
+    { qty: 1000, price: 7.99, regular: 9.99 },
+    { qty: 2500, price: 14.99, regular: 18.74 },
+    { qty: 5000, price: 24.99, regular: 31.24, popular: true },
+    { qty: 7500, price: 34.99, regular: 43.74 },
+    { qty: 10000, price: 42.99, regular: 53.74 },
+    { qty: 25000, price: 74.99, regular: 93.74 },
+    { qty: 50000, price: 124.99, regular: 156.24 },
+    { qty: 100000, price: 199.99, regular: 249.99, bestDeal: true },
+    { qty: 250000, price: 399.99, regular: 499.99 },
+    { qty: 500000, price: 699.99, regular: 874.99, bulkPrice: true },
+  ],
+  "youtube-likes": [
+    { qty: 100, price: 2.99, regular: 3.74 },
+    { qty: 250, price: 4.99, regular: 6.24 },
+    { qty: 500, price: 7.49, regular: 9.36, popular: true },
+    { qty: 1000, price: 9.99, regular: 12.49 },
+    { qty: 2500, price: 18.99, regular: 23.74 },
+    { qty: 5000, price: 32.99, regular: 41.24 },
+    { qty: 7500, price: 44.99, regular: 56.24 },
+    { qty: 10000, price: 54.99, regular: 68.74, bulkPrice: true },
+  ],
+  "twitter-followers": [
+    { qty: 50, price: 3.99, regular: 4.99 },
+    { qty: 100, price: 6.49, regular: 8.11 },
+    { qty: 250, price: 8.99, regular: 11.24 },
+    { qty: 500, price: 15.99, regular: 19.99 },
+    { qty: 1000, price: 29.99, regular: 37.49, popular: true },
+    { qty: 2500, price: 73.99, regular: 92.49 },
+    { qty: 5000, price: 144.99, regular: 181.24 },
+    { qty: 10000, price: 269.99, regular: 337.49 },
+  ],
+  "twitter-likes": [
+    { qty: 25, price: 2.49, regular: 3.11 },
+    { qty: 50, price: 3.99, regular: 4.99 },
+    { qty: 100, price: 5.49, regular: 6.86 },
+    { qty: 250, price: 11.49, regular: 14.36 },
+    { qty: 500, price: 19.49, regular: 24.36, popular: true },
+    { qty: 1000, price: 35.49, regular: 44.36 },
+    { qty: 2500, price: 69.49, regular: 86.86 },
+    { qty: 5000, price: 129.49, regular: 161.86 },
+  ],
+  "twitter-retweets": [
+    { qty: 25, price: 2.99, regular: 3.74 },
+    { qty: 50, price: 4.99, regular: 6.24 },
+    { qty: 100, price: 7.99, regular: 9.99 },
+    { qty: 250, price: 12.99, regular: 16.24 },
+    { qty: 500, price: 24.99, regular: 31.24, popular: true },
+    { qty: 1000, price: 44.99, regular: 56.24 },
+    { qty: 2500, price: 97.99, regular: 122.49 },
+    { qty: 5000, price: 179.99, regular: 224.99 },
+  ],
+  "facebook-followers": [
+    { qty: 100, price: 3.49, regular: 4.36 },
+    { qty: 250, price: 4.49, regular: 5.61 },
+    { qty: 500, price: 6.89, regular: 8.61 },
+    { qty: 1000, price: 12.49, regular: 15.61 },
+    { qty: 2500, price: 28.99, regular: 36.24, popular: true },
+    { qty: 5000, price: 38.99, regular: 48.74 },
+    { qty: 10000, price: 59.99, regular: 74.99 },
+    { qty: 20000, price: 99.99, regular: 124.99 },
+    { qty: 100000, price: 499.99, regular: 624.99 },
+  ],
+  "facebook-likes": [
+    { qty: 100, price: 3.5, regular: 4.38 },
+    { qty: 250, price: 7.5, regular: 9.38 },
+    { qty: 500, price: 11.5, regular: 14.38 },
+    { qty: 1000, price: 17.5, regular: 21.88 },
+    { qty: 2500, price: 39.5, regular: 49.38, popular: true },
+    { qty: 5000, price: 69.5, regular: 86.88 },
+    { qty: 10000, price: 125.5, regular: 156.88 },
+    { qty: 20000, price: 199.5, regular: 249.38 },
+    { qty: 40000, price: 385.5, regular: 481.88 },
+  ],
+  "facebook-views": [
+    { qty: 500, price: 2.99, regular: 3.74 },
+    { qty: 2500, price: 6.99, regular: 8.74 },
+    { qty: 5000, price: 14.99, regular: 18.74 },
+    { qty: 10000, price: 24.99, regular: 31.24, popular: true },
+    { qty: 25000, price: 49.99, regular: 62.49 },
+    { qty: 50000, price: 74.99, regular: 93.74 },
+  ],
+  "linkedin-followers": [
+    { qty: 100, price: 7, regular: 8.75 },
+    { qty: 250, price: 16, regular: 20 },
+    { qty: 500, price: 32, regular: 40, popular: true },
+    { qty: 1000, price: 64, regular: 80 },
+    { qty: 2500, price: 159, regular: 198.75 },
+    { qty: 5000, price: 319, regular: 398.75 },
+  ],
+  "linkedin-likes": [
+    { qty: 50, price: 4.5, regular: 5.63 },
+    { qty: 75, price: 6.5, regular: 8.13 },
+    { qty: 100, price: 9, regular: 11.25 },
+    { qty: 150, price: 14, regular: 17.5 },
+    { qty: 250, price: 23, regular: 28.75, popular: true },
+    { qty: 500, price: 45, regular: 56.25 },
+    { qty: 750, price: 67, regular: 83.75 },
+    { qty: 1000, price: 89, regular: 111.25 },
+  ],
+  "linkedin-comments": [
+    { qty: 10, price: 4, regular: 5 },
+    { qty: 15, price: 6, regular: 7.5 },
+    { qty: 25, price: 9, regular: 11.25 },
+    { qty: 50, price: 17, regular: 21.25 },
+    { qty: 100, price: 25, regular: 31.25 },
+    { qty: 150, price: 35, regular: 43.75, popular: true },
+    { qty: 200, price: 45, regular: 56.25 },
+    { qty: 250, price: 50, regular: 62.5 },
+    { qty: 300, price: 60, regular: 75 },
+    { qty: 400, price: 80, regular: 100 },
+    { qty: 500, price: 90, regular: 112.5 },
+    { qty: 1000, price: 160, regular: 200 },
+  ],
+};
+
+function popularIndex(tiers: HomeTier[]): number {
+  const i = tiers.findIndex((t) => t.popular);
+  return i >= 0 ? i : Math.floor(tiers.length / 2);
+}
 
 function homeQty(n: number): string {
   if (n >= 1_000_000) return `${n / 1_000_000}M`;
@@ -93,16 +274,16 @@ function HomeBuyBox() {
   const [billing, setBilling] = useState<"m" | "a">("m");
   const [aiPlan, setAiPlan] = useState(1);
   const { open: openWaitlist } = useAiWaitlist();
+  const { addItem } = useCart();
 
   const aiMode = platId === "ai";
   const plat = HOME_PLATFORMS.find((p) => p.id === platId) ?? HOME_PLATFORMS[0];
-  const mult = SERVICE_MULT[service] ?? 1;
-  const priced = HOME_PACKAGES.map((p) => ({ ...p, price: p.base * mult }));
-  const unit0 = priced[0].price / priced[0].qty;
-  const offFor = (p: { qty: number; price: number }) => Math.round(p.qty * unit0 - p.price);
-  const pkg = priced[selected];
-  const total = pkg.price.toFixed(2);
-  const lastIdx = priced.length - 1;
+  const activeService = !aiMode && plat.services.includes(service) ? service : plat.services[0];
+  const tiers = aiMode ? [] : HOME_PRICING[`${platId}-${activeService.toLowerCase()}`] ?? [];
+  const safeIdx = Math.min(selected, Math.max(0, tiers.length - 1));
+  const pkg = tiers[safeIdx];
+  const total = pkg ? pkg.price.toFixed(2) : "0.00";
+  const saveFor = (t: HomeTier) => Math.round(t.regular - t.price);
   const plan = HOME_AI_PLANS[aiPlan];
   const planPrice = billing === "a" ? plan.a : plan.m;
 
@@ -111,14 +292,30 @@ function HomeBuyBox() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [platId]);
 
-  const ctaHref = aiMode ? "/" : `/buy-${platId}-${service.toLowerCase()}/`;
+  useEffect(() => {
+    setSelected(popularIndex(tiers));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [platId, service]);
+
+  function handleAddToCart() {
+    if (aiMode || !pkg) return;
+    addItem({
+      platform: platId as Platform,
+      service: activeService.toLowerCase() as Service,
+      qty: pkg.qty,
+      price: pkg.price,
+      regular: pkg.regular,
+      premium: false,
+      target: url.trim() || undefined,
+    });
+  }
 
   return (
     <div className="buybox-frame">
       <div className="pkg-card">
         <div className="pkg-head">
           <div className="pkg-h-title">Build your order</div>
-          <span className="pkg-save">Save up to 50%</span>
+          <span className="pkg-save">Save up to 20%</span>
         </div>
 
         <div className="plat-row">
@@ -188,29 +385,33 @@ function HomeBuyBox() {
           </div>
         ) : (
           <div className="pkg-grid">
-            {priced.map((p, i) => {
-              const off = offFor(p);
-              const isBulk = i === lastIdx && !p.popular;
+            {tiers.map((t, i) => {
+              const save = saveFor(t);
               return (
                 <button
-                  key={p.qty}
+                  key={t.qty}
                   type="button"
-                  className={`pkg-tier ${selected === i ? "selected" : ""} ${p.popular ? "best" : ""} ${isBulk ? "bulk" : ""}`}
+                  className={`pkg-tier ${safeIdx === i ? "selected" : ""} ${t.popular ? "best" : ""} ${t.bestDeal || t.bulkPrice ? "bulk" : ""}`}
                   onClick={() => setSelected(i)}
                 >
-                  {p.popular && (
+                  {t.popular && (
                     <span className="pkg-tier-tag best">
                       <TrendingUp size={9} /> BEST SELLING
                     </span>
                   )}
-                  {isBulk && (
+                  {t.bestDeal && (
+                    <span className="pkg-tier-tag bulk">
+                      <Flame size={9} /> BEST DEAL
+                    </span>
+                  )}
+                  {t.bulkPrice && (
                     <span className="pkg-tier-tag bulk">
                       <Flame size={9} /> BULK PRICE
                     </span>
                   )}
-                  <span className="pkg-qty">{homeQty(p.qty)}</span>
-                  <span className="pkg-price">${p.price.toFixed(2)}</span>
-                  {off >= 1 && <span className="pkg-off">Save ${off}</span>}
+                  <span className="pkg-qty">{homeQty(t.qty)}</span>
+                  <span className="pkg-price">${t.price.toFixed(2)}</span>
+                  {save >= 1 && <span className="pkg-off">Save ${save}</span>}
                 </button>
               );
             })}
@@ -238,12 +439,16 @@ function HomeBuyBox() {
         <div className="pkg-cta-row">
           <div style={{ minWidth: 0 }}>
             <div className="pkg-total-label" style={{ whiteSpace: "nowrap", marginBottom: 4 }}>
-              {aiMode ? `${plan.name} plan · ${billing === "a" ? "annual" : "monthly"}` : `${homeQty(pkg.qty)} ${plat.label} ${service}`}
+              {aiMode
+                ? `${plan.name} plan · ${billing === "a" ? "annual" : "monthly"}`
+                : pkg
+                  ? `${homeQty(pkg.qty)} ${plat.label} ${activeService}`
+                  : ""}
             </div>
             <div className="pkg-total">{aiMode ? `$${planPrice}/mo` : `$${total}`}</div>
             {aiMode
               ? billing === "a" && <div className="pkg-save-line">You save ${(plan.m - plan.a) * 12}/yr</div>
-              : offFor(pkg) >= 1 && <div className="pkg-save-line">You save ${offFor(pkg)}</div>}
+              : pkg && saveFor(pkg) >= 1 && <div className="pkg-save-line">You save ${saveFor(pkg)}</div>}
           </div>
           {aiMode ? (
             <button
@@ -254,9 +459,14 @@ function HomeBuyBox() {
               Be the first <ArrowRight size={16} />
             </button>
           ) : (
-            <Link className="btn btn-primary btn-lg pkg-cta" href={ctaHref}>
-              Get Started <ArrowRight size={16} />
-            </Link>
+            <button
+              type="button"
+              className="btn btn-primary btn-lg pkg-cta"
+              onClick={handleAddToCart}
+              disabled={!pkg}
+            >
+              Add to cart <ArrowRight size={16} />
+            </button>
           )}
         </div>
 
@@ -276,7 +486,7 @@ function HomeBuyBox() {
           ) : (
             <>
               <span>
-                <ShieldCheck size={14} color="var(--uv-success-text)" /> Money-back
+                <ShieldCheck size={14} color="var(--uv-success-text)" /> 30-day refill
               </span>
               <span>
                 <Zap size={14} color="var(--uv-pink)" /> Starts in 30 min
@@ -334,12 +544,12 @@ export function Hero() {
 
             <p className="soft-sub">
               Real followers, likes &amp; views on TikTok, Instagram, YouTube, Twitter and more —
-              delivered with a little thunder. Money-back guaranteed, no password ever.
+              delivered with a little thunder. 30-day refill guaranteed, no password ever.
             </p>
 
             <div className="soft-chips">
               <span className="soft-chip">
-                <span className="dot" style={{ background: "var(--uv-success-text)" }} /> Money-back guarantee
+                <span className="dot" style={{ background: "var(--uv-success-text)" }} /> 30-day refill guarantee
               </span>
               <span className="soft-chip">
                 <span className="dot" style={{ background: "var(--uv-violet)" }} /> Secure checkout
