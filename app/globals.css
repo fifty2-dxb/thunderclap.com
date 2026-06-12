@@ -1293,6 +1293,27 @@ img { display: block; max-width: 100%; }
   display: block; font-size: 9px; font-weight: 800; letter-spacing: 0.04em;
   color: var(--uv-fg-3); margin-top: 3px; text-align: center;
 }
+/* Home buy box uses a denser 4-column product grid (the service-page .pkg-grid
+   stays locked at 3 cols). Scoped to .buybox-frame so the override beats the
+   global .pkg-grid mobile rules via specificity at every width. The AI-plan
+   grid keeps its inline repeat(3,1fr) since it only has 3 cards. */
+.buybox-frame .pkg-grid { grid-template-columns: repeat(4, 1fr); gap: 7px; }
+.buybox-frame .pkg-tier { padding: 12px 5px; min-height: 84px; gap: 4px; }
+.buybox-frame .pkg-qty { font-size: 15px; }
+.buybox-frame .pkg-price { font-size: 12.5px; }
+@media (max-width: 640px) {
+  .buybox-frame .pkg-grid { gap: 5px; }
+  .buybox-frame .pkg-tier { padding: 10px 3px; min-height: 76px; border-radius: 9px; }
+  .buybox-frame .pkg-qty { font-size: 13px; }
+  .buybox-frame .pkg-price { font-size: 11px; }
+  .buybox-frame .pkg-off { font-size: 8.5px; }
+}
+@media (max-width: 380px) {
+  .buybox-frame .pkg-grid { gap: 4px; }
+  .buybox-frame .pkg-tier { padding: 9px 2px; min-height: 72px; }
+  .buybox-frame .pkg-qty { font-size: 12px; }
+  .buybox-frame .pkg-price { font-size: 10.5px; }
+}
 .plat-row { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 16px; }
 .plat-chip {
   display: inline-flex; align-items: center; gap: 8px;
