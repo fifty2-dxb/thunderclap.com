@@ -71,6 +71,13 @@ export const MEGA_PLATFORMS: PlatformDef[] = [
         fromPrice: "$2.49",
         Icon: Play,
       },
+      {
+        label: "Buy Comments",
+        description: "Real, on-topic comments that make a post feel like a live conversation.",
+        href: "/buy-instagram-comments",
+        fromPrice: "$12.49",
+        Icon: MessageSquare,
+      },
     ],
   },
   {

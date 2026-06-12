@@ -26,6 +26,7 @@ const NAV: NavItem[] = [
       { label: "Buy Instagram Followers", href: "/buy-instagram-followers" },
       { label: "Buy Instagram Likes", href: "/buy-instagram-likes" },
       { label: "Buy Instagram Views", href: "/buy-instagram-views" },
+      { label: "Buy Instagram Comments", href: "/buy-instagram-comments" },
     ],
   },
   {

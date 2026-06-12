@@ -1,88 +1,86 @@
 import type { Metadata } from "next";
 import {
   ArrowUpRight,
-  BadgeCheck,
   Check,
   Heart,
   MessageSquare,
   Play,
   TrendingUp,
-  UserPlus,
+  Users,
+  Zap,
 } from "lucide-react";
 import { SITE_URL } from "@/lib/seo";
-import { FollowersHero, FollowersFaq } from "./_builder";
+import { CommentsHero, CommentsFaq } from "./_builder";
 import { IG_FAQS } from "./_faqs";
 
-const URL_PATH = "/buy-instagram-followers/";
+const URL_PATH = "/buy-instagram-comments/";
 const CANONICAL = `${SITE_URL}${URL_PATH}`;
 
 export const metadata: Metadata = {
-  title: "Buy Instagram Followers — Real, Fast, Safe",
+  title: "Buy Instagram Comments — Real, Fast, Safe",
   description:
-    "Buy real Instagram followers from active accounts. Delivery starts in 5 minutes. 30-day refill guarantee. No password required. Trusted by 200,000+ creators.",
+    "Buy real Instagram comments from active accounts. Delivery starts in 5 minutes. 30-day refill guarantee. No password required. Trusted by 200,000+ creators.",
   alternates: { canonical: CANONICAL },
   openGraph: {
-    title: "Buy Instagram Followers — Real, Fast, Safe · Thunderclap",
+    title: "Buy Instagram Comments — Real, Fast, Safe · Thunderclap",
     description:
-      "Real Instagram followers from active users. Delivery starts in 5 minutes, drip-fed for a safe organic growth curve. 30-day refill guarantee.",
+      "Real Instagram comments from active users. Delivery starts in 5 minutes, posted naturally for a safe organic look. 30-day refill guarantee.",
     url: CANONICAL,
     siteName: "Thunderclap",
     type: "website",
   },
   twitter: {
     card: "summary_large_image",
-    title: "Buy Instagram Followers — Real, Fast, Safe · Thunderclap",
+    title: "Buy Instagram Comments — Real, Fast, Safe · Thunderclap",
     description:
-      "Real Instagram followers, delivered in minutes. 30-day refill guarantee. No password required.",
+      "Real Instagram comments, delivered in minutes. 30-day refill guarantee. No password required.",
   },
 };
 
 const BENEFITS = [
   {
-    Icon: UserPlus,
-    title: "Real, lasting followers",
-    body: "Every follower comes from a real Instagram account with a profile picture, posts, and a follower base of their own. They don't drop, and they don't look like bots.",
+    Icon: MessageSquare,
+    title: "Real, on-topic comments",
+    body: "Comments from active Instagram accounts that read like a genuine conversation — not a wall of generic emoji.",
+  },
+  {
+    Icon: Zap,
+    title: "Instant social proof",
+    body: "Delivery starts within 5 minutes. A busy comment section tells new visitors the post is worth engaging with — and tells the algorithm to push it.",
   },
   {
     Icon: TrendingUp,
-    title: "Social proof from minute one",
-    body: "A profile with 12K followers converts visitors at 4× the rate of one with 200. Anchor your credibility so the next person who lands on your page hits the follow button.",
-  },
-  {
-    Icon: BadgeCheck,
-    title: "Unlock collabs, brand deals, badges",
-    body: "Reach the follower thresholds that unlock the verified badge, brand inquiries, link stickers, and Instagram subscriptions — without waiting years for organic growth.",
+    title: "More saves, shares, reach",
+    body: "Comments are the heaviest engagement signal on Instagram. Posts with real conversation get featured more and convert better.",
   },
 ];
 
 const PERSONAS = [
   {
-    eyebrow: "FOR NEW PROFILES",
-    title: "Get past the empty-profile problem.",
-    body: "Real users don't follow profiles with 38 followers — that's the cold-start trap. Buying your first 1K-5K followers gives newcomers a reason to hit follow themselves.",
+    eyebrow: "FOR NEW CREATORS",
+    title: "Break the empty-comment-section cycle.",
+    body: "Nobody wants to be the first to comment. Seeding a few real comments makes your post feel alive and gives the algorithm a reason to push it onto the explore page.",
     img: "https://images.unsplash.com/photo-1611162616475-46b635cb6868?auto=format&fit=crop&w=900&q=80",
   },
   {
-    eyebrow: "FOR PERSONAL BRANDS",
-    title: "Hit the thresholds that unlock features.",
-    body: "Link stickers, the verified badge, brand inquiries, and the partner program all kick in at specific follower counts. Reach them on your timeline, not Instagram's.",
-    img: "https://images.unsplash.com/photo-1485827404703-89b55fcc595e?auto=format&fit=crop&w=900&q=80",
+    eyebrow: "FOR INFLUENCERS",
+    title: "Keep your engagement rate brand-ready.",
+    body: "Brands check comment quality, not just counts, before booking. Top up under-performing posts with real conversation to stay above the engagement threshold sponsors require.",
+    img: "https://images.unsplash.com/photo-1556761175-5973dc0f32e7?auto=format&fit=crop&w=900&q=80",
   },
   {
-    eyebrow: "FOR BUSINESSES",
-    title: "Make every ad click see a serious brand.",
-    body: "If your paid ad sends 10,000 people to a profile with 400 followers, most of them bounce. A healthy follower count is the cheapest CRO improvement you'll make this quarter.",
-    img: "https://images.unsplash.com/photo-1556761175-5973dc0f32e7?auto=format&fit=crop&w=900&q=80",
+    eyebrow: "FOR BRANDS",
+    title: "Validate launches with real conversation.",
+    body: "Product launches need social proof from minute one. Positive, on-topic comments on launch reels become the trust signal that converts ad clicks into purchases.",
+    img: "https://images.unsplash.com/photo-1522202176988-66273c2fd55f?auto=format&fit=crop&w=900&q=80",
   },
 ];
 
 const COMPARE_ROWS = [
   { label: "Real, active accounts", us: true, them: false },
   { label: "Delivery starts in 5 minutes", us: true, them: false },
-  { label: "Drip-fed for natural growth curve", us: true, them: false },
   { label: "No password required", us: true, them: true },
   { label: "30-day refill guarantee", us: true, them: false },
-  { label: "Lifetime refill (Premium tier)", us: true, them: false },
   { label: "24/7 live support", us: true, them: false },
   { label: "Money-back within 7 days", us: true, them: false },
   { label: "Transparent pricing — no upsells", us: true, them: false },
@@ -91,21 +89,21 @@ const COMPARE_ROWS = [
 const REVIEWS = [
   {
     stars: 5,
-    text: "Jumped from 600 to 5.6K followers in three weeks. The real ones started compounding once the count looked credible — and they actually engaged.",
+    text: "The comments were genuinely on-topic and matched my caption — it looked like a real conversation, not spam. Engagement followed within a day.",
     name: "Sofia Alvarez",
     role: "Lifestyle creator",
     av: "https://i.pravatar.cc/100?img=47",
   },
   {
     stars: 5,
-    text: "We grew the brand account to 25K before our funding-round PR push. Investors check socials now — the move paid for itself ten times over.",
+    text: "Seeded a few comments on my product launch reel and the post took off. Delivery was fast and the accounts looked real.",
     name: "Marcus Chen",
     role: "Founder, Northbeam Co.",
     av: "https://i.pravatar.cc/100?img=12",
   },
   {
     stars: 5,
-    text: "Tried three other providers — all of them dropped half the followers in a week. Thunderclap is the only one where the count actually held.",
+    text: "Tried three other providers before Thunderclap. This is the only one whose comments didn't read like obvious bots.",
     name: "Priya Sharma",
     role: "Beauty creator",
     av: "https://i.pravatar.cc/100?img=44",
@@ -113,24 +111,24 @@ const REVIEWS = [
 ];
 
 const RELATED = [
-  { label: "Buy Instagram Likes", desc: "From $0.99", Icon: Heart, href: "/buy-instagram-likes" },
-  { label: "Buy Instagram Views", desc: "From $0.99", Icon: Play, href: "/buy-instagram-views" },
-  { label: "Buy Instagram Comments", desc: "From $12.49", Icon: MessageSquare, href: "/buy-instagram-comments" },
+  { label: "Buy Instagram Followers", desc: "From $3.49", Icon: Users, href: "/buy-instagram-followers" },
+  { label: "Buy Instagram Likes", desc: "From $1.99", Icon: Heart, href: "/buy-instagram-likes" },
+  { label: "Buy Instagram Views", desc: "From $2.49", Icon: Play, href: "/buy-instagram-views" },
 ];
 
 const productJsonLd = {
   "@context": "https://schema.org",
   "@type": "Product",
-  name: "Instagram Followers",
+  name: "Instagram Comments",
   description:
-    "Real Instagram followers from active accounts. Delivery starts in 5 minutes. 30-day refill guarantee. No password required.",
+    "Real Instagram comments from active accounts. Delivery starts in 5 minutes. 30-day refill guarantee. No password required.",
   brand: { "@type": "Brand", name: "Thunderclap" },
   offers: {
     "@type": "AggregateOffer",
     priceCurrency: "USD",
-    lowPrice: "3.49",
-    highPrice: "649.99",
-    offerCount: 11,
+    lowPrice: "12.49",
+    highPrice: "94.99",
+    offerCount: 5,
     availability: "https://schema.org/InStock",
     url: CANONICAL,
   },
@@ -159,7 +157,7 @@ const breadcrumbJsonLd = {
   itemListElement: [
     { "@type": "ListItem", position: 1, name: "Home", item: SITE_URL },
     { "@type": "ListItem", position: 2, name: "Instagram", item: `${SITE_URL}/buy-instagram-followers` },
-    { "@type": "ListItem", position: 3, name: "Followers", item: CANONICAL },
+    { "@type": "ListItem", position: 3, name: "Comments", item: CANONICAL },
   ],
 };
 
@@ -182,13 +180,13 @@ export default function Page() {
         dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }}
       />
 
-      <FollowersHero />
+      <CommentsHero />
 
       <section style={{ padding: "96px 0 32px" }}>
         <div className="container">
           <div style={{ textAlign: "center", marginBottom: 48 }}>
             <span className="uv-eyebrow" style={{ color: "var(--uv-pink)" }}>
-              WHY BUY INSTAGRAM FOLLOWERS
+              WHY BUY INSTAGRAM COMMENTS
             </span>
             <h2
               style={{
@@ -202,7 +200,7 @@ export default function Page() {
                 textWrap: "balance",
               }}
             >
-              Follower count is the <span className="grad-text">first impression</span> every visitor makes.
+              Comments are the heaviest <span className="grad-text">signal</span> Instagram trusts.
             </h2>
           </div>
           <div className="why-grid-3">
@@ -404,7 +402,7 @@ export default function Page() {
         </div>
       </section>
 
-      <FollowersFaq />
+      <CommentsFaq />
 
       <section style={{ padding: "32px 0 80px" }}>
         <div className="container">
@@ -412,8 +410,7 @@ export default function Page() {
             <div className="coral-band-bg" />
             <h2>Ready to grow?</h2>
             <p>
-              Pick a package, paste your username, and watch your follower count climb within the
-              hour.
+              Pick a package, paste your URL, and watch the conversation build within the hour.
             </p>
             <div
               style={{ display: "inline-flex", gap: 12, flexWrap: "wrap", justifyContent: "center" }}

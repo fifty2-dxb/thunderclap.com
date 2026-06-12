@@ -20,12 +20,12 @@ Social media growth marketing site (Instagram / TikTok / YouTube / Facebook / Tw
 | Route | Status |
 | --- | --- |
 | `/` | Built — hero, trust bar, service table, pricing, FAQ, testimonials, CTA |
-| `/buy-instagram-{followers,likes,views}` | **Fully built** — full service-page pattern (see below). Flat `buy-{platform}-{service}` slug chosen to match the exact-match SERP cluster ("buy instagram followers" 34K vol etc., per Ahrefs) and to preserve the live `/buy-instagram-followers` ranking. |
+| `/buy-instagram-{followers,likes,views,comments}` | **Fully built** — full service-page pattern (see below). Flat `buy-{platform}-{service}` slug chosen to match the exact-match SERP cluster ("buy instagram followers" 34K vol etc., per Ahrefs) and to preserve the live `/buy-instagram-followers` ranking. `comments` added 2026-06 (smmId `1873`); Hero/Faq exports `CommentsHero`/`CommentsFaq`, FAQs export `IG_FAQS`. 5 tiers (10/25/50/75/100). |
 | `/buy-tiktok-{followers,likes,views}` | **Fully built** — same pattern, TikTok-branded |
 | `/buy-youtube-{subscribers,likes,views}` | **Fully built** — YouTube-branded with YPP threshold framing. FAQs export `YT_FAQS`. |
 | `/buy-facebook-{followers,likes,views}` | **Fully built** — Facebook-branded copy. FAQs export `FB_FAQS`. |
 | `/buy-twitter-{followers,likes,retweets}` | **Fully built** — labelled "Twitter / X" everywhere user-facing. FAQs export `TW_FAQS`. Adds the `retweets` service type. |
-| `/buy-linkedin-{connections,followers,likes,comments}` | **Fully built** — same 8-section pattern, LinkedIn blue `#0A66C2`. FAQs export `LI_FAQS`. Adds the `connections` service type (LinkedIn-specific) and the first `comments` page on the site. Brand glyph is the LinkedIn "in" SVG (also in `cart-drawer.tsx` as `LinkedInBrand`). |
+| `/buy-linkedin-{connections,followers,likes,comments}` | **Fully built** — same 8-section pattern, LinkedIn blue `#0A66C2`. FAQs export `LI_FAQS`. Adds the `connections` service type (LinkedIn-specific); `comments` was first introduced here, later also added for Instagram. Brand glyph is the LinkedIn "in" SVG (also in `cart-drawer.tsx` as `LinkedInBrand`). |
 | `next.config.ts` redirects | 301s from old `/{platform}/{service}` nested routes AND legacy prod URLs (`/buy-instagram-impressions`, `/free-youtube-subscribers`, `/instagram`, `/tiktok`, `/youtube`, `/facebook`, `/twitter`) → new canonicals. **`trailingSlash: true`** is set so every served URL ends in `/` and non-slash variants 308 to the trailing-slash form — needed to match the legacy WordPress URL pattern Google has already indexed. |
 | `app/not-found.tsx` | Catch-all: every unmatched HTML route 308s to `/` via `permanentRedirect("/")` so old WP URLs without a 1:1 replacement keep their crawl/link signal instead of returning 404. Triggered by any unmatched route + by the `app/[slug]` `dynamicParams=false` fall-through. Trade-off: Google can flag mass-redirect-to-home as a soft-404 pattern; acceptable here because the alternative is 580+ Ahrefs "4XX page" warnings. |
 | `middleware.ts` | Silently 404s legacy WordPress asset/admin/API prefixes (`/wp-content/`, `/wp-includes/`, `/wp-admin`, `/wp-json/`, `/xmlrpc.php`) so they don't loop into the not-found.tsx 308-to-home (an HTML home page response is wrong for `<img src="/wp-content/…">`-style requests). Matcher excludes Next internals, `/api/`, `/images/`, the sitemap/robots/favicon/logo so real assets are untouched. |
@@ -55,7 +55,7 @@ app/
   opengraph-image.tsx                 dynamic OG image
   globals.css                         design tokens + ALL component classes (single source of CSS truth)
   (marketing)/                        grouped service pages (no URL segment)
-    buy-instagram-{followers,likes,views}/{page.tsx, _builder.tsx, _faqs.ts}
+    buy-instagram-{followers,likes,views,comments}/{page.tsx, _builder.tsx, _faqs.ts}
     buy-tiktok-{followers,likes,views}/{page.tsx, _builder.tsx, _faqs.ts}
     buy-youtube-{subscribers,likes,views}/{page.tsx, _builder.tsx, _faqs.ts}
     buy-facebook-{followers,likes,views}/{page.tsx, _builder.tsx, _faqs.ts}
@@ -418,7 +418,7 @@ metadata: {
 }
 ```
 
-Currently mapped: `tiktok-followers: 5818`, `tiktok-likes: 1126`, `tiktok-views: 9121`, `instagram-followers: 8072`, `instagram-likes: 2916`, `instagram-views: 7762`, `facebook-followers: 4139`, `facebook-likes: 4704`, `facebook-views: 4715`, `youtube-subscribers: 8125`, `youtube-likes: 9538`, `youtube-views: 1573`, `twitter-followers: 2594`, `twitter-likes: 970`, `twitter-retweets: 3308`, `linkedin-connections: 5471`, `linkedin-followers: 5467`, `linkedin-likes: 5472`, `linkedin-comments: 5475`. All 6 platforms × their services are now mapped. Add more entries as the user supplies them — unmapped pairs are included in `items[]` without a `smmServiceId` (and contribute nothing to `smmDataItems`), letting Redlap fall back to its default routing for those lines.
+Currently mapped: `tiktok-followers: 5818`, `tiktok-likes: 1126`, `tiktok-views: 9121`, `instagram-followers: 8072`, `instagram-likes: 2916`, `instagram-views: 7762`, `instagram-comments: 1873`, `facebook-followers: 4139`, `facebook-likes: 4704`, `facebook-views: 4715`, `youtube-subscribers: 8125`, `youtube-likes: 9538`, `youtube-views: 1573`, `twitter-followers: 2594`, `twitter-likes: 970`, `twitter-retweets: 3308`, `linkedin-connections: 5471`, `linkedin-followers: 5467`, `linkedin-likes: 5472`, `linkedin-comments: 5475`. All 6 platforms × their services are now mapped. Add more entries as the user supplies them — unmapped pairs are included in `items[]` without a `smmServiceId` (and contribute nothing to `smmDataItems`), letting Redlap fall back to its default routing for those lines.
 
 ## WebEngage event tracking
 

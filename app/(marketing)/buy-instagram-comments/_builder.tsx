@@ -19,33 +19,29 @@ import { useCart } from "@/components/cart-context";
 import { IG_FAQS } from "./_faqs";
 
 const SERVICE_TABS = [
-  { id: "followers", label: "Followers", Icon: Users, href: "/buy-instagram-followers" },
-  { id: "likes",     label: "Likes",     Icon: Heart, href: "/buy-instagram-likes" },
-  { id: "views",     label: "Views",     Icon: Play,  href: "/buy-instagram-views" },
+  { id: "followers", label: "Followers", Icon: Users,         href: "/buy-instagram-followers" },
+  { id: "likes",     label: "Likes",     Icon: Heart,         href: "/buy-instagram-likes" },
+  { id: "views",     label: "Views",     Icon: Play,          href: "/buy-instagram-views" },
   { id: "comments",  label: "Comments",  Icon: MessageSquare, href: "/buy-instagram-comments" },
 ] as const;
 
 const PACKAGES = [
-  { qty: 50, price: 1.99, regular: 2.49 },
-  { qty: 100, price: 3.49, regular: 4.36 },
-  { qty: 250, price: 5.99, regular: 7.49 },
-  { qty: 500, price: 7.99, regular: 9.99 },
-  { qty: 1000, price: 14.99, regular: 18.74, popular: true },
-  { qty: 2500, price: 26.99, regular: 33.74 },
-  { qty: 5000, price: 49.99, regular: 62.49 },
-  { qty: 10000, price: 99.99, regular: 124.99 },
-  { qty: 20000, price: 189.99, regular: 237.49 },
+  { qty: 10, price: 12.49, regular: 15.61 },
+  { qty: 25, price: 26.99, regular: 33.74 },
+  { qty: 50, price: 49.99, regular: 62.49, popular: true },
+  { qty: 75, price: 69.99, regular: 87.49 },
+  { qty: 100, price: 94.99, regular: 118.74 },
 ] as const;
 
 const SIDE_BENEFITS = [
-  { title: "Real users", desc: "likes from real, active Instagram accounts" },
-  { title: "Starts in 5 min", desc: "drip-fed naturally over the next hour" },
+  { title: "Real users", desc: "comments from real, active Instagram accounts" },
+  { title: "Starts in 5 min", desc: "posted naturally over the next hour" },
   { title: "Money-back", desc: "refund if we miss the count or speed" },
   { title: "24/7 support", desc: "real humans, 7-min average reply time" },
 ];
 
-export function LikesHero() {
-  const [tab, setTab] = useState<(typeof SERVICE_TABS)[number]["id"]>("likes");
+export function CommentsHero() {
+  const [tab] = useState<(typeof SERVICE_TABS)[number]["id"]>("comments");
   const [selected, setSelected] = useState(0); // default to the first (smallest) tier
   const [premium, setPremium] = useState(false);
 
@@ -56,7 +52,7 @@ export function LikesHero() {
   const onAddToCart = () =>
     addItem({
       platform: "instagram",
-      service: "likes",
+      service: "comments",
       qty: pkg.qty,
       price: pkg.price,
       regular: pkg.regular,
@@ -84,7 +80,7 @@ export function LikesHero() {
             Instagram
           </a>
           <span style={{ opacity: 0.4 }}>›</span>
-          <span style={{ color: "var(--uv-fg-1)", fontWeight: 600 }}>Likes</span>
+          <span style={{ color: "var(--uv-fg-1)", fontWeight: 600 }}>Comments</span>
         </nav>
 
         <h1
@@ -98,8 +94,8 @@ export function LikesHero() {
             textWrap: "balance",
           }}
         >
-          Buy Instagram Likes <span style={{ color: "var(--uv-fg-3)", fontWeight: 500 }}>—</span>{" "}
-          <span className="grad-text">delivered in minutes</span>
+          Buy Instagram Comments <span style={{ color: "var(--uv-fg-3)", fontWeight: 500 }}>—</span>{" "}
+          <span className="grad-text">real conversation on every post</span>
         </h1>
         <p
           style={{
@@ -111,14 +107,14 @@ export function LikesHero() {
             textWrap: "pretty",
           }}
         >
-          Buy Instagram Likes from real, active users. Money-back guarantee, no password needed,
-          drip-fed naturally for a safe, organic look.
+          Buy Instagram Comments from real, active users. Money-back guarantee, no password needed,
+          posted naturally for a safe, organic look.
         </p>
 
         <div className="live-pill">
           <span className="live-dot" />
           <span>
-            <strong>498 live users</strong> on this page right now
+            <strong>421 live users</strong> on this page right now
           </span>
         </div>
 
@@ -135,7 +131,7 @@ export function LikesHero() {
                     <span className="prem-tag">+35%</span>
                   </div>
                   <div className="prem-sub">
-                    High-retention accounts · faster delivery · lifetime refill
+                    High-retention accounts · custom on-topic copy · lifetime refill
                   </div>
                 </div>
               </div>
@@ -302,7 +298,7 @@ export function LikesHero() {
   );
 }
 
-export function LikesFaq() {
+export function CommentsFaq() {
   const [active, setActive] = useState<number>(0);
 
   return (
@@ -321,7 +317,7 @@ export function LikesFaq() {
               margin: "10px 0 8px",
             }}
           >
-            About Instagram likes.
+            About Instagram comments.
           </h2>
           <p style={{ color: "var(--uv-fg-3)", fontSize: 14, margin: 0 }}>
             Everything most people ask before placing their first order.

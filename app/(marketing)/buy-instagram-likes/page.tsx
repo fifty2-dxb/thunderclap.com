@@ -113,7 +113,7 @@ const REVIEWS = [
 const RELATED = [
   { label: "Buy Instagram Followers", desc: "From $0.49", Icon: Users, href: "/buy-instagram-followers" },
   { label: "Buy Instagram Views", desc: "From $0.99", Icon: Play, href: "/buy-instagram-views" },
-  { label: "Buy Instagram Comments", desc: "From $1.99", Icon: MessageSquare, href: "#" },
+  { label: "Buy Instagram Comments", desc: "From $12.49", Icon: MessageSquare, href: "/buy-instagram-comments" },
 ];
 
 const productJsonLd = {

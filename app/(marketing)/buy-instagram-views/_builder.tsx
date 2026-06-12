@@ -22,6 +22,7 @@ const SERVICE_TABS = [
   { id: "followers", label: "Followers", Icon: Users, href: "/buy-instagram-followers" },
   { id: "likes",     label: "Likes",     Icon: Heart, href: "/buy-instagram-likes" },
   { id: "views",     label: "Views",     Icon: Play,  href: "/buy-instagram-views" },
+  { id: "comments",  label: "Comments",  Icon: MessageSquare, href: "/buy-instagram-comments" },
 ] as const;
 
 const PACKAGES = [

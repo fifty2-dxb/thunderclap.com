@@ -135,6 +135,7 @@ const SUGGESTION_POOL: Suggestion[] = [
   { platform: "instagram", service: "followers", qty: 1000, price: 14.99, regular: 18.74, href: "/buy-instagram-followers" },
   { platform: "instagram", service: "likes",     qty: 1000, price: 14.99, regular: 18.74, href: "/buy-instagram-likes" },
   { platform: "instagram", service: "views",     qty: 2500, price: 7.99,  regular: 9.99,  href: "/buy-instagram-views" },
+  { platform: "instagram", service: "comments",  qty: 50,   price: 49.99, regular: 62.49, href: "/buy-instagram-comments" },
   { platform: "tiktok",    service: "followers", qty: 1000, price: 29.99, regular: 37.49, href: "/buy-tiktok-followers" },
   { platform: "tiktok",    service: "likes",     qty: 1000, price: 13.99, regular: 17.49, href: "/buy-tiktok-likes" },
   { platform: "tiktok",    service: "views",     qty: 5000, price: 5.49,  regular: 6.86,  href: "/buy-tiktok-views" },

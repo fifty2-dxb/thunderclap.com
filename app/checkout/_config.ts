@@ -54,6 +54,10 @@ export const INPUT_CONFIG: Record<string, InputConfig> = {
     label: "Instagram Reel or video URL",
     placeholder: "https://instagram.com/reel/abc123/",
   },
+  "instagram-comments": {
+    label: "Instagram post or Reel URL",
+    placeholder: "https://instagram.com/p/abc123/",
+  },
   "tiktok-followers": {
     label: "TikTok username or profile link",
     placeholder: "https://tiktok.com/@yourusername",
