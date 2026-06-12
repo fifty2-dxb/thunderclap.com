@@ -156,12 +156,12 @@ const SUGGESTION_POOL: Suggestion[] = [
 ];
 
 const BROWSE_LINKS: { platform: Platform; href: string; from: string }[] = [
-  { platform: "instagram", href: "/buy-instagram-followers", from: "$3.49" },
-  { platform: "tiktok", href: "/buy-tiktok-followers", from: "$5.99" },
-  { platform: "youtube", href: "/buy-youtube-subscribers", from: "$6.99" },
-  { platform: "facebook", href: "/buy-facebook-followers", from: "$3.49" },
-  { platform: "twitter", href: "/buy-twitter-followers", from: "$3.99" },
-  { platform: "linkedin", href: "/buy-linkedin-followers", from: "$7" },
+  { platform: "instagram", href: "/buy-instagram-likes", from: "$1.99" },
+  { platform: "tiktok", href: "/buy-tiktok-views", from: "$1.99" },
+  { platform: "youtube", href: "/buy-youtube-views", from: "$2.49" },
+  { platform: "facebook", href: "/buy-facebook-views", from: "$2.99" },
+  { platform: "twitter", href: "/buy-twitter-likes", from: "$2.49" },
+  { platform: "linkedin", href: "/buy-linkedin-comments", from: "$4" },
 ];
 
 function pickSuggestions(
