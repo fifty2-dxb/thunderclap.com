@@ -61,7 +61,14 @@ export const metadata: Metadata = {
   },
 };
 
-const WE_LICENSE = process.env.NEXT_PUBLIC_WEBENGAGE_LICENSE_CODE;
+// WebEngage's JS SDK expects the license code prefixed with "~" in init().
+// Normalise here so the env var works with or without the leading tilde.
+const WE_LICENSE_RAW = process.env.NEXT_PUBLIC_WEBENGAGE_LICENSE_CODE;
+const WE_LICENSE = WE_LICENSE_RAW
+  ? WE_LICENSE_RAW.startsWith("~")
+    ? WE_LICENSE_RAW
+    : `~${WE_LICENSE_RAW}`
+  : undefined;
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
