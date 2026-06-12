@@ -526,18 +526,6 @@ export function Hero() {
               delivered with a little thunder. 30-day refill guaranteed, no password ever.
             </p>
 
-            <div className="soft-chips">
-              <span className="soft-chip">
-                <span className="dot" style={{ background: "var(--uv-success-text)" }} /> 30-day refill guarantee
-              </span>
-              <span className="soft-chip">
-                <span className="dot" style={{ background: "var(--uv-violet)" }} /> Secure checkout
-              </span>
-              <span className="soft-chip">
-                <span className="dot" style={{ background: "var(--uv-pink)" }} /> Starts in 30 min
-              </span>
-            </div>
-
             <div className="soft-stats">
               <div>
                 <div className="soft-stat-n">200K+</div>
