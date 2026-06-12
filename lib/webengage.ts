@@ -62,27 +62,85 @@ export async function trackEvent(event: WebEngageEvent): Promise<boolean> {
   }
 }
 
+export type WebEngageUserAttributes = Record<string, string | number | boolean | null>;
+
 /**
- * Track a user profile update via WebEngage REST API.
- * Docs: https://docs.webengage.com/docs/rest-api-tracking-users
+ * WebEngage user profile. `userId` or `anonymousId` is required (userId wins
+ * if both are present). The reserved system attributes are sent at the top
+ * level; everything else goes under `attributes` as custom key/value pairs.
  */
-export async function trackUser(data: {
+export type WebEngageUser = {
   userId?: string;
   anonymousId?: string;
+  firstName?: string;
+  lastName?: string;
   email?: string;
-  attributes?: Record<string, string | number | boolean | null>;
-}): Promise<boolean> {
+  phone?: string; // E.164, e.g. +14155552671
+  birthDate?: string; // yyyy-MM-ddTHH:mm:ss±hhmm
+  gender?: "male" | "female" | "other";
+  company?: string;
+  emailOptIn?: boolean;
+  smsOptIn?: boolean;
+  whatsappOptIn?: boolean;
+  hashedEmail?: string;
+  hashedPhone?: string;
+  attributes?: WebEngageUserAttributes;
+  /** Optional idempotency key — WebEngage dedupes the same id within 4 hours. */
+  requestId?: string;
+};
+
+// Reserved top-level system attributes recognised by the WebEngage Users API.
+const USER_SYSTEM_FIELDS = [
+  "firstName",
+  "lastName",
+  "email",
+  "phone",
+  "birthDate",
+  "gender",
+  "company",
+  "emailOptIn",
+  "smsOptIn",
+  "whatsappOptIn",
+  "hashedEmail",
+  "hashedPhone",
+] as const;
+
+/**
+ * Create or update a user profile via the WebEngage REST API (server-side).
+ * Docs: https://docs.webengage.com/docs/rest-api-tracking-users
+ * Returns true on success, false on failure (logs but never throws) so it
+ * can never break the request that triggered it.
+ */
+export async function trackUser(user: WebEngageUser): Promise<boolean> {
   if (!WEBENGAGE_LICENSE || !WEBENGAGE_API_KEY) {
+    if (process.env.NODE_ENV === "development") {
+      console.log("[WebEngage] Skipping user (missing credentials):", user.userId || user.anonymousId);
+    }
+    return false;
+  }
+
+  if (!user.userId && !user.anonymousId) {
+    console.error("[WebEngage] User tracking skipped: userId or anonymousId is required.");
     return false;
   }
 
   const url = `${WEBENGAGE_HOST}/v1/accounts/${WEBENGAGE_LICENSE}/users`;
 
   const payload: Record<string, unknown> = {};
-  if (data.userId) payload.userId = data.userId;
-  if (data.anonymousId) payload.anonymousId = data.anonymousId;
-  if (data.email) payload.email = data.email;
-  if (data.attributes) Object.assign(payload, data.attributes);
+  // userId wins over anonymousId when both are supplied.
+  if (user.userId) payload.userId = user.userId;
+  else if (user.anonymousId) payload.anonymousId = user.anonymousId;
+
+  for (const key of USER_SYSTEM_FIELDS) {
+    const value = user[key];
+    if (value !== undefined && value !== null && value !== "") {
+      payload[key] = value;
+    }
+  }
+
+  if (user.attributes && Object.keys(user.attributes).length > 0) {
+    payload.attributes = user.attributes;
+  }
 
   try {
     const res = await fetch(url, {
@@ -90,6 +148,7 @@ export async function trackUser(data: {
       headers: {
         "Content-Type": "application/json",
         Authorization: `Bearer ${WEBENGAGE_API_KEY}`,
+        ...(user.requestId ? { "x-request-id": user.requestId } : {}),
       },
       body: JSON.stringify(payload),
     });

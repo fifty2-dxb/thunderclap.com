@@ -9,27 +9,40 @@ export type TrackEventPayload = {
   eventName: string;
   eventData?: Record<string, string | number | boolean | null | undefined>;
   userId?: string;
-  anonymousId?: string;
 };
 
-// Get or create anonymous ID from localStorage
-function getAnonymousId(): string {
+const USER_ID_KEY = "tc:we_user_id";
+
+/**
+ * Get the stable WebEngage userId for this browser. Once a visitor identifies
+ * (email captured), that id is promoted to their email via `setUserId` so all
+ * subsequent events stay under one user. Until then it's a stable random id.
+ * WebEngage's events API is keyed by `userId` (not `anonymousId`) for us.
+ */
+function getUserId(): string {
   if (typeof window === "undefined") return "";
-  const KEY = "tc:we_anon_id";
-  let id = localStorage.getItem(KEY);
+  let id = localStorage.getItem(USER_ID_KEY);
   if (!id) {
-    id = `anon_${Date.now()}_${Math.random().toString(36).slice(2, 11)}`;
-    localStorage.setItem(KEY, id);
+    // Migrate any pre-existing anonymous id so we don't fork the profile.
+    id = localStorage.getItem("tc:we_anon_id");
+    if (!id) id = `anon_${Date.now()}_${Math.random().toString(36).slice(2, 11)}`;
+    localStorage.setItem(USER_ID_KEY, id);
   }
   return id;
 }
 
+/** Promote this browser to a known userId (the email) once they identify. */
+function setUserId(userId: string): void {
+  if (typeof window === "undefined" || !userId) return;
+  localStorage.setItem(USER_ID_KEY, userId);
+}
+
 /**
  * Track an event client-side by posting to our API route.
- * Fire-and-forget — doesn't block UI.
+ * Fire-and-forget — doesn't block UI. Always keyed by `userId`.
  */
 export function trackEvent(payload: TrackEventPayload): void {
-  const anonymousId = payload.anonymousId || getAnonymousId();
+  const userId = payload.userId || getUserId();
 
   console.log("[WebEngage]", payload.eventName, payload.eventData ?? {});
 
@@ -38,8 +51,32 @@ export function trackEvent(payload: TrackEventPayload): void {
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({
       ...payload,
-      anonymousId,
+      userId,
     }),
+  }).catch(() => {
+    // Silent fail — analytics shouldn't break the app
+  });
+}
+
+/**
+ * Create/update the WebEngage user profile (Users API) and promote this
+ * browser's userId to the supplied email so future events tie to the same
+ * user. Call this the moment a visitor gives their details.
+ */
+export function identifyUser(data: {
+  email: string;
+  firstName?: string;
+  lastName?: string;
+  phone?: string;
+  attributes?: Record<string, string | number | boolean | null>;
+}): void {
+  const userId = data.email || getUserId();
+  setUserId(userId);
+
+  fetch("/api/webengage/user", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ userId, ...data }),
   }).catch(() => {
     // Silent fail — analytics shouldn't break the app
   });
@@ -144,6 +181,7 @@ export function trackAddedToCart(item: {
 }
 
 export function trackNewsletterSubscribed(email: string): void {
+  identifyUser({ email });
   trackEvent({
     eventName: "NewsLetter Subscribed",
     eventData: {
@@ -194,6 +232,7 @@ export function trackAiWaitlistJoined(data: {
   lastName: string;
   email: string;
 }): void {
+  identifyUser({ email: data.email, firstName: data.firstName, lastName: data.lastName });
   trackEvent({
     eventName: "AI Growth Waitlist",
     eventData: {
