@@ -10,6 +10,7 @@ import { Header } from "@/components/header";
 import { Ticker } from "@/components/ticker";
 import { Footer } from "@/components/footer";
 import { PageViewTracker } from "@/components/page-view-tracker";
+import { WorldCupGame } from "@/components/worldcup-game";
 import { SITE_URL } from "@/lib/seo";
 import "./globals.css";
 
@@ -116,6 +117,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             {children}
             <Footer />
             <CartDrawer />
+            <WorldCupGame />
           </AiWaitlistProvider>
         </CartProvider>
       </body>

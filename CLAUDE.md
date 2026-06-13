@@ -511,6 +511,14 @@ Thunderclap AI is an unbuilt subscription product. Instead of linking its CTAs t
 
 **CSS**: all `.aiw-*` classes live in `app/globals.css`. The modal reuses the amber `pill-grad-shift` animated gradient on its "EARLY ACCESS" badge. `@media (max-width: 640px)` collapses `.aiw-row` to one column and forces 16px inputs (iOS no-zoom); `prefers-reduced-motion` kills the entrance animations.
 
+## World Cup promo mini-game widget
+
+A self-contained "Super Kick-Up!" promo game (display-only coupon reveal) loads site-wide. **DISPLAY-ONLY** — it only reveals/copies the coupon code `WORLDCUP20` (20% off); it does NOT touch pricing or the payment flow. The code itself must be configured in Redlap to actually grant the discount.
+
+- **`public/worldcup-game.js`** — the vanilla-JS IIFE widget (no deps, all `.wcg-*` classes injected at runtime). CONFIG block at top: `COUPON_CODE="WORLDCUP20"`, `DISCOUNT_PCT=20`, `SHOP_URL="/"`, `HIDE_ON=[]` (intentionally empty — see below), `BEST_KEY="wc_best_score"`. Self-guards against double-injection via `window.__wcGameLoaded`. Renders a bouncing football launcher (bottom-right, "20% OFF" badge, z-index 2147483000; mobile `bottom: calc(84px + safe-area)` so it clears any sticky bottom bar) → opens a modal canvas game (tap/click/Space kicks) → on game over (win OR lose) shows the reward screen with a Copy button + "Shop now" link to SHOP_URL.
+- **`components/worldcup-game.tsx`** (`"use client"`) — mounts the script via `<Script src="/worldcup-game.js" strategy="afterInteractive" />` and handles **route-aware hiding**: a `usePathname()` `useEffect` sets `document.body[data-wc-hide="1"]` when the path starts with `/checkout` or `/cart`, else removes it. **The widget's own `HIDE_ON` is left empty on purpose** — its one-time `location.pathname` check runs only at script load, which is unreliable under Next.js client navigation, so React drives visibility instead. Mounted in `app/layout.tsx` after `<CartDrawer />`.
+- **CSS** — only one rule lives in `globals.css`: `body[data-wc-hide="1"] .wcg-launch { display: none !important; }` (all other `.wcg-*` styles are injected by the script). Keep the hide list in `HIDE_PREFIXES` (the component) in sync with the checkout/cart funnel paths.
+
 ## Ahrefs SEO grounding (don't change these without re-checking)
 
 The repo is a real DR-72 domain with established Google rankings. Several decisions are grounded in Ahrefs data and should NOT be reverted without re-running the lookup:

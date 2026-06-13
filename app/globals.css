@@ -4005,3 +4005,9 @@ img { display: block; max-width: 100%; }
      narrowest viewports so the title doesn't wrap to 3 lines. */
   .cart-upsell-regular { display: none; }
 }
+
+/* World Cup promo widget — route-aware launcher hiding. The widget's own
+   HIDE_ON is empty (SPA navigation makes a one-time path check unreliable);
+   components/worldcup-game.tsx toggles body[data-wc-hide] on every route
+   change instead, and this rule hides the bouncing launcher accordingly. */
+body[data-wc-hide="1"] .wcg-launch { display: none !important; }
